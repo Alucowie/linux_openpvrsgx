@@ -3841,6 +3841,7 @@ typedef void (*OuterCacheOp_t)(phys_addr_t uStart, phys_addr_t uEnd);
 typedef void (*OuterCacheOp_t)(unsigned long ulStart, unsigned long ulEnd);
 #endif
 
+#if 0
 #if defined(CONFIG_OUTER_CACHE)
 
 typedef IMG_BOOL (*MemAreaToPhys_t)(LinuxMemArea *psLinuxMemArea,
@@ -3921,6 +3922,7 @@ static IMG_BOOL IONAreaToPhys(LinuxMemArea *psLinuxMemArea,
 }
 
 #endif /* defined(CONFIG_OUTER_CACHE) */
+#endif
 
 /* g_sMMapMutex must be held while this function is called */
 
