@@ -469,6 +469,20 @@ AllocFlagsToPGProt(pgprot_t *pPGProtFlags, IMG_UINT32 ui32AllocFlags)
     return IMG_TRUE;
 }
 
+static void *__old_vmalloc_node(unsigned long size, unsigned long align,
+			    gfp_t gfp_mask, pgprot_t prot,
+			    int node, const void *caller)
+{
+	return __vmalloc_node_range(size, align, VMALLOC_START, VMALLOC_END,
+				    gfp_mask, prot, 0, node, caller);
+}
+
+static void *__old_vmalloc(unsigned long size, gfp_t gfp_mask, pgprot_t prot)
+{
+	return __old_vmalloc_node(size, 1, gfp_mask, prot, NUMA_NO_NODE,
+				__builtin_return_address(0));
+}
+
 IMG_VOID *
 _VMallocWrapper(IMG_UINT32 ui32Bytes,
                 IMG_UINT32 ui32AllocFlags,
@@ -484,8 +498,8 @@ _VMallocWrapper(IMG_UINT32 ui32Bytes,
     }
 
 	/* Allocate virtually contiguous pages */
-    pvRet = __vmalloc(ui32Bytes, GFP_KERNEL | __GFP_HIGHMEM, PGProtFlags);
-    
+    pvRet = __old_vmalloc(ui32Bytes, GFP_KERNEL | __GFP_HIGHMEM, PGProtFlags);
+
 #if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
     if (pvRet)
     {
