@@ -82,6 +82,7 @@ static void *pvr_proc_seq_next (struct seq_file *m, void *v, loff_t *pos);
 static int pvr_proc_seq_show (struct seq_file *m, void *v);
 static ssize_t pvr_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *ppos);
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0))
 static struct file_operations pvr_proc_operations =
 {
 	.open		= pvr_proc_open,
@@ -90,8 +91,19 @@ static struct file_operations pvr_proc_operations =
 	.llseek		= seq_lseek,
 	.release	= seq_release,
 };
+#else
+static struct proc_ops pvr_proc_operations =
+{
+	.proc_open	= pvr_proc_open,
+	.proc_read	= seq_read,
+	.proc_write	= pvr_proc_write,
+	.proc_lseek	= seq_lseek,
+	.proc_release	= seq_release,
+};
+#endif
 
 static ssize_t pvr_proc_read(struct file *file, char __user *buffer, size_t count, loff_t *ppos);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0))
 static struct file_operations pvr_read_proc_operations =
 {
 	.open		= pvr_proc_open,
@@ -100,6 +112,16 @@ static struct file_operations pvr_read_proc_operations =
 	.llseek		= seq_lseek,
 	.release	= seq_release,
 };
+#else
+static struct proc_ops pvr_read_proc_operations =
+{
+	.proc_open	= pvr_proc_open,
+	.proc_read	= pvr_proc_read,
+	.proc_write	= pvr_proc_write,
+	.proc_lseek	= seq_lseek,
+	.proc_release	= seq_release,
+};
+#endif
 
 static struct seq_operations pvr_proc_seq_operations =
 {
