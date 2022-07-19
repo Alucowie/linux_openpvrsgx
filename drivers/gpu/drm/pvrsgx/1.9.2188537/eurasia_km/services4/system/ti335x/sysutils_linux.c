@@ -316,7 +316,7 @@ static PVRSRV_ERROR AcquireGPTimer(SYS_SPECIFIC_DATA *psSysSpecData)
 #if defined(PVR_OMAP3_TIMING_PRCM)
 	struct clk *psCLK;
 	IMG_INT res;
-	struct clk *sys_ck;
+	//struct clk *sys_ck;
 	IMG_INT rate;
 #endif
 	PVRSRV_ERROR eError;

@@ -1205,6 +1205,8 @@ static OMAPLFB_ERROR OMAPLFBInitFBDev(OMAPLFB_DEVINFO *psDevInfo)
 	psLINFBInfo = registered_fb[uiFBDevID];
 	if (psLINFBInfo == NULL)
 	{
+		printk(KERN_INFO DRIVER_PREFIX
+			": %s: Device %u: unregistered framebuffer\n", __FUNCTION__, uiFBDevID);
 		eError = OMAPLFB_ERROR_INVALID_DEVICE;
 		goto ErrorRelSem;
 	}
@@ -1219,6 +1221,8 @@ static OMAPLFB_ERROR OMAPLFBInitFBDev(OMAPLFB_DEVINFO *psDevInfo)
 	 */
 	if (FBSize == 0 || psLINFBInfo->fix.line_length == 0)
 	{
+		printk(KERN_INFO DRIVER_PREFIX
+			": %s: Device %u: Filter out invalid framebuffer info structure\n", __FUNCTION__, uiFBDevID);
 		eError = OMAPLFB_ERROR_INVALID_DEVICE;
 		goto ErrorRelSem;
 	}
