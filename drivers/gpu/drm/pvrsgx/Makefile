@@ -76,6 +76,9 @@ ifneq ($(CONFIG_ARCH_OMAP3),)
 	@$(kecho) "  MAKE    $(obj): omap3430"
 	$(Q)SOC_VENDOR=ti SOC_FAMILY=omap SOC=omap3 SGX=sgx530 SGX_FLAG=SGX530 SGX_REV=121 AM_VERSION=3 TARGET_TYPE=$(CONFIG_SGX_OMAP) $(MAKE) $(build)=$(SOURCE)
 	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
+	@$(kecho) "  MAKE    $(obj): omap3530"
+	$(Q)SOC_VENDOR=ti SOC_FAMILY=omap SOC=omap3 SGX=sgx530 SGX_FLAG=SGX530 SGX_REV=125 AM_VERSION=3 TARGET_TYPE=$(CONFIG_SGX_OMAP) $(MAKE) $(build)=$(SOURCE)
+	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
 	@$(kecho) "  MAKE    $(obj): omap3630"
 	$(Q)SOC_VENDOR=ti SOC_FAMILY=omap SOC=omap3630 SGX=sgx530 SGX_FLAG=SGX530 SGX_REV=125 AM_VERSION=3 TARGET_TYPE=$(CONFIG_SGX_OMAP) $(MAKE) $(build)=$(SOURCE)
 	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
@@ -118,14 +121,14 @@ endif	# CONFIG_SOC_DRA7XX
 else # pvr_drv
 # kept here for compatibility with omap-pvr tree
 	@$(kecho) "  MAKE    $(obj): omap3"
-	$(Q)TI_PLATFORM=omap3 $(MAKE) $(build)=$(SOURCE)
+	$(Q)TI_PLATFORM=omap3 OMAPES=3.x BUILD=debug $(MAKE) $(build)=$(SOURCE)
 	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
-	@$(kecho) "  MAKE    $(obj): omap3630"
-	$(Q)TI_PLATFORM=omap3630 $(MAKE) $(build)=$(SOURCE)
-	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
-	@$(kecho) "  MAKE    $(obj): ti335x"
-	$(Q)TI_PLATFORM=ti335x $(MAKE) $(build)=$(SOURCE)
-	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
+#	@$(kecho) "  MAKE    $(obj): omap3630"
+#	$(Q)TI_PLATFORM=omap3630 $(MAKE) $(build)=$(SOURCE)
+#	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
+#	@$(kecho) "  MAKE    $(obj): ti335x"
+#	$(Q)TI_PLATFORM=ti335x $(MAKE) $(build)=$(SOURCE)
+#	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
 # may add more SOC variants here, e.g.
 # $(Q)CONFIG_SOC=generic $(MAKE) $(build)=$(SOURCE)
 # $(Q)CONFIG_SOC=omap5 $(MAKE) $(build)=$(obj)/omap5

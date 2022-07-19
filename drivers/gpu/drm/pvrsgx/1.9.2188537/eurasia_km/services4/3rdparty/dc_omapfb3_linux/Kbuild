@@ -6,19 +6,19 @@ SYS_CFLAGS.$(SYS_USING_INTERRUPTS)                      += -DSYS_USING_INTERRUPT
 SYS_CFLAGS.$(SUPPORT_OMAP3430_OMAPFB3)                         += -DSUPPORT_OMAP3430_OMAPFB3
 SYS_CFLAGS.$(SUPPORT_TI_DSS_FW)                         += -DSUPPORT_TI_DSS_FW
 SYS_CFLAGS.$(PVR_LINUX_USING_WORKQUEUES)             += -DPVR_LINUX_USING_WORKQUEUES
-SYS_CFLAGS += -DDISPLAY_CONTROLLER=omaplfb
+SYS_CFLAGS.1 += -DDISPLAY_CONTROLLER=omaplfb -DDEBUG
 
 
 EXTRA_CFLAGS =	-DLINUX \
-		-I$(PVR_BUILD_DIR)/include4 \
-		-I$(PVR_BUILD_DIR)/services4/include \
-		-I$(PVR_BUILD_DIR)/services4/system/$(PVR_SYSTEM) \
-		-I$(PVR_BUILD_DIR)/services4/srvkm/env/linux \
-		-I$(PVR_BUILD_DIR)/services4/include/env/linux \
-		-I$(PVR_BUILD_DIR)/services4/system/include \
-		-I$(KERNELDIR)/drivers/video/omap2 \
-		-I$(KERNELDIR)/drivers/video/fbdev/omap2 \
-		-I$(KERNELDIR)/arch/arm/plat-omap/include \
+		-I$(srctree)/$(src)/../../../include4 \
+		-I$(srctree)/$(src)/../../../services4/include \
+		-I$(srctree)/$(src)/../../../services4/system/$(PVR_SYSTEM) \
+		-I$(srctree)/$(src)/../../../services4/srvkm/env/linux \
+		-I$(srctree)/$(src)/../../../services4/include/env/linux \
+		-I$(srctree)/$(src)/../../../services4/system/include \
+		-I$(srctree)/drivers/video/omap2 \
+		-I$(srctree)/drivers/video/fbdev/omap2 \
+		-I$(srctree)/arch/arm/plat-omap/include \
 		$(SYS_CFLAGS.1) \
 
 ifneq ($(FBDEV),no)

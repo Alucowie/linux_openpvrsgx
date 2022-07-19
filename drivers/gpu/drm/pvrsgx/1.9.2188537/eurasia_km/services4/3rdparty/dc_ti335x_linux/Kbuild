@@ -11,11 +11,12 @@ SYS_CFLAGS += -DDISPLAY_CONTROLLER=omaplfb
 
 EXTRA_CFLAGS =	-DLINUX \
 		-DCONFIG_OMAP2_DSS \
-		-I$(PVR_BUILD_DIR)/include4 \
-		-I$(PVR_BUILD_DIR)/services4/include \
-		-I$(PVR_BUILD_DIR)/services4/system/$(PVR_SYSTEM) \
-		-I$(KERNELDIR)/drivers/video/omap2 \
-		-I$(PVR_BUILD_DIR)/services4/system/include \
+		-I$(srctree)/$(src)/../../../include4 \
+		-I$(srctree)/$(src)/../../../services4/include \
+		-I$(srctree)/$(src)/../../../services4/system/$(PVR_SYSTEM) \
+		-I$(srctree)/drivers/video/omap2 \
+		-I$(srctree)/drivers/video/fbdev/omap2 \
+		-I$(srctree)/$(src)/../../../services4/system/include \
 		$(SYS_CFLAGS.1) \
 
 ifneq ($(FBDEV),no)
@@ -27,6 +28,7 @@ EXTRA_CFLAGS += -DSUPPORT_DRI_DRM
 EXTRA_CFLAGS += -DPVR_DISPLAY_CONTROLLER_DRM_IOCTL
 endif
 
-
+ifdef ($(TI_PLATFORM),ti335x)
 obj-m := omaplfb.o
 omaplfb-y := omaplfb_displayclass.o omaplfb_linux.o
+endif
