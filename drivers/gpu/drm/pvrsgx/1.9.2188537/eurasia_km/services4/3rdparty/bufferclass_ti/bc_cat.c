@@ -539,7 +539,7 @@ static PVRSRV_ERROR BC_DestroyBuffers(int id)
 }
 
 
-static PVRSRV_ERROR BC_Register(id)
+static PVRSRV_ERROR BC_Register(int id)
 {
     BC_CAT_DEVINFO  *psDevInfo;
     
