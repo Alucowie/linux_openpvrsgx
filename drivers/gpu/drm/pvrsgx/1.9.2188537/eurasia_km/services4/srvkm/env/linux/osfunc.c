@@ -4375,8 +4375,14 @@ IMG_BOOL OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32Length)
 {
 	/* Write-back and invalidate */
-	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length,
-							   x86_flush_cache_range, IMG_NULL);
+	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length
+#if defined(USE_VIRTUAL_CACHE_OP)
+			, x86_flush_cache_range
+#endif
+#if defined(USE_PHYSICAL_CACHE_OP)
+			, IMG_NULL
+#endif
+			);
 }
 
 IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4385,8 +4391,14 @@ IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32Length)
 {
 	/* No clean feature on x86 */
-	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length,
-							   x86_flush_cache_range, IMG_NULL);
+	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length
+#if defined(USE_VIRTUAL_CACHE_OP)
+			, x86_flush_cache_range
+#endif
+#if defined(USE_PHYSICAL_CACHE_OP)
+			, IMG_NULL
+#endif
+			);
 }
 
 IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4395,8 +4407,14 @@ IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 									 IMG_UINT32 ui32Length)
 {
 	/* No invalidate-only support */
-	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length,
-							   x86_flush_cache_range, IMG_NULL);
+	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length
+#if defined(USE_VIRTUAL_CACHE_OP)
+			, x86_flush_cache_range
+#endif
+#if defined(USE_PHYSICAL_CACHE_OP)
+			, IMG_NULL
+#endif
+			);
 }
 
 #else /* defined(__i386__) */
@@ -4596,8 +4614,14 @@ IMG_BOOL OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32Length)
 {
 	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset,
-							   pvRangeAddrStart, ui32Length,
-							   pvr_dma_cache_wback_inv, IMG_NULL);
+			pvRangeAddrStart, ui32Length
+#if defined(USE_VIRTUAL_CACHE_OP)
+			, pvr_dma_cache_wback_inv
+#endif
+#if defined(USE_PHYSICAL_CACHE_OP)
+			, IMG_NULL
+#endif
+			);
 }
 
 IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4606,8 +4630,14 @@ IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32Length)
 {
 	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset,
-							   pvRangeAddrStart, ui32Length,
-							   pvr_dma_cache_wback, IMG_NULL);
+			pvRangeAddrStart, ui32Length
+#if defined(USE_VIRTUAL_CACHE_OP)
+			, pvr_dma_cache_wback
+#endif
+#if defined(USE_PHYSICAL_CACHE_OP)
+			, IMG_NULL
+#endif
+			);
 }
 
 IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4616,8 +4646,14 @@ IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 									 IMG_UINT32 ui32Length)
 {
 	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset,
-							   pvRangeAddrStart, ui32Length,
-							   pvr_dma_cache_inv, IMG_NULL);
+			pvRangeAddrStart, ui32Length
+#if defined(USE_VIRTUAL_CACHE_OP)
+			, pvr_dma_cache_inv
+#endif
+#if defined(USE_PHYSICAL_CACHE_OP)
+			, IMG_NULL
+#endif
+			);
 }
 
 #else /* defined(__mips__) */
