@@ -3606,7 +3606,7 @@ PVRSRV_ERROR OSAcquirePhysPageAddr(IMG_VOID *pvCPUVAddr,
     psInfo->eType = WRAP_TYPE_GET_USER_PAGES;
 
     /* Lock down user memory */
-    down_read(&current->mm->mmap_sem);
+    down_read(&current->mm->mmap_lock);
     bMMapSemHeld = IMG_TRUE;
 
     /* Get page list */
@@ -3797,7 +3797,7 @@ PVRSRV_ERROR OSAcquirePhysPageAddr(IMG_VOID *pvCPUVAddr,
 
 exit:
     PVR_ASSERT(bMMapSemHeld);
-    up_read(&current->mm->mmap_sem);
+    up_read(&current->mm->mmap_lock);
 
     /* Return the cookie */
     *phOSWrapMem = (IMG_HANDLE)psInfo;
@@ -3815,7 +3815,7 @@ exit:
 error:
     if (bMMapSemHeld)
     {
-        up_read(&current->mm->mmap_sem);
+        up_read(&current->mm->mmap_lock);
     }
     OSReleasePhysPageAddr((IMG_HANDLE)psInfo);
 
