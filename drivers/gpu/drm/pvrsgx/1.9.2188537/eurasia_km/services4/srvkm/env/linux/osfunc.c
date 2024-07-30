@@ -4140,7 +4140,7 @@ static
 IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 							 IMG_UINT32 ui32ByteOffset,
 							 IMG_VOID *pvVirtRangeStart,
-							 IMG_SIZE_T ui32Length
+							 IMG_SIZE_T uiLength
 #if defined(USE_VIRTUAL_CACHE_OP)
                              , VirtualCacheOp_t pfnVirtualCacheOp
 #endif
@@ -4171,7 +4171,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 	*/
 	if (!psLinuxMemArea->hBMHandle)
 	{
-		PVR_ASSERT(ui32Length <= psLinuxMemArea->ui32ByteSize);
+		PVR_ASSERT(uiLength <= psLinuxMemArea->ui32ByteSize);
 	}
 
 	if(psLinuxMemArea->eAreaType == LINUX_MEM_AREA_SUB_ALLOC)
@@ -4203,7 +4203,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 				 */
 
 				pvMinVAddr = FindMMapBaseVAddr(psMMapOffsetStructList,
-				                               pvVirtRangeStart, ui32Length);
+				                               pvVirtRangeStart, uiLength);
 				if(!pvMinVAddr)
 					goto err_blocked;
 
@@ -4244,7 +4244,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 			}
 
 			pvMinVAddr = FindMMapBaseVAddr(psMMapOffsetStructList,
-			                               pvVirtRangeStart, ui32Length);
+			                               pvVirtRangeStart, uiLength);
 			if(!pvMinVAddr)
 				goto err_blocked;
 
@@ -4254,7 +4254,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 		case LINUX_MEM_AREA_ALLOC_PAGES:
 		{
 			pvMinVAddr = FindMMapBaseVAddr(psMMapOffsetStructList,
-			                               pvVirtRangeStart, ui32Length);
+			                               pvVirtRangeStart, uiLength);
 			if(!pvMinVAddr)
 				goto err_blocked;
 
@@ -4314,7 +4314,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 
 	DoPhysicalCacheOp(psLinuxMemArea,
 	                  pvPhysRangeStart,
-	                  ui32Length,
+	                  uiLength,
 	                  uPageNumOffset,
 	                  pfnMemAreaToPhys,
 	                  pfnPhysicalCacheOp);
@@ -4325,7 +4325,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 err_blocked:
 	PVR_DPF((PVR_DBG_WARNING, "%s: Blocked cache op on virtual range "
 							  "%p-%p (type %d)", __func__,
-			 pvVirtRangeStart, pvVirtRangeStart + ui32Length,
+			 pvVirtRangeStart, pvVirtRangeStart + uiLength,
 			 psLinuxMemArea->eAreaType));
 	LinuxUnLockMutex(&g_sMMapMutex);
 	return IMG_FALSE;
