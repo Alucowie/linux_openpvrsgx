@@ -87,7 +87,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_uaccess.h"
 #include "lock.h"
 
-#include <../arch/arm/mm/dma.h>
 
 #if defined (SUPPORT_ION)
 #include "ion.h"
