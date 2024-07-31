@@ -10,15 +10,15 @@ SYS_CFLAGS += -DDISPLAY_CONTROLLER=omaplfb
 
 
 EXTRA_CFLAGS =	-DLINUX \
-		-I$(PVR_BUILD_DIR)/include4 \
-		-I$(PVR_BUILD_DIR)/services4/include \
-		-I$(PVR_BUILD_DIR)/services4/system/$(PVR_SYSTEM) \
-		-I$(PVR_BUILD_DIR)/services4/srvkm/env/linux \
-		-I$(PVR_BUILD_DIR)/services4/include/env/linux \
-		-I$(PVR_BUILD_DIR)/services4/system/include \
-		-I$(KERNELDIR)/drivers/video/omap2 \
-		-I$(KERNELDIR)/drivers/video/fbdev/omap2 \
-		-I$(KERNELDIR)/arch/arm/plat-omap/include \
+		-I$(src)/../../../include4 \
+		-I$(src)/../../../services4/include \
+		-I$(src)/../../../services4/system/$(PVR_SYSTEM) \
+		-I$(src)/../../../services4/srvkm/env/linux \
+		-I$(src)/../../../services4/include/env/linux \
+		-I$(src)/../../../services4/system/include \
+		-I$(srctree)/drivers/video/omap2 \
+		-I$(srctree)/drivers/video/fbdev/omap2 \
+		-I$(srctree)/arch/arm/plat-omap/include \
 		$(SYS_CFLAGS.1) \
 
 ifneq ($(FBDEV),no)
