@@ -1,6 +1,6 @@
 EXTRA_CFLAGS =	-DLINUX \
-               -I$(PVR_BUILD_DIR)/include4 \
-               -I$(PVR_BUILD_DIR)/services4/include
+               -I$(src)/../../../include4 \
+               -I$(src)/../../../services4/include
 
 ifeq ($(TI_PLATFORM),ti81xx)
 EXTRA_CFLAGS += -DPLAT_TI81xx
