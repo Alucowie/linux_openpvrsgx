@@ -692,7 +692,7 @@ static int __init bc_cat_init(void)
     bc_class = class_create(DEVNAME);
 
     if (IS_ERR(bc_class)) {
-       printk(KERN_ERR DRVNAME ": upable to create device class\n");
+       printk(KERN_ERR DRVNAME ": unable to create device class\n");
        goto ExitUnregister;
     }
 
