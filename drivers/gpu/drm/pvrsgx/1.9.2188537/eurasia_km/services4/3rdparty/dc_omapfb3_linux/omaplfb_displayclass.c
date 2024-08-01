@@ -678,6 +678,7 @@ static PVRSRV_ERROR DestroyDCSwapChain(IMG_HANDLE hDevice,
 {
 	OMAPLFB_DEVINFO	*psDevInfo;
 	OMAPLFB_SWAPCHAIN *psSwapChain;
+	PVRSRV_ERROR ePvrError;
 	OMAPLFB_ERROR eError;
 
 	/* Check parameters */
@@ -696,7 +697,7 @@ static PVRSRV_ERROR DestroyDCSwapChain(IMG_HANDLE hDevice,
 		printk(KERN_WARNING DRIVER_PREFIX
 			": %s: Device %u: Swap chain mismatch\n", __FUNCTION__, psDevInfo->uiFBDevID);
 
-		eError = PVRSRV_ERROR_INVALID_PARAMS;
+		ePvrError = PVRSRV_ERROR_INVALID_PARAMS;
 		goto ExitUnLock;
 	}
 
@@ -718,12 +719,12 @@ static PVRSRV_ERROR DestroyDCSwapChain(IMG_HANDLE hDevice,
 	OMAPLFBFlip(psDevInfo, &psDevInfo->sSystemBuffer);
 	(void) OMAPLFBCheckModeAndSync(psDevInfo);
 
-	eError = PVRSRV_OK;
+	ePvrError = PVRSRV_OK;
 
 ExitUnLock:
 	OMAPLFBCreateSwapChainUnLock(psDevInfo);
 
-	return eError;
+	return ePvrError;
 }
 
 /*
