@@ -129,7 +129,7 @@ static DEFINE_MUTEX(sBCExampleBridgeMutex);
 static int bc_mmap(struct file *filp, struct vm_area_struct *vma);
 
 static int BC_CreateBuffers(int id, bc_buf_params_t *p);
-static PVRSRV_ERROR BC_DestroyBuffers(int id);
+static BCE_ERROR BC_DestroyBuffers(int id);
 static PVRSRV_ERROR BC_Register(int id);
 static PVRSRV_ERROR BC_Unregister(int id);
 
@@ -493,7 +493,7 @@ if (psDevInfo->sBufferInfo.ui32Width < ui32MaxWidth)
 }
 
 
-static PVRSRV_ERROR BC_DestroyBuffers(int id)
+static BCE_ERROR BC_DestroyBuffers(int id)
 {
     BC_CAT_DEVINFO *psDevInfo;
     IMG_UINT32 i;
@@ -535,7 +535,7 @@ static PVRSRV_ERROR BC_DestroyBuffers(int id)
     psDevInfo->sBufferInfo.ui32Flags = 0;
     psDevInfo->sBufferInfo.ui32BufferCount = (IMG_UINT32)psDevInfo->ulNumBuffers;
 
-    return PVRSRV_OK;
+    return BCE_OK;
 }
 
 
@@ -740,7 +740,7 @@ device_destroy(bc_class, MKDEV(major, id));
     unregister_chrdev(major, DEVNAME);
   
   for (id = 0; id < DEVICE_COUNT; id++) {
-        if (BC_DestroyBuffers(id) != PVRSRV_OK) {
+        if (BC_DestroyBuffers(id) != BCE_OK) {
             printk(KERN_ERR DRVNAME ": can't free texture buffers\n");
             return;
         }
@@ -965,7 +965,7 @@ static int bc_release(struct inode *i, struct file *f)
         return -ENODEV;
 
     for (id = 0; id < DEVICE_COUNT; id++) {
-        if (BC_DestroyBuffers(id) != PVRSRV_OK) {
+        if (BC_DestroyBuffers(id) != BCE_OK) {
             printk(KERN_ERR DRVNAME ": can't free texture buffer \n");
         }
     }
