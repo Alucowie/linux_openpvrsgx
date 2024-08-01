@@ -16,9 +16,9 @@ EXTRA_CFLAGS =	-DLINUX \
 		-I$(src)/../../../services4/srvkm/env/linux \
 		-I$(src)/../../../services4/include/env/linux \
 		-I$(src)/../../../services4/system/include \
-		-I$(srctree)/drivers/video/omap2 \
 		-I$(srctree)/drivers/video/fbdev/omap2 \
-		-I$(srctree)/arch/arm/plat-omap/include \
+		-I$(srctree)/drivers/video/fbdev/core \
+		-I$(srctree)/arch/arm/mach-omap2 \
 		$(SYS_CFLAGS.1) \
 
 ifneq ($(FBDEV),no)

@@ -80,6 +80,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/module.h>
 #include <linux/string.h>
 #include <linux/notifier.h>
+#include <fb_internal.h>
 
 /* IMG services headers */
 #include "img_defs.h"
