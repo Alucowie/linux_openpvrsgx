@@ -3321,6 +3321,7 @@ typedef struct _sWrapMemInfo_
 ******************************************************************************/
 static IMG_BOOL CPUVAddrToPFN(struct vm_area_struct *psVMArea, IMG_UINT32 ulCPUVAddr, IMG_UINT32 *pulPFN, struct page **ppsPage)
 {
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,6,0))
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,10))
     pgd_t *psPGD;
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(4,12,0))
@@ -3375,6 +3376,28 @@ static IMG_BOOL CPUVAddrToPFN(struct vm_area_struct *psVMArea, IMG_UINT32 ulCPUV
     return bRet;
 #else
     return IMG_FALSE;
+#endif
+#else	/* #if (LINUX_VERSION_CODE < KERNEL_VERSION(6,6,0)) */
+	spinlock_t *ptl;
+	pte_t *ptep;
+	int ret;
+
+	if (!(psVMArea->vm_flags & (VM_IO | VM_PFNMAP)))
+		return IMG_FALSE;
+
+	ret = follow_pte(psVMArea, ulCPUVAddr, &ptep, &ptl);
+	if (ret < 0)
+		return IMG_FALSE;
+
+	*pulPFN = pte_pfn(ptep_get(ptep));
+	if (!pfn_valid(*pulPFN))
+		return IMG_FALSE;
+
+	*ppsPage = pfn_to_page(*pulPFN);
+	get_page(*ppsPage);
+	pte_unmap_unlock(ptep, ptl);
+
+	return IMG_TRUE;
 #endif
 }
 
