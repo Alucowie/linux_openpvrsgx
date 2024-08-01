@@ -1046,7 +1046,7 @@ static int __init PVRCore_Init(void)
 	 * This code (using GPL symbols) facilitates automatic device
 	 * node creation on platforms with udev (or similar).
 	 */
-	psPvrClass = class_create(THIS_MODULE, "pvr");
+	psPvrClass = class_create("pvr");
 
 	if (IS_ERR(psPvrClass))
 	{
