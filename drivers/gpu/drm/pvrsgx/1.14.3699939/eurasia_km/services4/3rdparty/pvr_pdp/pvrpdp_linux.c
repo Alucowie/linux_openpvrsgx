@@ -68,12 +68,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <linux/version.h>
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #include <linux/module.h>
 #if defined(PVR_PDP_LINUX_FB)
 #include <linux/fb.h>
@@ -84,10 +78,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/sched.h>
 #include <linux/time.h>
 #include <linux/delay.h>
-#endif
-
-#if defined(SUPPORT_DRI_DRM) && (LINUX_VERSION_CODE < KERNEL_VERSION(5,5,0))
-#include <drm/drmP.h>
 #endif
 
 #include "img_defs.h"

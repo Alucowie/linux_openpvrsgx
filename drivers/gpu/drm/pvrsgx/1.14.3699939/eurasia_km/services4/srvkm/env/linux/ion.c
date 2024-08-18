@@ -180,9 +180,7 @@ static struct ion_platform_data gsGenericConfig =
 {
 	.nr = 3,
 	.heaps =
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,39))
 	(struct ion_platform_heap [])
-#endif
 	{
 		{
 			.type = ION_HEAP_TYPE_SYSTEM_CONTIG,

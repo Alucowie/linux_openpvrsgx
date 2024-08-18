@@ -41,42 +41,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <linux/version.h>
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #include <linux/mm.h>
 #include <linux/pfn_t.h>
 #include <linux/module.h>
 #include <linux/vmalloc.h>
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0))
-#include <linux/wrapper.h>
-#endif
 #include <linux/slab.h>
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26))
 #include <linux/highmem.h>
-#endif
 #include <asm/io.h>
 #include <asm/page.h>
 #include <asm/shmparam.h>
 #include <asm/pgtable.h>
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22))
 #include <linux/sched.h>
 #include <asm/current.h>
-#endif
 #if defined(SUPPORT_DRI_DRM)
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,5,0))
-#include <drm/drmP.h>
-#else
 #include <linux/platform_device.h>
-#endif
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,18,0))
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0))
-#include <drm/drm_legacy.h>
-#endif
-#endif
 #endif
 
 #ifdef CONFIG_ARCH_OMAP5
@@ -105,16 +83,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #error "The mmap code requires PVR_SECURE_HANDLES"
 #endif
 
-#if defined(SUPPORT_DRI_DRM) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,18,0))
+#if defined(SUPPORT_DRI_DRM)
 static inline int drm_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0))
-	return drm_legacy_mmap(filp, vma);
-#else
 	/* FIXME if necessary and/or possible */
 	pr_err("call to drm_legacy_mmap has been removed in v6.8-rc1\n");
 	return -EINVAL;
-#endif
 }
 #endif
 
@@ -800,21 +774,12 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 #if defined(PVR_MAKE_ALL_PFNS_SPECIAL)
 		    if (bMixedMap)
 		    {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,20,0))
 			result = vmf_insert_mixed(ps_vma, ulVMAPos, pfn_to_pfn_t(pfn));
 			if (result & VM_FAULT_ERROR)
 			{
 				PVR_DPF((PVR_DBG_ERROR,"%s: Error - vmf_insert_mixed failed (%x)", __FUNCTION__, result));
 				return IMG_FALSE;
 			}
-#else
-			result = vm_insert_mixed(ps_vma, ulVMAPos, pfn_to_pfn_t(pfn));
-	                if(result != 0)
-	                {
-	                    PVR_DPF((PVR_DBG_ERROR,"%s: Error - vm_insert_mixed failed (%d)", __FUNCTION__, result));
-	                    return IMG_FALSE;
-	                }
-#endif
 		    }
 		    else
 #endif
@@ -935,7 +900,6 @@ MMapVClose(struct vm_area_struct* ps_vma)
     LinuxUnLockMutex(&g_sMMapMutex);
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26))
 /*
  * This vma operation is used to read data from mmap regions. It is called
  * by access_process_vm, which is called to handle PTRACE_PEEKDATA ptrace
@@ -996,15 +960,12 @@ exit_unlock:
 	LinuxUnLockMutex(&g_sMMapMutex);
     return iRetVal;
 }
-#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26) */
 
 static struct vm_operations_struct MMapIOOps =
 {
 	.open=MMapVOpen,
 	.close=MMapVClose,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26))
 	.access=MMapVAccess,
-#endif
 };
 
 
@@ -1092,12 +1053,7 @@ PVRMMap(struct file* pFile, struct vm_area_struct* ps_vma)
     PVR_DPF((PVR_DBG_MESSAGE, "%s: Mapped psLinuxMemArea 0x%p\n",
          __FUNCTION__, psOffsetStruct->psLinuxMemArea));
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0))
-    /* This is probably superfluous and implied by VM_IO */
-   ps_vma->vm_flags |= VM_RESERVED;
-#else
     vm_flags_set(ps_vma, VM_DONTDUMP);
-#endif
     vm_flags_set(ps_vma, VM_IO);
 
     /*

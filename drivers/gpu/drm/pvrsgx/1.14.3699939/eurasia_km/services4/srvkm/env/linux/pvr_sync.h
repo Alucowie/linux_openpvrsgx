@@ -48,7 +48,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/seq_file.h>
 #include <linux/version.h>
 
-#if !defined(__KERNEL__) || (LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0))
+#if !defined(__KERNEL__)
 #include <linux/sync.h>
 #else
 #include <../drivers/staging/android/sync.h>

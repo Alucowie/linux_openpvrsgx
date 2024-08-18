@@ -69,19 +69,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <linux/version.h>
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #include <linux/module.h>
 #include <linux/pci.h>
 #include <linux/slab.h>
-
-#if defined(SUPPORT_DRI_DRM) && (LINUX_VERSION_CODE < KERNEL_VERSION(5,5,0))
-#include <drm/drmP.h>
-#endif
 
 #if defined(DC_NOHW_DISCONTIG_BUFFERS)
 #include <linux/vmalloc.h>
@@ -105,7 +95,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 #if !defined(DC_NOHW_DISCONTIG_BUFFERS)
-	#if defined(__i386__) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26)) && defined(SUPPORT_LINUX_X86_PAT) && defined(SUPPORT_LINUX_X86_WRITECOMBINE)
+	#if defined(__i386__) && defined(SUPPORT_LINUX_X86_PAT) && defined(SUPPORT_LINUX_X86_WRITECOMBINE)
 		#include <asm/cacheflush.h>
 		#define	DC_USE_SET_MEMORY
 	#endif

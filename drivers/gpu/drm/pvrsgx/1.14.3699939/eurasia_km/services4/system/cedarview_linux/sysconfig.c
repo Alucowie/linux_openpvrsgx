@@ -44,9 +44,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "linux/pci.h"
 #endif
 #include <linux/version.h>
-#if defined(SUPPORT_DRI_DRM) && (LINUX_VERSION_CODE < KERNEL_VERSION(5,5,0))
-#include "drm/drmP.h"
-#endif
 
 #include "sgxdefs.h"
 #include "services_headers.h"

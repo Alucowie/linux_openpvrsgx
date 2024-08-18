@@ -41,12 +41,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <linux/version.h>
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #if !defined(PVR_LINUX_MEM_AREA_POOL_MAX_PAGES)
 #define PVR_LINUX_MEM_AREA_POOL_MAX_PAGES 0
 #endif
@@ -58,17 +52,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/mm.h>
 #include <linux/vmalloc.h>
 #include <asm/io.h>
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0))
-#include <linux/wrapper.h>
-#endif
 #include <linux/slab.h>
 #include <linux/highmem.h>
 #include <linux/sched.h>
 
 #if defined(PVR_LINUX_MEM_AREA_POOL_ALLOW_SHRINK)
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,1,0))
 #include <linux/shrinker.h>
-#endif
 #endif
 
 #include "img_defs.h"
@@ -238,11 +227,6 @@ static LinuxKMemCache *g_PsLinuxPagePoolCache;
 
 static LIST_HEAD(g_sPagePoolList);
 static int g_iPagePoolMaxEntries;
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-static IMG_VOID ReservePages(IMG_VOID *pvAddress, IMG_SIZE_T uiLength);
-static IMG_VOID UnreservePages(IMG_VOID *pvAddress, IMG_SIZE_T uiLength);
-#endif
 
 static LinuxMemArea *LinuxMemAreaStructAlloc(IMG_VOID);
 static IMG_VOID LinuxMemAreaStructFree(LinuxMemArea *psLinuxMemArea);
@@ -485,33 +469,17 @@ AllocFlagsToPGProt(pgprot_t *pPGProtFlags, IMG_UINT32 ui32AllocFlags)
     return IMG_TRUE;
 }
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,8,0))
-#else
 /* provide pre-5.8 __vmalloc() with 3 parameters */
-
 #include <linux/kallsyms.h>
 
 static void *__old_vmalloc_node(unsigned long size, unsigned long align,
 			    gfp_t gfp_mask, pgprot_t prot,
 			    int node, const void *caller)
 {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,10,0))
-/* we need to add EXPORT_SYMBOL(__vmalloc_node_range); to vmalloc.c */
-	return __vmalloc_node_range(size, align, VMALLOC_START, VMALLOC_END,
-				    gfp_mask, prot, 0, node, caller);
-#else
 /* we need to add EXPORT_SYMBOL(__vmalloc_node_range_noprof); to vmalloc.c */
 	return __vmalloc_node_range_noprof(size, align, VMALLOC_START, VMALLOC_END,
 				    gfp_mask, prot, 0, node, caller);
-#endif
 }
-
-static void *__old_vmalloc(unsigned long size, gfp_t gfp_mask, pgprot_t prot)
-{
-	return __old_vmalloc_node(size, 1, gfp_mask, prot, NUMA_NO_NODE,
-				__builtin_return_address(0));
-}
-#endif
 
 IMG_VOID *
 _VMallocWrapper(IMG_SIZE_T uiBytes,
@@ -538,12 +506,9 @@ _VMallocWrapper(IMG_SIZE_T uiBytes,
 
 	/* Allocate virtually contiguous pages */
 //printk("%s: PGProtFlags = %0lx\n", __func__, (long) PGProtFlags);
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,8,0))
-    pvRet = __vmalloc(uiBytes, gfp_mask, PGProtFlags);
-#else
 // if(PGProtFlags != PAGE_KERNEL) printk("%s: PGProtFlags != PAGE_KERNEL\n", __func__);
-    pvRet = __old_vmalloc(uiBytes, gfp_mask, PGProtFlags);
-#endif
+    pvRet = __old_vmalloc_node(uiBytes, 1, gfp_mask, PGProtFlags, NUMA_NO_NODE,
+				__builtin_return_address(0));
 
 #if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
     if (pvRet)
@@ -716,14 +681,6 @@ AllocPageFromLinux(void)
 		return NULL;
 
 	}
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-    	/* Reserve those pages to allow them to be re-mapped to user space */
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0))		
-    	SetPageReserved(psPage);
-#else
-        mem_map_reserve(psPage);
-#endif
-#endif
 	return psPage;
 }
 
@@ -731,13 +688,6 @@ AllocPageFromLinux(void)
 static IMG_VOID
 FreePageToLinux(struct page *psPage)
 {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))		
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0))		
-        ClearPageReserved(psPage);
-#else
-        mem_map_reserve(psPage);
-#endif		
-#endif	
         __free_pages(psPage, 0);
 }
 
@@ -1077,10 +1027,6 @@ NewVMallocLinuxMemArea(IMG_SIZE_T uBytes, IMG_UINT32 ui32AreaFlags)
         goto failed;
     }
 /* PG_reserved was deprecated in linux-2.6.15 */
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-    /* Reserve those pages to allow them to be re-mapped to user space */
-    ReservePages(pvCpuVAddr, uBytes);
-#endif
 #endif	/* defined(PVR_LINUX_MEM_AREA_USE_VMAP) */ 
 
     psLinuxMemArea->eAreaType = LINUX_MEM_AREA_VMALLOC;
@@ -1166,55 +1112,12 @@ FreeVMallocLinuxMemArea(LinuxMemArea *psLinuxMemArea)
     FreePages(CanFreeToPool(psLinuxMemArea), ppsPageList, hBlockPageList, ui32NumPages);
 #else
 /* PG_reserved was deprecated in linux-2.6.15 */
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-    UnreservePages(psLinuxMemArea->uData.sVmalloc.pvVmallocAddress,
-                    psLinuxMemArea->uiByteSize);
-#endif
 
     VFreeWrapper(psLinuxMemArea->uData.sVmalloc.pvVmallocAddress);
 #endif	/* defined(PVR_LINUX_MEM_AREA_USE_VMAP) */ 
 
     LinuxMemAreaStructFree(psLinuxMemArea);
 }
-
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-/* Reserve pages of memory in order that they're not automatically
-   deallocated after the last user reference dies. */
-static IMG_VOID
-ReservePages(IMG_VOID *pvAddress, IMG_SIZE_T uLength)
-{
-	IMG_VOID *pvPage;
-	IMG_VOID *pvEnd = pvAddress + uLength;
-
-	for(pvPage = pvAddress; pvPage < pvEnd;  pvPage += PAGE_SIZE)
-	{
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0))
-		SetPageReserved(vmalloc_to_page(pvPage));
-#else
-		mem_map_reserve(vmalloc_to_page(pvPage));
-#endif
-	}
-}
-
-
-/* Un-reserve pages of memory in order that they can be freed. */
-static IMG_VOID
-UnreservePages(IMG_VOID *pvAddress, IMG_SIZE_T uLength)
-{
-	IMG_VOID *pvPage;
-	IMG_VOID *pvEnd = pvAddress + uLength;
-
-	for(pvPage = pvAddress; pvPage < pvEnd;  pvPage += PAGE_SIZE)
-	{
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0))
-		ClearPageReserved(vmalloc_to_page(pvPage));
-#else
-		mem_map_unreserve(vmalloc_to_page(pvPage));
-#endif
-	}
-}
-#endif /* (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15)) */
 
 
 IMG_VOID *
@@ -1608,11 +1511,7 @@ KMemCacheCreateWrapper(IMG_CHAR *pszName,
 #if defined(DEBUG_LINUX_SLAB_ALLOCATIONS)
     ui32Flags |= SLAB_POISON|SLAB_RED_ZONE;
 #endif
-    return kmem_cache_create(pszName, Size, Align, ui32Flags, NULL
-#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22))
-				, NULL
-#endif	/* (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22) */
-			   );
+    return kmem_cache_create(pszName, Size, Align, ui32Flags, NULL);
 }
 
 
@@ -1625,11 +1524,7 @@ KMemCacheDestroyWrapper(LinuxKMemCache *psCache)
 
 IMG_VOID *
 _KMemCacheAllocWrapper(LinuxKMemCache *psCache,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14))
                       gfp_t Flags,
-#else
-                      IMG_INT Flags,
-#endif
                       IMG_CHAR *pszFileName,
                       IMG_UINT32 ui32Line)
 {

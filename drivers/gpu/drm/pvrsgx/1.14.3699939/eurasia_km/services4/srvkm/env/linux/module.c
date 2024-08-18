@@ -41,12 +41,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <linux/version.h>
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #if defined(CONFIG_OMAP2PLUS)
 #if (AM_VERSION != 5)
 #include <linux/platform_data/sgx-omap.h>
@@ -95,11 +89,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/reset.h>
 
 #if defined(SUPPORT_DRI_DRM)
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,5,0))
-#include <drm/drmP.h>
-#else
 #include <drm/drm_file.h>
-#endif
 #if defined(PVR_SECURE_DRM_AUTH_EXPORT)
 #include "env_perproc.h"
 #endif
@@ -379,11 +369,7 @@ static int __devinit PVRSRVDriverProbe(LDM_DEV *pDevice, const struct pci_device
 
 	PVR_TRACE(("PVRSRVDriverProbe(pDevice=%p)", pDevice));
 #ifdef CONFIG_RESET_CONTROLLER
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,16,0))
 	rstc = reset_control_get_optional_exclusive(&pDevice->dev, NULL);
-#else
-	rstc = reset_control_get(&pDevice->dev, NULL);
-#endif
 
 	if (IS_ERR(rstc))
 	{
@@ -392,15 +378,6 @@ static int __devinit PVRSRVDriverProbe(LDM_DEV *pDevice, const struct pci_device
 	}
 
 	if(rstc) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(99,99,99))
-		ret = reset_control_clear_reset(rstc);
-
-		if (ret < 0)
-		{
-			dev_err(&pDevice->dev, "%s: error: reset_control_clear_reset\n", __func__);
-			return ret;
-		}
-#endif
 
 		ret = reset_control_deassert(rstc);
 
@@ -452,16 +429,6 @@ static int __devinit PVRSRVDriverProbe(LDM_DEV *pDevice, const struct pci_device
 	}
 
 #ifdef CONFIG_RESET_CONTROLLER
-        if (!already_deasserted && rstc)
-        {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(99,99,99))
-                ret = reset_control_is_reset(rstc);
-                if (ret <= 0)
-                {
-                        PVR_DPF((PVR_DBG_MESSAGE, "reset control reset"));
-                }
-#endif
-        }
         reset_control_put(rstc);
 #endif /* CONFIG_RESET_CONTROLLER */
 
@@ -1169,11 +1136,7 @@ static int __init PVRCore_Init(void)
 		goto unregister_device;
 	}
 
-	psDev = device_create(psPvrClass, NULL, MKDEV(AssignedMajorNumber, 0),
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,26))
-				  NULL,
-#endif /* (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,26)) */
-				  DEVNAME);
+	psDev = device_create(psPvrClass, NULL, MKDEV(AssignedMajorNumber, 0), NULL, DEVNAME);
 	if (IS_ERR(psDev))
 	{
 		PVR_DPF((PVR_DBG_ERROR, "PVRCore_Init: unable to create device (%ld)", PTR_ERR(psDev)));
@@ -1289,18 +1252,7 @@ static void __exit PVRCore_Cleanup(void)
 	class_destroy(psPvrClass);
 #endif
 
-#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22))
-	if (
-#endif	/* (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22)) */
-		unregister_chrdev((IMG_UINT)AssignedMajorNumber, DEVNAME)
-#if !(LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22))
-								;
-#else	/* (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22)) */
-								)
-	{
-		PVR_DPF((PVR_DBG_ERROR," can't unregister device major %d", AssignedMajorNumber));
-	}
-#endif	/* (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22)) */
+	unregister_chrdev((IMG_UINT)AssignedMajorNumber, DEVNAME);
 #endif	/* !defined(SUPPORT_DRI_DRM) */
 
 #if defined(PVR_LDM_MODULE)
