@@ -52,9 +52,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_fb_helper.h>
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,15,0))
 #include <drm/drm_modes.h>
-#endif
 #endif /* defined(SUPPORT_DRI_DRM) */
 
 #include <linux/i2c.h>
@@ -163,7 +161,6 @@ struct i2c_adapter *PVRI2CAdapterCreate(PVRPSB_DEVINFO *psDevInfo, const char *p
 IMG_VOID PVRI2CAdapterDestroy(struct i2c_adapter *psAdapter);
 
 #if defined(SUPPORT_DRI_DRM)
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,15,0))
 static inline int drm_mode_width(const struct drm_display_mode *mode)
 {
 	return mode->hdisplay;
@@ -178,12 +175,6 @@ static inline struct drm_framebuffer *crtc_to_fb(struct drm_crtc *crtc)
 {
 	return crtc->primary->fb;
 }
-#else
-static inline struct drm_framebuffer *crtc_to_fb(struct drm_crtc *crtc)
-{
-	return crtc->fb;
-}
-#endif	/* (LINUX_VERSION_CODE >= KERNEL_VERSION(3,15,0)) */
 #endif	/* defined(SUPPORT_DRI_DRM) */
 
 #if defined(__cplusplus)

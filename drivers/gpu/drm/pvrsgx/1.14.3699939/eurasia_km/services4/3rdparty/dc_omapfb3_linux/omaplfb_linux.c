@@ -68,12 +68,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <linux/version.h>
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #include <asm/atomic.h>
 
 #if defined(SUPPORT_DRI_DRM)
@@ -93,11 +87,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/mutex.h>
 
 #if defined(PVR_OMAPLFB_DRM_FB)
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0))
-#include <plat/display.h>
-#else
 #include <video/omapdss.h>
-#endif
 #include <linux/omap_gpu.h>
 #else	/* defined(PVR_OMAPLFB_DRM_FB) */
 /* OmapZoom.org OMAP3 2.6.29 kernel tree	- Needs mach/vrfb.h
@@ -113,9 +103,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #if defined(PVR_OMAPFB3_OMAP5_UEVM)
 #define PVR_OMAPFB3_NEEDS_VIDEO_OMAPVRFB_H
 #else
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34))
 #define PVR_OMAPFB3_NEEDS_PLAT_VRFB_H
-#endif
 #endif
 
 #if defined(PVR_OMAPFB3_NEEDS_VIDEO_OMAPVRFB_H)
@@ -180,15 +168,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define OMAP_DSS_MANAGER(man, dev) struct omap_overlay_manager *man = (dev)->output->manager
 #define	WAIT_FOR_VSYNC(man)	((man)->wait_for_vsync)
 #else	/* defined(PVR_OMAPFB3_OMAP5_UEVM) */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34))
 #define OMAP_DSS_DRIVER(drv, dev) struct omap_dss_driver *drv = (dev) != NULL ? (dev)->driver : NULL
 #define OMAP_DSS_MANAGER(man, dev) struct omap_overlay_manager *man = (dev) != NULL ? (dev)->manager : NULL
 #define	WAIT_FOR_VSYNC(man)	((man)->wait_for_vsync)
-#else	/* (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34)) */
-#define OMAP_DSS_DRIVER(drv, dev) struct omap_dss_device *drv = (dev)
-#define OMAP_DSS_MANAGER(man, dev) struct omap_dss_device *man = (dev)
-#define	WAIT_FOR_VSYNC(man)	((man)->wait_vsync)
-#endif	/* (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34)) */
 #endif	/* defined(PVR_OMAPFB3_OMAP5_UEVM) */
 #endif	/* !defined(PVR_OMAPLFB_DRM_FB) */
 
@@ -300,10 +282,6 @@ static void WorkQueueHandler(struct work_struct *psWork)
 /* Create a swap chain work queue */
 OMAPLFB_ERROR OMAPLFBCreateSwapQueue(OMAPLFB_SWAPCHAIN *psSwapChain)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37))
-#if (LINUX_VERSION_CODE == KERNEL_VERSION(2,6,37))
-#define WQ_FREEZABLE WQ_FREEZEABLE
-#endif
 	/*
 	 * Calling alloc_ordered_workqueue with the WQ_FREEZABLE and
 	 * WQ_MEM_RECLAIM flags set, (currently) has the same effect as
@@ -314,20 +292,6 @@ OMAPLFB_ERROR OMAPLFBCreateSwapQueue(OMAPLFB_SWAPCHAIN *psSwapChain)
 	 * resources longer than it needs to.
 	 */
 	psSwapChain->psWorkQueue = alloc_ordered_workqueue(DEVNAME, WQ_FREEZABLE | WQ_MEM_RECLAIM);
-#else
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36))
-	psSwapChain->psWorkQueue = create_freezable_workqueue(DEVNAME);
-#else
-	/*
-	 * Create a single-threaded, freezable, rt-prio workqueue.
-	 * Such workqueues are frozen with user threads when a system
-	 * suspends, before driver suspend entry points are called.
-	 * This ensures this driver will not call into the Linux
-	 * framebuffer driver after the latter is suspended.
-	 */
-	psSwapChain->psWorkQueue = __create_workqueue(DEVNAME, 1, 1, 1);
-#endif
-#endif
 	if (psSwapChain->psWorkQueue == NULL)
 	{
 		printk(KERN_ERR DRIVER_PREFIX ": %s: Device %u: Couldn't create workqueue\n", __FUNCTION__, psSwapChain->uiFBDevID);
@@ -484,10 +448,6 @@ void OMAPLFBFlip(OMAPLFB_DEVINFO *psDevInfo, OMAPLFB_BUFFER *psBuffer)
 }
 
 /* Newer kernels don't have any update mode capability */
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0))
-#define	PVR_OMAPLFB_HAS_UPDATE_MODE
-#endif
 
 #if defined(PVR_OMAPLFB_HAS_UPDATE_MODE)
 #if !defined(PVR_OMAPLFB_DRM_FB) || defined(DEBUG)

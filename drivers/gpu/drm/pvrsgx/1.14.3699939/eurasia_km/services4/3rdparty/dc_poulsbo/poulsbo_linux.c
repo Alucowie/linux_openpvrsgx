@@ -76,9 +76,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_drm.h"
 #include "3rdparty_dc_drm_shared.h"
 #include <drm/drm_mode.h>
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,19,0))
 #include <drm/drm_plane_helper.h>
-#endif
 #else
 #include "pvrmodule.h"
 #include <linux/fb.h>
@@ -136,9 +134,7 @@ static const struct GTF_TIMINGS_DEF gsGtfTimings[] =
 #if !defined(SUPPORT_DRI_DRM)
 #endif
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,19,0))
 #define _PAGE_CACHE_WC cachemode2protval(_PAGE_CACHE_MODE_WC)
-#endif
 
 /*******************************************************************************
  * I2C interface
@@ -400,11 +396,7 @@ struct drm_connector *PVRGetConnectorForEncoder(struct drm_encoder *psEncoder)
  * DRM mode config functions
  ******************************************************************************/
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
-static struct drm_framebuffer *ModeConfigUserFbCreate(struct drm_device *psDrmDev, struct drm_file *psFile, struct drm_mode_fb_cmd *psModeCommand)
-#else
 static struct drm_framebuffer *ModeConfigUserFbCreate(struct drm_device *psDrmDev, struct drm_file *psFile, struct drm_mode_fb_cmd2 *psModeCommand)
-#endif
 {
 	PVR_UNREFERENCED_PARAMETER(psDrmDev);
 	PVR_UNREFERENCED_PARAMETER(psFile);
@@ -646,11 +638,7 @@ static int CrtcHelperModeSet(struct drm_crtc *psCrtc, struct drm_display_mode *p
 	PVROSWriteMMIOReg(psDevInfo, ui32DspPos, 0);
 
 	ui32RegVal = 0;
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
-	ui32RegVal = PVRPSB_DSPSTRIDE_STRIDE_SET(ui32RegVal, crtc_to_fb(psCrtc)->pitch);
-#else
 	ui32RegVal = PVRPSB_DSPSTRIDE_STRIDE_SET(ui32RegVal, crtc_to_fb(psCrtc)->pitches[0]);
-#endif
 	PVROSWriteMMIOReg(psDevInfo, ui32DspStride, ui32RegVal);
 
 
@@ -960,11 +948,7 @@ static const struct drm_framebuffer_funcs sFramebufferFuncs =
 	.create_handle	= FramebufferCreateHandle,
 };
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
-static PVRPSB_FRAMEBUFFER *FramebufferCreate(struct drm_device *psDrmDev, struct drm_mode_fb_cmd *psFbCommand, PVRPSB_BUFFER *psBuffer)
-#else
 static PVRPSB_FRAMEBUFFER *FramebufferCreate(struct drm_device *psDrmDev, struct drm_mode_fb_cmd2 *psFbCommand, PVRPSB_BUFFER *psBuffer)
-#endif
 {
 	PVRPSB_FRAMEBUFFER *psPVRFramebuffer;
 
@@ -988,11 +972,7 @@ static int FbHelperProbe(struct drm_fb_helper *psFbHelper, struct drm_fb_helper_
 	struct fb_info *psFbInfo;
 	IMG_UINT32 ui32BufferSize;
 	int iResult;
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
-	struct drm_mode_fb_cmd sFbCommand;
-#else
 	struct drm_mode_fb_cmd2 sFbCommand;
-#endif
 
 	if (psFbHelper->fb != NULL)
 	{
@@ -1015,18 +995,10 @@ static int FbHelperProbe(struct drm_fb_helper *psFbHelper, struct drm_fb_helper_
 	sFbCommand.width	= psSizes->surface_width;
 	sFbCommand.height	= psSizes->surface_height;
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
-	sFbCommand.bpp		= psSizes->surface_bpp;
-	sFbCommand.depth	= psSizes->surface_depth;
-	sFbCommand.pitch	= PVRPSB_ALIGN(psSizes->surface_width * (sFbCommand.bpp >> 3), PVRPSB_DSPSTRIDE_LINEAR_MEM);
-
-	ui32BufferSize		= sFbCommand.height * sFbCommand.pitch;
-#else
 	sFbCommand.pixel_format	= DRM_FORMAT_BGRX8888;
 	sFbCommand.pitches[0]	= PVRPSB_ALIGN(psSizes->surface_width * 4, PVRPSB_DSPSTRIDE_LINEAR_MEM);
 
 	ui32BufferSize		= sFbCommand.height * sFbCommand.pitches[0];
-#endif /* (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0)) */
 
 	psDevInfo->psSystemBuffer = PVRPSBCreateBuffer(psDevInfo, ui32BufferSize);
 	if (psDevInfo->psSystemBuffer == NULL)
@@ -1053,11 +1025,7 @@ static int FbHelperProbe(struct drm_fb_helper *psFbHelper, struct drm_fb_helper_
 	/* Store values to pass back to Services */
 	psDevInfo->sDisplayDims.ui32Width	= psPVRFramebuffer->sFramebuffer.width;
 	psDevInfo->sDisplayDims.ui32Height	= psPVRFramebuffer->sFramebuffer.height;
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
-	psDevInfo->sDisplayDims.ui32ByteStride	= psPVRFramebuffer->sFramebuffer.pitch;
-#else
 	psDevInfo->sDisplayDims.ui32ByteStride	= psPVRFramebuffer->sFramebuffer.pitches[0];
-#endif
 	psDevInfo->sDisplayFormat.pixelformat	= PVRSRV_PIXEL_FORMAT_ARGB8888;
 
 	/* Fill out the Linux framebuffer info */
@@ -1068,11 +1036,7 @@ static int FbHelperProbe(struct drm_fb_helper *psFbHelper, struct drm_fb_helper_
 	psFbInfo->flags		= FBINFO_DEFAULT | FBINFO_HWACCEL_DISABLED | FBINFO_CAN_FORCE_OUTPUT;
 	psFbInfo->fbops		= &sFbOps;
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
-	drm_fb_helper_fill_fix(psFbInfo, psFbHelper->fb->pitch, psFbHelper->fb->depth);
-#else
 	drm_fb_helper_fill_fix(psFbInfo, psFbHelper->fb->pitches[0], psFbHelper->fb->depth);
-#endif
 	drm_fb_helper_fill_var(psFbInfo, psFbHelper, psFbHelper->fb->width, psFbHelper->fb->height);
 
 	strlcpy(psFbInfo->fix.id, DRVNAME, sizeof(psFbInfo->fix.id));
@@ -1203,11 +1167,7 @@ PSB_ERROR PVROSModeSetInit(PVRPSB_DEVINFO *psDevInfo)
 
 	mutex_lock(&psDrmDev->mode_config.mutex);
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0))
 	drm_fb_helper_prepare(psDrmDev, &psDevInfo->sDrmFbHelper, &sFbHelperFuncs);
-#else
-	psDevInfo->sDrmFbHelper.funcs = &sFbHelperFuncs;
-#endif
 	iResult = drm_fb_helper_init(psDrmDev, &psDevInfo->sDrmFbHelper, psDrmDev->mode_config.num_crtc, psDrmDev->mode_config.num_connector);
 	if (iResult < 0)
 	{

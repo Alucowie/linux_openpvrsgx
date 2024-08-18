@@ -48,9 +48,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/version.h>
 #include <linux/kernel.h>
 #include <linux/pci.h>
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0))	// https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f05e798ad4c09255f590f5b2c00a7ca6c172f983
-#include <asm/system.h>
-#endif
 
 #include "pvr_drm_mod.h"
 
@@ -186,14 +183,6 @@ pci_get_subsys(unsigned int vendor, unsigned int device,
 
 	return NULL;
 }
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,34))
-int
-pci_set_dma_mask(struct pci_dev *dev, u64 mask)
-{
-	return 0;
-}
-#endif
 
 void
 pci_unregister_driver(struct pci_driver *drv)

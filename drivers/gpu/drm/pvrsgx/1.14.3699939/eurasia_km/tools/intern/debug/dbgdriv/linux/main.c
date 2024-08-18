@@ -194,11 +194,7 @@ static int __init dbgdrv_init(void)
 		goto ErrUnregisterCharDev;
 	}
 
-	psDev = device_create(psDbgDrvClass, NULL, MKDEV(AssignedMajorNumber, 0),
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,26))
-						  NULL,
-#endif
-						  DRVNAME);
+	psDev = device_create(psDbgDrvClass, NULL, MKDEV(AssignedMajorNumber, 0), NULL, DRVNAME);
 	if (IS_ERR(psDev))
 	{
 		PVR_DPF((PVR_DBG_ERROR, "%s: unable to create device (%ld)",

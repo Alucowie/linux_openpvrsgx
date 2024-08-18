@@ -47,11 +47,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #if defined(PVR_ANDROID_NATIVE_WINDOW_HAS_SYNC)
 #include <linux/version.h>
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0))
-#include <linux/sw_sync.h>
-#else
 #include <../drivers/staging/android/sw_sync.h>
-#endif
+
 static struct sync_fence *AllocQueueFence(struct sw_sync_timeline *psTimeline, IMG_UINT32 ui32FenceValue, const char *szName)
 {
 	struct sync_fence *psFence = IMG_NULL;
