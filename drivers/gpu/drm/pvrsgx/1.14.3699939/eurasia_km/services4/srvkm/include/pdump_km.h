@@ -327,14 +327,6 @@ IMG_BOOL PDumpWillCapture(IMG_UINT32 ui32Flags);
 								  IMG_UINT32	ui32BufferSize,
 								  IMG_UINT32	ui32Flags);
 
-	IMG_VOID PDumpVGXMemToFile(IMG_CHAR *pszFileName,
-							   IMG_UINT32 ui32FileOffset, 
-							   PVRSRV_KERNEL_MEM_INFO *psMemInfo,
-							   IMG_UINT32 uiAddr, 
-							   IMG_UINT32 ui32Size,
-							   IMG_UINT32 ui32PDumpFlags,
-							   IMG_HANDLE hUniqueTag);
-
 	IMG_VOID PDumpSuspendKM(IMG_VOID);
 	IMG_VOID PDumpResumeKM(IMG_VOID);
 

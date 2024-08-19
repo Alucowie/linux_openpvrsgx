@@ -39,7 +39,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#if defined (SUPPORT_SGX) || defined (SUPPORT_VGX)
+#if defined (SUPPORT_SGX)
 #if defined (PDUMP)
 
 #include <asm/atomic.h>

@@ -53,12 +53,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "oemfuncs.h"
 #include "sgxinfo.h"
 #include "sgxinfokm.h"
-#ifdef SUPPORT_MSVDX
-#include "msvdx_defs.h"
-#include "msvdxapi.h"
-#include "msvdx_infokm.h"
-#include "osfunc.h"
-#endif
 #include "syslocal.h"
 #if defined(SUPPORT_DRI_DRM_EXT)
 #include "psb_drv.h"
@@ -99,20 +93,10 @@ static PVRSRV_DEVICE_NODE *gpsSGXDevNode;
 #endif
 #endif
 
-#ifdef SUPPORT_MSVDX
-/* MSVDX structures */
-static IMG_UINT32		gui32MSVDXDeviceID;
-static MSVDX_DEVICE_MAP	gsMSVDXDeviceMap;
-#endif
-
 
 #if defined(NO_HARDWARE)
 /* mimic register block with contiguous memory */
 static IMG_CPU_VIRTADDR gsSGXRegsCPUVAddr;
-#ifdef SUPPORT_MSVDX
-/* and MSVDX */
-static IMG_CPU_VIRTADDR gsMSVDXRegsCPUVAddr;
-#endif
 #endif
 
 #if !defined(NO_HARDWARE)
@@ -466,176 +450,12 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 	}
 #endif
 
-#ifdef SUPPORT_MSVDX
-	/************************************************
-		MSVDX Device:
-	*************************************************/
-#if defined(NO_HARDWARE)
-	/* No hardware registers */
-	eError = OSBaseAllocContigMemory(MSVDX_REG_SIZE,
-										&gsMSVDXRegsCPUVAddr,
-										&sCpuPAddr);
-	if(eError != PVRSRV_OK)
-	{
-		return eError;
-	}
-	SYS_SPECIFIC_DATA_SET(psSysSpecData, SYS_SPECIFIC_DATA_ALLOC_DUMMY_MSVDX_REGS);
-	gsMSVDXDeviceMap.sRegsCpuPBase = sCpuPAddr;
-
-	OSMemSet(gsMSVDXRegsCPUVAddr, 0, MSVDX_REG_SIZE);
-
-#if defined(__linux__)
-	/* Indicate the registers are already mapped */
-	gsMSVDXDeviceMap.pvRegsCpuVBase = gsMSVDXRegsCPUVAddr;
-#else
-	/*
-	 * FIXME: Could we just use the virtual address returned by
-	 * OSBaseAllocContigMemory?
-	 */
-	gsMSVDXDeviceMap.pvRegsCpuVBase = IMG_NULL;
-#endif /* __linux__ */
-#else	/* NO_HARDWARE */
-	gsMSVDXDeviceMap.sRegsCpuPBase.uiAddr = ui32BaseAddr + MSVDX_REGS_OFFSET;
-#endif /* NO_HARDWARE */
-	gsMSVDXDeviceMap.sRegsSysPBase		  = SysCpuPAddrToSysPAddr(gsMSVDXDeviceMap.sRegsCpuPBase);
-	gsMSVDXDeviceMap.ui32RegsSize		  = MSVDX_REG_SIZE;
-
-	/*
-		Local Device Memory Region: (not present)
-		Note: the device doesn't need to know about its memory
-		but keep info here for now
-	*/
-	gsMSVDXDeviceMap.sLocalMemSysPBase.uiAddr = 0;
-	gsMSVDXDeviceMap.sLocalMemDevPBase.uiAddr = 0;
-	gsMSVDXDeviceMap.sLocalMemCpuPBase.uiAddr = 0;
-	gsMSVDXDeviceMap.ui32LocalMemSize		  = 0;
-
-	/*
-		device interrupt IRQ
-	*/
-	gsMSVDXDeviceMap.ui32IRQ = ui32IRQ;
-
-#if defined(PDUMP)
-	{
-		/* initialise memory region name for pdumping */
-		static IMG_CHAR pszPDumpDevName[] = SYSTEM_PDUMP_NAME;
-		gsMSVDXDeviceMap.pszPDumpDevName = pszPDumpDevName;
-	}
-#endif
-#endif // SUPPORT_MSVDX
-
 	/************************************************
 		add other devices here:
 	*************************************************/
 
 	return PVRSRV_OK;
 }
-
-#ifdef SUPPORT_MSVDX_FPGA
-/*!
-******************************************************************************
-
- @Function		FindPCIDevice
-
- @Description	Scans the PCI bus for ui16DevID/ui16VenID and if found,
-				enumerates the PCI config registers.
-
- @Input			ui16VenID
- @Input			ui16DevID
- @Output		psPCISpace
-
- @Return		PVRSRV_ERROR
-
-******************************************************************************/
-static PVRSRV_ERROR FindPCIDevice(IMG_UINT16 ui16VenID, IMG_UINT16 ui16DevID, PCICONFIG_SPACE *psPCISpace)
-{
-	IMG_UINT32  ui32BusNum;
-	IMG_UINT32  ui32DevNum;
-	IMG_UINT32  ui32VenDevID;
-	IMG_UINT32	ui32BarIndex;
-
-	/* Check all the busses */
-	for (ui32BusNum=0; ui32BusNum < 255; ui32BusNum++)
-	{
-		/* Check all devices on that bus */
-		for (ui32DevNum=0; ui32DevNum < 32; ui32DevNum++)
-		{
-			/* Get the deviceID and vendor ID */
-			ui32VenDevID=OSPCIReadDword(ui32BusNum, ui32DevNum, 0, 0);
-
-			/* Check if it is the required device */
-			if (ui32VenDevID == (IMG_UINT32)((ui16DevID<<16)+ui16VenID))
-			{
-				IMG_UINT32 ui32Idx;
-
-				/* Ensure access to memory space is enabled */
-				OSPCIWriteDword(ui32BusNum, ui32DevNum, 0, 4, OSPCIReadDword(ui32BusNum, ui32DevNum, 0, 4) | 0x02);
-
-				psPCISpace->ui32BusNum  = ui32BusNum;	/* Save the device's address	*/
-				psPCISpace->ui32DevNum  = ui32DevNum;
-				psPCISpace->ui32FuncNum = 0;
-
-				/* Now copy PCI config space to users buffer */
-				for (ui32Idx=0; ui32Idx < 64; ui32Idx++)
-				{
-					psPCISpace->u.aui32PCISpace[ui32Idx] = OSPCIReadDword(ui32BusNum, ui32DevNum, 0, ui32Idx*4);
-
-					if (ui32Idx < 16)
-					{
-						PVR_DPF((PVR_DBG_VERBOSE,"%08X\n",psPCISpace->u.aui32PCISpace[ui32Idx]));
-					}
-				}
-						 										/* Get the size of the BARs		*/
-				for (ui32BarIndex = 0; ui32BarIndex < 6; ui32BarIndex++)
-				{
-					GetPCIMemSpaceSize (ui32BusNum, ui32DevNum, ui32BarIndex, &psPCISpace->aui32PCIMemSpaceSize[ui32BarIndex]);
-				}
-				return PVRSRV_OK;
-			}
-
-		}/*End loop for each device*/
-
-	}/*End loop for each bus*/
-
-	PVR_DPF((PVR_DBG_ERROR,"Couldn't find PCI device"));
-
-	return PVRSRV_ERROR_PCI_DEVICE_NOT_FOUND;
-}
-
-/*!
-******************************************************************************
-
- @Function		GetPCIMemSpaceSize
-
- @Description	Identify the size for each PCI memory region.
-
- @Input			ui32BusNum
- @Input			ui32DevNum
- @Input			ui32BarIndex
- @Output		pui32PCIMemSpaceSize
-
- @Return		PVRSRV_ERROR
-
-******************************************************************************/
-static IMG_UINT32 GetPCIMemSpaceSize (IMG_UINT32 ui32BusNum, IMG_UINT32 ui32DevNum, IMG_UINT32 ui32BarIndex, IMG_UINT32* pui32PCIMemSpaceSize)
-{
-
-	IMG_UINT32	ui32AddressRange;
-	IMG_UINT32	ui32BarSave;
-
-	ui32BarSave = OSPCIReadDword (ui32BusNum, ui32DevNum, 0, ((4 + ui32BarIndex) * sizeof (IMG_UINT32)));
-
-	OSPCIWriteDword (ui32BusNum, ui32DevNum, 0, ((4 + ui32BarIndex) * sizeof (IMG_UINT32)), 0xFFFFFFFF);
-
-	ui32AddressRange = OSPCIReadDword (ui32BusNum, ui32DevNum, 0, ((4 + ui32BarIndex) * sizeof (IMG_UINT32)));
-
-	OSPCIWriteDword (ui32BusNum, ui32DevNum, 0, ((4 + ui32BarIndex) * sizeof (IMG_UINT32)), ui32BarSave);
-
-	*pui32PCIMemSpaceSize = (~(ui32AddressRange & 0xFFFFFFF0)) + 1;
-	return PVRSRV_OK;
-}
-#endif
-
 
 #ifdef __linux__
 /*!
@@ -836,18 +656,6 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 		return eError;
 	}
 
-#ifdef SUPPORT_MSVDX
-	eError = PVRSRVRegisterDevice(gpsSysData, MSVDXRegisterDevice,
-								  DEVICE_MSVDX_INTERRUPT, &gui32MSVDXDeviceID);
-	if (eError != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR,"SysInitialise: Failed to register device!"));
-		SysDeinitialise(gpsSysData);
-		gpsSysData = IMG_NULL;
-		return eError;
-	}
-#endif
-
 	/*
 		Once all devices are registered, specify the backing store
 		and, if required, customise the memory heap config
@@ -884,30 +692,6 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 #endif
 				break;
 			}
-#ifdef SUPPORT_MSVDX
-			case PVRSRV_DEVICE_TYPE_MSVDX:
-			{
-				DEVICE_MEMORY_INFO *psDevMemoryInfo;
-				DEVICE_MEMORY_HEAP_INFO *psDeviceMemoryHeap;
-
-				/* specify the backing store to use for the devices MMU PT/PDs */
-				psDeviceNode->psLocalDevMemArena = IMG_NULL;
-
-				/* useful pointers */
-				psDevMemoryInfo = &psDeviceNode->sDevMemoryInfo;
-				psDeviceMemoryHeap = psDevMemoryInfo->psDeviceMemoryHeap;
-
-				/* specify the backing store for all SGX heaps */
-				for(i=0; i<psDevMemoryInfo->ui32HeapCount; i++)
-				{
-					psDeviceMemoryHeap[i].ui32Attribs |= PVRSRV_BACKINGSTORE_SYSMEM_NONCONTIG;
-#ifdef OEM_CUSTOMISE
-					/* if required, modify the memory config */
-#endif
-				}
-				break;
-			}
-#endif
 			default:
 			{
 				PVR_DPF((PVR_DBG_ERROR,"SysInitialise: Failed to find SGX device node!"));
@@ -930,18 +714,6 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 	}
 	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_SGX_INITIALISED);
 
-#ifdef SUPPORT_MSVDX
-	eError = PVRSRVInitialiseDevice (gui32MSVDXDeviceID);
-	if (eError != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR,"SysInitialise: Failed to initialise device!"));
-		SysDeinitialise(gpsSysData);
-		gpsSysData = IMG_NULL;
-		return eError;
-	}
-	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_MSVDX_INITIALISED);
-#endif
-
 	return PVRSRV_OK;
 }
 
@@ -953,11 +725,7 @@ static IMG_VOID SysEnableInterrupts(SYS_DATA *psSysData)
 	IMG_UINT32 ui32RegData;
 	IMG_UINT32 ui32Mask;
 
-#ifdef SUPPORT_MSVDX
-	ui32Mask = POULSBO_THALIA_MASK | POULSBO_MSVDX_MASK;
-#else
 	ui32Mask = POULSBO_THALIA_MASK;
-#endif
 
 	/* clear any spurious SGX interrupts */
 	ui32RegData = OSReadHWReg(gsPoulsboRegsCPUVaddr, POULSBO_INTERRUPT_IDENTITY_REG);
@@ -984,11 +752,7 @@ static IMG_VOID SysDisableInterrupts(SYS_DATA *psSysData)
 	IMG_UINT32 ui32RegData;
 	IMG_UINT32 ui32Mask;
 
-#if defined (SUPPORT_MSVDX)
-	ui32Mask = POULSBO_THALIA_MASK | POULSBO_MSVDX_MASK;
-#else
 	ui32Mask = POULSBO_THALIA_MASK;
-#endif
 
 	/* Disable SGX bit in IER */
 	ui32RegData = OSReadHWReg(gsPoulsboRegsCPUVaddr, POULSBO_INTERRUPT_ENABLE_REG);
@@ -1107,19 +871,6 @@ PVRSRV_ERROR SysDeinitialise (SYS_DATA *psSysData)
 		}
 	}
 
-#if defined(SUPPORT_MSVDX)
-	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_MSVDX_INITIALISED))
-	{
-		/* de-initialise all services managed devices */
-		eError = PVRSRVDeinitialiseDevice(gui32MSVDXDeviceID);
-		if (eError != PVRSRV_OK)
-		{
-			PVR_DPF((PVR_DBG_ERROR,"SysDeinitialise: failed to de-init the device"));
-			return eError;
-		}
-	}
-#endif
-
 	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_SGX_INITIALISED))
 	{
 		/* de-initialise all services managed devices */
@@ -1147,13 +898,6 @@ PVRSRV_ERROR SysDeinitialise (SYS_DATA *psSysData)
 	SysDeinitialiseCommon(gpsSysData);
 
 #if defined(NO_HARDWARE)
-#ifdef SUPPORT_MSVDX
-	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_ALLOC_DUMMY_MSVDX_REGS))
-	{
-		OSBaseFreeContigMemory(MSVDX_REG_SIZE, gsMSVDXRegsCPUVAddr, gsMSVDXDeviceMap.sRegsCpuPBase);
-	}
-#endif
-
 	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_ALLOC_DUMMY_SGX_REGS))
 	{
 		OSBaseFreeContigMemory(SGX_REG_SIZE, gsSGXRegsCPUVAddr, gsSGXDeviceMap.sRegsCpuPBase);
@@ -1305,14 +1049,6 @@ PVRSRV_ERROR SysGetDeviceMemoryMap(PVRSRV_DEVICE_TYPE eDeviceType,
 			*ppvDeviceMap = (IMG_VOID*)&gsSGXDeviceMap;
 			break;
 		}
-#ifdef SUPPORT_MSVDX
-		case PVRSRV_DEVICE_TYPE_MSVDX:
-		{
-			/* just return a pointer to the structure */
-			*ppvDeviceMap = (IMG_VOID*)&gsMSVDXDeviceMap;
-			break;
-		}
-#endif
 		default:
 		{
 			PVR_DPF((PVR_DBG_ERROR,"SysGetDeviceMemoryMap: unsupported device type"));
@@ -1578,39 +1314,6 @@ static PVRSRV_ERROR SysMapInRegisters(IMG_VOID)
 #endif /* #if defined(SGX_FEATURE_HOST_PORT) */
 			break;
 		}
-#ifdef SUPPORT_MSVDX
-		case PVRSRV_DEVICE_TYPE_MSVDX:
-		{
-			PVRSRV_MSVDXDEV_INFO *psDevInfo = (PVRSRV_MSVDXDEV_INFO *)psDeviceNodeList->pvDevice;
-#if defined(NO_HARDWARE) && defined(__linux__)
-			/*
-			 * SysLocate will have reallocated the
-			 * dummy registers
-			 */
-			PVR_ASSERT(gsMSVDXRegsCPUVAddr);
-			psDevInfo->pvRegsBaseKM = gsMSVDXRegsCPUVAddr;
-#else	/* defined(NO_HARDWARE) && defined(__linux__) */
-			if (SYS_SPECIFIC_DATA_TEST(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNMAP_MSVDX_REGS))
-			{
-				/* Remap registers */
-				psDevInfo->pvRegsBaseKM = OSMapPhysToLin (
-					gsMSVDXDeviceMap.sRegsCpuPBase,
-					gsMSVDXDeviceMap.ui32RegsSize,
-					PVRSRV_HAP_KERNEL_ONLY|PVRSRV_HAP_UNCACHED,
-					IMG_NULL);
-				if (!psDevInfo->pvRegsBaseKM)
-				{
-					PVR_DPF((PVR_DBG_ERROR,"SysMapInRegisters : Failed to map MSVDX registers\n"));
-					return PVRSRV_ERROR_BAD_MAPPING;
-				}
-				SYS_SPECIFIC_DATA_CLEAR(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNMAP_MSVDX_REGS);
-			}
-#endif	/* defined(NO_HARDWARE) && defined(__linux__) */
-			psDevInfo->ui32RegSize = gsMSVDXDeviceMap.ui32RegsSize;
-			psDevInfo->sRegsPhysBase = gsMSVDXDeviceMap.sRegsSysPBase;
-			break;
-		}
-#endif	/* SUPPORT_MSVDX */
 		default:
 			break;
 		}
@@ -1673,27 +1376,6 @@ static PVRSRV_ERROR SysUnmapRegisters(IMG_VOID)
 #endif /* #if defined(SGX_FEATURE_HOST_PORT) */
 			break;
 		}
-#ifdef SUPPORT_MSVDX
-		case PVRSRV_DEVICE_TYPE_MSVDX:
-		{
-			PVRSRV_MSVDXDEV_INFO *psDevInfo = (PVRSRV_MSVDXDEV_INFO *)psDeviceNodeList->pvDevice;
-#if !(defined(NO_HARDWARE) && defined(__linux__))
-			if (psDevInfo->pvRegsBaseKM)
-			{
-				OSUnMapPhysToLin(psDevInfo->pvRegsBaseKM,
-					psDevInfo->ui32RegSize,
-					PVRSRV_HAP_KERNEL_ONLY|PVRSRV_HAP_UNCACHED,
-					IMG_NULL);
-
-				SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNMAP_MSVDX_REGS);
-			}
-#endif	/* !(defined(NO_HARDWARE) && defined(__linux__)) */
-			psDevInfo->pvRegsBaseKM = IMG_NULL;
-			psDevInfo->ui32RegSize = 0;
-			psDevInfo->sRegsPhysBase.uiAddr = 0;
-			break;
-		}
-#endif	/* SUPPORT_MSVDX */
 		default:
 			break;
 		}
@@ -1716,19 +1398,6 @@ static PVRSRV_ERROR SysUnmapRegisters(IMG_VOID)
 #endif	/* #if !defined(NO_HARDWARE) */
 
 #if defined(NO_HARDWARE)
-#ifdef SUPPORT_MSVDX
-	if (SYS_SPECIFIC_DATA_TEST(&gsSysSpecificData, SYS_SPECIFIC_DATA_ALLOC_DUMMY_MSVDX_REGS))
-	{
-		PVR_ASSERT(gsMSVDXRegsCPUVAddr)
-
-		OSBaseFreeContigMemory(MSVDX_REG_SIZE, gsMSVDXRegsCPUVAddr, gsMSVDXDeviceMap.sRegsCpuPBase);
-
-		gsMSVDXRegsCPUVAddr = IMG_NULL;
-
-		SYS_SPECIFIC_DATA_CLEAR(&gsSysSpecificData, SYS_SPECIFIC_DATA_ALLOC_DUMMY_MSVDX_REGS);
-	}
-#endif
-
 	if (SYS_SPECIFIC_DATA_TEST(&gsSysSpecificData, SYS_SPECIFIC_DATA_ALLOC_DUMMY_SGX_REGS))
 	{
 		PVR_ASSERT(gsSGXRegsCPUVAddr);

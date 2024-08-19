@@ -56,12 +56,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "sysinfo.h"
 #include "sysconfig.h"
 #include "sysutils.h"
-#ifdef SUPPORT_MSVDX
-#include "msvdx_defs.h"
-#include "msvdxapi.h"
-#include "msvdx_infokm.h"
-#include "osfunc.h"
-#endif
 
 #define SUPPORT_PRIMARY_SURFACE_SEGMENT
 
@@ -98,14 +92,6 @@ static CDV_DEVICE_MAP gsSOCDeviceMap;
  */
 static IMG_UINT32		gui32SGXDeviceID;
 static SGX_DEVICE_MAP	gsSGXDeviceMap;
-
-/**
- * VXD structures
- */
-#if defined(SUPPORT_MSVDX)
-static IMG_UINT32		gui32MSVDXDeviceID;
-static MSVDX_DEVICE_MAP	gsMSVDXDeviceMap;
-#endif
 
 #if defined(SUPPORT_DRI_DRM)
 extern struct drm_device *gpsPVRDRMDev;
@@ -223,66 +209,10 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 	/************************
 	 *       VXD Setup      *
 	 ************************/
-#if defined(SUPPORT_MSVDX)
-
-#if !defined(NO_HARDWARE)
-	gsMSVDXDeviceMap.sRegsSysPBase.uiAddr =
-		gsSOCDeviceMap.sRegsSysPBase.uiAddr + SYS_MSVDX_REG_OFFSET;
-
-	gsMSVDXDeviceMap.sRegsCpuPBase =
-		SysSysPAddrToCpuPAddr(gsMSVDXDeviceMap.sRegsSysPBase);
-
-#else
-	/* No hardware registers */
-	eError = OSBaseAllocContigMemory(MSVDX_REG_SIZE,
-									 &(gsMSVDXDeviceMap.sRegsCpuVBase),
-									 &(gsMSVDXDeviceMap.sRegsCpuPBase));
-	if(eError != PVRSRV_OK)
-	{
-		return eError;
-	}
-	SYS_SPECIFIC_DATA_SET(psSysSpecData, SYS_SPECIFIC_DATA_DUMMY_MSVDX_REGS);
-
-	OSMemSet(gsMSVDXDeviceMap.sRegsCpuVBase, 0, MSVDX_REG_SIZE);
-	gsMSVDXDeviceMap.sRegsSysPBase =
-		SysCpuPAddrToSysPAddr(gsMSVDXDeviceMap.sRegsCpuPBase);
-
-#endif /* NO_HARDWARE */
-
-	/* Common setup */
-	gsMSVDXDeviceMap.ui32RegsSize = MSVDX_REG_SIZE;
-
-	/*
-	 * No local device memory region
-	 */
-	gsMSVDXDeviceMap.sLocalMemSysPBase.uiAddr = 0;
-	gsMSVDXDeviceMap.sLocalMemDevPBase.uiAddr = 0;
-	gsMSVDXDeviceMap.sLocalMemCpuPBase.uiAddr = 0;
-	gsMSVDXDeviceMap.ui32LocalMemSize		  = 0;
-
-	/*
-	 * device interrupt IRQ
-	 */
-	gsMSVDXDeviceMap.ui32IRQ = ui32IRQ;
-
-#if defined(PDUMP)
-	{
-		/* initialise memory region name for pdumping */
-		static IMG_CHAR pszPDumpDevName[] = SYSTEM_PDUMP_NAME;
-		gsMSVDXDeviceMap.pszPDumpDevName = pszPDumpDevName;
-	}
-#endif /* defined(PDUMP) */
-
-#endif /* defined(SUPPORT_MSVDX) */
 
 	PVR_DPF((PVR_DBG_MESSAGE,
 			 "SGX registers base physical address: 0x" SYSPADDR_FMT,
 			 gsSGXDeviceMap.sRegsSysPBase.uiAddr));
-#if defined(SUPPORT_MSVDX)
-	PVR_DPF((PVR_DBG_MESSAGE,
-			 "VXD registers base physical address: 0x" SYSPADDR_FMT,
-			 gsMSVDXDeviceMap.sRegsSysPBase.uiAddr));
-#endif
 
 	return PVRSRV_OK;
 }
@@ -390,17 +320,6 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 	}
 	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_REGSGXDEV);
 
-#if defined(SUPPORT_MSVDX)
-	eError = PVRSRVRegisterDevice(gpsSysData, MSVDXRegisterDevice,
-								  DEVICE_MSVDX_INTERRUPT, &gui32MSVDXDeviceID);
-	if (eError != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR,"SysInitialise: Failed to register VXD device!"));
-		goto errorExit;
-	}
-	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_REGVXDDEV);
-#endif
-
 	/*
 	 * Once all devices are registered, specify the backing store
 	 * and, if required, customise the memory heap config
@@ -436,31 +355,6 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 			}
 			break;
 		}
-#if defined(SUPPORT_MSVDX)
-		case PVRSRV_DEVICE_TYPE_MSVDX:
-		{
-			DEVICE_MEMORY_INFO *psDevMemoryInfo;
-			DEVICE_MEMORY_HEAP_INFO *psDeviceMemoryHeap;
-
-			/* specify the backing store to use for the devices MMU PT/PDs */
-			psDeviceNode->psLocalDevMemArena = IMG_NULL;
-
-			/* useful pointers */
-			psDevMemoryInfo = &psDeviceNode->sDevMemoryInfo;
-			psDeviceMemoryHeap = psDevMemoryInfo->psDeviceMemoryHeap;
-
-			/* specify the backing store for all SGX heaps */
-			for(i=0; i<psDevMemoryInfo->ui32HeapCount; i++)
-			{
-				psDeviceMemoryHeap[i].ui32Attribs |=
-					PVRSRV_BACKINGSTORE_SYSMEM_NONCONTIG;
-#if defined(OEM_CUSTOMISE)
-				/* if required, modify the memory config */
-#endif
-			}
-			break;
-		}
-#endif
 		default:
 			break;
 		}
@@ -480,16 +374,6 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 	}
 	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_INITSGXDEV);
 
-#ifdef SUPPORT_MSVDX
-	eError = PVRSRVInitialiseDevice(gui32MSVDXDeviceID);
-	if (eError != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR,"SysInitialise: Failed to initialise VXD!"));
-		goto errorExit;
-	}
-	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_INITVXDDEV);
-#endif
-
 	/* All fine! */
 	return eError;
 
@@ -506,11 +390,7 @@ IMG_VOID SysEnableInterrupts(SYS_DATA *psSysData)
 	IMG_UINT32 ui32RegData;
 	IMG_UINT32 ui32Mask;
 
-#ifdef SUPPORT_MSVDX
-	ui32Mask = CDV_SGX_MASK | CDV_MSVDX_MASK;
-#else
 	ui32Mask = CDV_SGX_MASK;
-#endif
 
 	ui32RegData = OSReadHWReg(gsSOCDeviceMap.sRegsCpuVBase, CDV_INTERRUPT_IDENTITY_REG);
 	OSWriteHWReg(gsSOCDeviceMap.sRegsCpuVBase, CDV_INTERRUPT_IDENTITY_REG, ui32RegData | ui32Mask);
@@ -534,11 +414,7 @@ IMG_VOID SysDisableInterrupts(SYS_DATA *psSysData)
 	IMG_UINT32 ui32RegData;
 	IMG_UINT32 ui32Mask;
 
-#if defined (SUPPORT_MSVDX)
-	ui32Mask = CDV_SGX_MASK | CDV_MSVDX_MASK;
-#else
 	ui32Mask = CDV_SGX_MASK;
-#endif
 
 	/* Disable SGX bit in IER */
 	ui32RegData = OSReadHWReg(gsSOCDeviceMap.sRegsCpuVBase, CDV_INTERRUPT_ENABLE_REG);
@@ -648,20 +524,6 @@ PVRSRV_ERROR SysDeinitialise (SYS_DATA *psSysData)
 	}
 #endif /* #if defined(SYS_USING_INTERRUPTS) */
 
-#if defined(SUPPORT_MSVDX)
-	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_INITVXDDEV))
-	{
-		/* de-initialise all services managed devices */
-		eError = PVRSRVDeinitialiseDevice(gui32MSVDXDeviceID);
-		if (eError != PVRSRV_OK)
-		{
-			PVR_DPF((PVR_DBG_ERROR,"SysDeinitialise: failed to de-init the device"));
-			return eError;
-		}
-		SYS_SPECIFIC_DATA_CLEAR(psSysSpecData, SYS_SPECIFIC_DATA_INITVXDDEV);
-	}
-#endif
-
 	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_INITSGXDEV))
 	{
 		/* de-initialise all services managed devices */
@@ -692,17 +554,6 @@ PVRSRV_ERROR SysDeinitialise (SYS_DATA *psSysData)
 	}
 
 #if defined(NO_HARDWARE)
-#if defined(SUPPORT_MSVDX)
-	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_DUMMY_MSVDX_REGS))
-	{
-		OSBaseFreeContigMemory(MSVDX_REG_SIZE,
-							   gsMSVDXDeviceMap.sRegsCpuVBase,
-							   gsMSVDXDeviceMap.sRegsCpuPBase);
-		SYS_SPECIFIC_DATA_CLEAR(psSysSpecData,
-								SYS_SPECIFIC_DATA_DUMMY_MSVDX_REGS);
-	}
-#endif
-
 	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_DUMMY_SGX_REGS))
 	{
 		OSBaseFreeContigMemory(SYS_SGX_REG_SIZE,
@@ -749,14 +600,6 @@ PVRSRV_ERROR SysGetDeviceMemoryMap(PVRSRV_DEVICE_TYPE eDeviceType,
 		*ppvDeviceMap = (IMG_VOID*)&gsSGXDeviceMap;
 		break;
 	}
-#if defined(SUPPORT_MSVDX)
-	case PVRSRV_DEVICE_TYPE_MSVDX:
-	{
-		/* just return a pointer to the structure */
-		*ppvDeviceMap = (IMG_VOID*)&gsMSVDXDeviceMap;
-		break;
-	}
-#endif
 	default:
 	{
 		PVR_DPF((PVR_DBG_ERROR,"SysGetDeviceMemoryMap: unsupported device type"));
@@ -909,12 +752,6 @@ PVRSRV_ERROR SysResetDevice(IMG_UINT32 ui32DeviceIndex)
 	{
 		/* INTEGRATION_POINT: What do we need for SGX resets? */
 	}
-#if defined(SUPPORT_MSVDX)
-	else if (ui32DeviceIndex == gui32MSVDXDeviceID)
-	{
-		/* INTEGRATION_POINT: What do we need for VXD resets? */
-	}
-#endif
 	else
 	{
 		/* INTEGRATION_POINT: Display? */
@@ -998,39 +835,6 @@ static PVRSRV_ERROR SysMapInRegisters(void)
 			psDevInfo->sRegsPhysBase = gsSGXDeviceMap.sRegsSysPBase;
 			break;
 		}
-#if defined(SUPPORT_MSVDX)
-		case PVRSRV_DEVICE_TYPE_MSVDX:
-		{
-			PVRSRV_MSVDXDEV_INFO *psDevInfo = (PVRSRV_MSVDXDEV_INFO *)
-				psDeviceNodeList->pvDevice;
-#if !defined(NO_HARDWARE)
-			if (SYS_SPECIFIC_DATA_TEST(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNMAP_MSVDX_REGS))
-			{
-				/* Remap registers */
-				psDevInfo->pvRegsBaseKM =
-					OSMapPhysToLin(gsMSVDXDeviceMap.sRegsCpuPBase,
-								   gsMSVDXDeviceMap.ui32RegsSize,
-								   PVRSRV_HAP_KERNEL_ONLY|PVRSRV_HAP_UNCACHED,
-								   IMG_NULL);
-				if (!psDevInfo->pvRegsBaseKM)
-				{
-					PVR_DPF((PVR_DBG_ERROR,"SysMapInRegisters : Failed to map MSVDX registers\n"));
-					return PVRSRV_ERROR_BAD_MAPPING;
-				}
-				SYS_SPECIFIC_DATA_CLEAR(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNMAP_MSVDX_REGS);
-			}
-#else	/* !defined(NO_HARDWARE) */
-			/*
-			 * SysLocateDevices will have reallocated the dummy
-			 * registers.
-			 */
-			psDevInfo->pvRegsBaseKM = gsMSVDXDeviceMap.sRegsCpuVBase;
-#endif	/* !defined(NO_HARDWARE) */
-			psDevInfo->ui32RegSize = gsMSVDXDeviceMap.ui32RegsSize;
-			psDevInfo->sRegsPhysBase = gsMSVDXDeviceMap.sRegsSysPBase;
-			break;
-		}
-#endif	/* SUPPORT_MSVDX */
 		default:
 			/* Ignore any other (unknown) devices */
 			break;
@@ -1078,29 +882,6 @@ static PVRSRV_ERROR SysUnmapRegisters(void)
 			psDevInfo->sRegsPhysBase.uiAddr = 0;
 			break;
 		}
-#ifdef SUPPORT_MSVDX
-		case PVRSRV_DEVICE_TYPE_MSVDX:
-		{
-			PVRSRV_MSVDXDEV_INFO *psDevInfo = (PVRSRV_MSVDXDEV_INFO *)
-				psDeviceNodeList->pvDevice;
-
-#if !defined(NO_HARDWARE)
-			if (psDevInfo->pvRegsBaseKM)
-			{
-				OSUnMapPhysToLin(psDevInfo->pvRegsBaseKM,
-								 psDevInfo->ui32RegSize,
-								 PVRSRV_HAP_KERNEL_ONLY|PVRSRV_HAP_UNCACHED,
-								 IMG_NULL);
-
-				SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNMAP_MSVDX_REGS);
-			}
-#endif
-			psDevInfo->pvRegsBaseKM = IMG_NULL;
-			psDevInfo->ui32RegSize = 0;
-			psDevInfo->sRegsPhysBase.uiAddr = 0;
-			break;
-		}
-#endif	/* SUPPORT_MSVDX */
 		default:
 			/* Ignore unknowns */
 			break;
@@ -1108,19 +889,6 @@ static PVRSRV_ERROR SysUnmapRegisters(void)
 		psDeviceNodeList = psDeviceNodeList->psNext;
 	}
 #if defined(NO_HARDWARE)
-#if defined(SUPPORT_MSVDX)
-	if (SYS_SPECIFIC_DATA_TEST(&gsSysSpecificData, SYS_SPECIFIC_DATA_DUMMY_MSVDX_REGS))
-	{
-		PVR_ASSERT(gsMSVDXDeviceMap);
-
-		OSBaseFreeContigMemory(MSVDX_REG_SIZE,
-							   gsMSVDXDeviceMap.sRegsCpuVBase,
-							   gsMSVDXDeviceMap.sRegsCpuPBase);
-
-		SYS_SPECIFIC_DATA_CLEAR(&gsSysSpecificData, SYS_SPECIFIC_DATA_DUMMY_MSVDX_REGS);
-	}
-#endif /* defined(SUPPORT_MSVDX) */
-
 	if (SYS_SPECIFIC_DATA_TEST(&gsSysSpecificData, SYS_SPECIFIC_DATA_DUMMY_SGX_REGS))
 	{
 		OSBaseFreeContigMemory(SYS_SGX_REG_SIZE,
@@ -1129,7 +897,6 @@ static PVRSRV_ERROR SysUnmapRegisters(void)
 
 		SYS_SPECIFIC_DATA_CLEAR(&gsSysSpecificData, SYS_SPECIFIC_DATA_DUMMY_SGX_REGS);
 	}
-
 #endif /* defined(NO_HARDWARE) */
 
 #if !defined(NO_HARDWARE)
