@@ -98,9 +98,6 @@ typedef struct _DEVICE_COMMAND_DATA_
 	IMG_UINT32				ui32MaxSrcSyncCount;	/*!< Maximum number of source syncs */
 } DEVICE_COMMAND_DATA;
 
-
-#if defined(__linux__) && defined(__KERNEL__)
-
 #include "proc.h"
 
 /*****************************************************************************
@@ -204,7 +201,6 @@ void* ProcSeqOff2ElementQueue(struct seq_file * sfile, loff_t off)
 
 	return psQueue;
 }
-#endif /* __linux__ && __KERNEL__ */
 
 /*!
  * Macro to return space in given command queue
@@ -483,13 +479,13 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateCommandQueueKM(IMG_SIZE_T uQueueSize,
 	}
 
 	/* Ensure we don't corrupt queue list, by blocking access */
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	eError = OSLockResourceAndBlockMISR(&psSysData->sQProcessResource,
 							KERNEL_ID);
-#else /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#else /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	eError = OSLockResource(&psSysData->sQProcessResource,
 							KERNEL_ID);
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	if (eError != PVRSRV_OK)
 	{
 		goto ErrorExit;
@@ -498,11 +494,11 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateCommandQueueKM(IMG_SIZE_T uQueueSize,
 	psQueueInfo->psNextKM = psSysData->psQueueList;
 	psSysData->psQueueList = psQueueInfo;
 
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	eError = OSUnlockResourceAndUnblockMISR(&psSysData->sQProcessResource, KERNEL_ID);
-#else /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#else /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	eError = OSUnlockResource(&psSysData->sQProcessResource, KERNEL_ID);
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	if (eError != PVRSRV_OK)
 	{
 		goto ErrorExit;
@@ -583,13 +579,13 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyCommandQueueKM(PVRSRV_QUEUE_INFO *psQueue
 	}
 
 	/* Ensure we don't corrupt queue list, by blocking access */
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	eError = OSLockResourceAndBlockMISR(&psSysData->sQProcessResource,
 								KERNEL_ID);
-#else /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#else /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	eError = OSLockResource(&psSysData->sQProcessResource,
 								KERNEL_ID);
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	if (eError != PVRSRV_OK)
 	{
 		goto ErrorExit;
@@ -643,11 +639,11 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyCommandQueueKM(PVRSRV_QUEUE_INFO *psQueue
 
 		if(!psQueue)
 		{
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 			eError = OSUnlockResourceAndUnblockMISR(&psSysData->sQProcessResource, KERNEL_ID);
-#else /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#else /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 			eError = OSUnlockResource(&psSysData->sQProcessResource, KERNEL_ID);
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 			if (eError != PVRSRV_OK)
 			{
 				goto ErrorExit;
@@ -658,11 +654,11 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyCommandQueueKM(PVRSRV_QUEUE_INFO *psQueue
 	}
 
 	/*  unlock the Q list lock resource */
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	eError = OSUnlockResourceAndUnblockMISR(&psSysData->sQProcessResource, KERNEL_ID);
-#else /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#else /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	eError = OSUnlockResource(&psSysData->sQProcessResource, KERNEL_ID);
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	if (eError != PVRSRV_OK)
 	{
 		goto ErrorExit;
@@ -1246,11 +1242,11 @@ PVRSRV_ERROR PVRSRVProcessQueues(IMG_BOOL	bFlush)
 		return PVRSRV_OK;
 	}
 
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	while (OSLockResourceAndBlockMISR(&psSysData->sQProcessResource, ISR_ID) != PVRSRV_OK)
-#else /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#else /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	while (OSLockResource(&psSysData->sQProcessResource, ISR_ID) != PVRSRV_OK)
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	{
 		OSWaitus(1);
 	};
@@ -1294,11 +1290,11 @@ PVRSRV_ERROR PVRSRVProcessQueues(IMG_BOOL	bFlush)
 	List_PVRSRV_DEVICE_NODE_ForEach(psSysData->psDeviceNodeList,
 									&PVRSRVProcessQueues_ForEachCb);
 
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	OSUnlockResourceAndUnblockMISR(&psSysData->sQProcessResource, ISR_ID);
-#else /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#else /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 	OSUnlockResource(&psSysData->sQProcessResource, ISR_ID);
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 
 	return PVRSRV_OK;
 }

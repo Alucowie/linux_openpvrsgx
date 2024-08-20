@@ -382,11 +382,6 @@ PVRSRV_ERROR PDumpMallocPages (PVRSRV_DEVICE_IDENTIFIER	*psDevID,
 
 	PDUMP_LOCK();
 
-	/* However, lin addr is only required in non-linux OSes */
-#if !defined(LINUX)
-	PVR_ASSERT(((IMG_UINTPTR_T)pvLinAddr & HOST_PAGEMASK) == 0);
-#endif
-
 	PVR_ASSERT(((IMG_UINT32) ui32DevVAddr & HOST_PAGEMASK) == 0);
 	PVR_ASSERT(((IMG_UINT32) ui32NumBytes & HOST_PAGEMASK) == 0);
 

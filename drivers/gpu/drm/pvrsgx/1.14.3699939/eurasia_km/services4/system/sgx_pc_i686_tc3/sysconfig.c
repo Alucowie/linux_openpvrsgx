@@ -50,9 +50,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "tcfdefs.h"
 
-#ifdef __linux__
 #include "mm.h"
-#endif
 
 #if defined(LDM_PCI) || defined(SUPPORT_DRI_DRM)
 #include "linux/pci.h"
@@ -95,8 +93,6 @@ IMG_UINT32 PVRSRV_BridgeDispatchKM( IMG_UINT32  Ioctl,
 									IMG_BYTE   *pOutBuf,
 									IMG_UINT32  OutBufLen,
 									IMG_UINT32 *pdwBytesTransferred);
-
-#ifdef __linux__
 
 /*!
 ******************************************************************************
@@ -230,66 +226,7 @@ static IMG_VOID PCIDeInitDev(SYS_DATA *psSysData)
 		OSPCIReleaseDev(psSysSpecData->hSGXPCI);
 	}
 }
-#else	/* __linux__ */
-/*!
-******************************************************************************
 
- @Function		FindPCIDevice
-
- @Description	Scans the PCI bus for ui16DevID/ui16VenID and if found,
-				enumerates the PCI config registers.
-
- @Input			ui16VenID
- @Input			ui16DevID
- @Output		psPCISpace
-
- @Return		PVRSRV_ERROR
-
-******************************************************************************/
-static PVRSRV_ERROR FindPCIDevice(IMG_UINT16 ui16VenID, IMG_UINT16 ui16DevID, PCICONFIG_SPACE *psPCISpace)
-{
-	IMG_UINT32 ui32BusNum;
-	IMG_UINT32 ui32DevNum;
-	IMG_UINT32 ui32VenDevID;
-
-	/* Check all the busses */
-	for (ui32BusNum=0; ui32BusNum < 255; ui32BusNum++)
-	{
-		/* Check all devices on that bus */
-		for (ui32DevNum=0; ui32DevNum < 32; ui32DevNum++)
-		{
-			/* Get the deviceID and vendor ID */
-			ui32VenDevID=OSPCIReadDword(ui32BusNum, ui32DevNum, 0, 0);
-
-			/* Check if it is the required device */
-			if (ui32VenDevID == (IMG_UINT32)((ui16DevID<<16)+ui16VenID))
-			{
-				IMG_UINT32 ui32Idx;
-
-				/* Ensure Access to FB memory is enabled */
-				OSPCIWriteDword(ui32BusNum, ui32DevNum, 0, 4, OSPCIReadDword(ui32BusNum, ui32DevNum, 0, 4) | 0x02);
-
-				/* Now copy PCI config space to users buffer */
-				for (ui32Idx=0; ui32Idx < 64; ui32Idx++)
-				{
-					psPCISpace->u.aui32PCISpace[ui32Idx] = OSPCIReadDword(ui32BusNum, ui32DevNum, 0, ui32Idx*4);
-
-					if (ui32Idx < 16)
-					{
-						PVR_DPF((PVR_DBG_VERBOSE,"%08X\n",psPCISpace->u.aui32PCISpace[ui32Idx]));
-					}
-				}
-				return PVRSRV_OK;
-			}
-
-		}/*End loop for each device*/
-
-	}/*End loop for each bus*/
-
-	return PVRSRV_ERROR_PCI_DEVICE_NOT_FOUND;
-}
-
-#endif	/* __linux__ */
 /*!
 ******************************************************************************
 
@@ -310,14 +247,11 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 #if defined(NO_HARDWARE)
 	IMG_CPU_PHYADDR sCpuPAddr;
 #endif
-#ifdef __linux__
 	SYS_SPECIFIC_DATA *psSysSpecData = (SYS_SPECIFIC_DATA *) psSysData->pvSysSpecificData;
-#endif
-#if !defined(__linux__) || defined(NO_HARDWARE)
+#if defined(NO_HARDWARE)
 	PVRSRV_ERROR eError;
 #endif
 
-#ifdef	__linux__
 	ui32AtlasRegBaseAddr = OSPCIAddrRangeStart(psSysSpecData->hSGXPCI, SYS_ATLAS_REG_PCI_BASENUM);
 
 	ui32SGXRegBaseAddr = OSPCIAddrRangeStart(psSysSpecData->hSGXPCI, SYS_SGX_REG_PCI_BASENUM);
@@ -330,49 +264,6 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 		return PVRSRV_ERROR_INVALID_DEVICE;
 	}
 	PVR_TRACE(("IRQ: %d", ui32IRQ));
-#else	/* __linux__ */
-	PCICONFIG_SPACE	sPCISpace;
-
-	PVR_UNREFERENCED_PARAMETER(psSysData);
-
-	eError = FindPCIDevice(SYS_SGX_DEV_VENDOR_ID, SYS_SGX_DEV_DEVICE_ID, &sPCISpace);
-
-	if (eError == PVRSRV_OK)
-	{
-		/* Get the regions from base address register 0, 1, 2 */
-		ui32AtlasRegBaseAddr = sPCISpace.u.aui32PCISpace[SYS_ATLAS_REG_PCI_OFFSET];
-		ui32SGXRegBaseAddr = sPCISpace.u.aui32PCISpace[SYS_SGX_REG_PCI_OFFSET];
-		ui32SGXMemBaseAddr = sPCISpace.u.aui32PCISpace[SYS_SGX_MEM_PCI_OFFSET];
-	}
-	else
-	{
-#if defined (SYS_SGX_DEV1_DEVICE_ID)
-		ui32DeviceID = SYS_SGX_DEV1_DEVICE_ID;
-		eError = FindPCIDevice(SYS_SGX_DEV_VENDOR_ID, SYS_SGX_DEV1_DEVICE_ID, &sPCISpace);
-		
-		if (eError == PVRSRV_OK)
-		{
-			/* Get the regions from base address register 0, 1, 2 */
-			ui32AtlasRegBaseAddr = sPCISpace.u.aui32PCISpace[SYS_ATLAS_REG_PCI_OFFSET];
-			ui32SGXRegBaseAddr = sPCISpace.u.aui32PCISpace[SYS_SGX_REG_PCI_OFFSET];
-			ui32SGXMemBaseAddr = sPCISpace.u.aui32PCISpace[SYS_SGX_MEM_PCI_OFFSET];
-		}
-		else
-#endif
-		{
-			PVR_DPF((PVR_DBG_ERROR,"Couldn't find PCI device"));
-			return PVRSRV_ERROR_INVALID_DEVICE;
-		}
-	}
-
-	PVR_DPF((PVR_DBG_MESSAGE,"Found - DevID %04X Ven Id 0x%04X SSDevId %04X SSVenId %04X",
-			sPCISpace.u.aui16PCISpace[SYS_SGX_DEV_ID_16_PCI_OFFSET], 
-			sPCISpace.u.aui16PCISpace[SYS_SGX_VEN_ID_16_PCI_OFFSET],
-			sPCISpace.u.aui16PCISpace[SYS_SGX_SSDEV_ID_16_PCI_OFFSET], 
-			sPCISpace.u.aui16PCISpace[SYS_SGX_SSVEN_ID_16_PCI_OFFSET]));
-
-	ui32IRQ = (IMG_UINT32)sPCISpace.u.aui8PCISpace[SYS_SGX_IRQ_8_PCI_OFFSET];
-#endif	/* __linux__ */
 
 	/* Atlas registers */
 	gsSOCRegsCpuPBase.uiAddr = ui32AtlasRegBaseAddr;
@@ -394,16 +285,8 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 
 	OSMemSet(gsSGXRegsCPUVAddr, 0, SYS_SGX_REG_SIZE);
 
-#if defined(__linux__)
 	/* Indicate the registers are already mapped */
 	gsSGXDeviceMap.pvRegsCpuVBase = gsSGXRegsCPUVAddr;
-#else
-	/*
-	 * FIXME: Could we just use the virtual address returned by
-	 * OSBaseAllocContigMemory?
-	 */
-	gsSGXDeviceMap.pvRegsCpuVBase = IMG_NULL;
-#endif
 
 #else	/* defined(NO_HARDWARE) */
 	/* Hardware registers */
@@ -508,7 +391,6 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 	psTimingInfo->ui32ActivePowManLatencyms = SYS_SGX_ACTIVE_POWER_LATENCY_MS;
 	psTimingInfo->ui32uKernelFreq = SYS_SGX_PDS_TIMER_FREQ;
 
-#ifdef __linux__
 	eError = PCIInitDev(gpsSysData);
 	if (eError != PVRSRV_OK)
 	{
@@ -517,7 +399,6 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 		return eError;
 	}
 	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_ENABLE_PCINIT);
-#endif
 
 	gpsSysData->ui32NumDevices = SYS_DEVICE_COUNT;
 
@@ -737,7 +618,6 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_ENABLE_IRQ);
 #endif
 
-#if defined(__linux__)
 	/* Create a human readable version string for this system */
 	gpsSysData->pszVersionString = SysCreateVersionString(gsSGXDeviceMap.sRegsCpuPBase);
 	if (!gpsSysData->pszVersionString)
@@ -748,7 +628,6 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 	{
 		PVR_DPF((PVR_DBG_MESSAGE, "SysFinalise: Version string: %s", gpsSysData->pszVersionString));
 	}
-#endif
 
 	return PVRSRV_OK;
 }
@@ -837,12 +716,11 @@ PVRSRV_ERROR SysDeinitialise (SYS_DATA *psSysData)
 
 	SysDeinitialiseCommon(gpsSysData);
 
-#ifdef __linux__
 	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_ENABLE_PCINIT))
 	{
 		PCIDeInitDev(psSysData);
 	}
-#endif
+
 	if (SYS_SPECIFIC_DATA_TEST(psSysSpecData, SYS_SPECIFIC_DATA_ENABLE_ENVDATA))
 	{
 		eError = OSDeInitEnvData(gpsSysData->pvEnvSpecificData);
@@ -1297,7 +1175,7 @@ static PVRSRV_ERROR SysMapInRegisters(IMG_VOID)
 		PVRSRV_SGXDEV_INFO *psDevInfo = (PVRSRV_SGXDEV_INFO *)psDeviceNodeList->pvDevice;
 		if (psDeviceNodeList->sDevId.eDeviceType == PVRSRV_DEVICE_TYPE_SGX)
 		{
-#if defined(NO_HARDWARE) && defined(__linux__)
+#if defined(NO_HARDWARE)
 			/*
 			 * SysLocateDevices will have reallocated the dummy
 			 * registers.
@@ -1321,7 +1199,7 @@ static PVRSRV_ERROR SysMapInRegisters(IMG_VOID)
 				}
 				SYS_SPECIFIC_DATA_CLEAR(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNMAP_SGX_REGS);
 			}
-#endif	/* #if defined(NO_HARDWARE) && defined(__linux__) */
+#endif	/* #if defined(NO_HARDWARE) */
 
 			psDevInfo->ui32RegSize   = gsSGXDeviceMap.ui32RegsSize;
 			psDevInfo->sRegsPhysBase = gsSGXDeviceMap.sRegsSysPBase;
@@ -1368,7 +1246,7 @@ static PVRSRV_ERROR SysUnmapRegisters(IMG_VOID)
 		if (psDeviceNodeList->sDevId.eDeviceType == PVRSRV_DEVICE_TYPE_SGX)
 		{
 
-#if !(defined(NO_HARDWARE) && defined(__linux__))
+#if !(defined(NO_HARDWARE))
 			/* Unmap Regs */
 			if (psDevInfo->pvRegsBaseKM)
 			{
@@ -1379,7 +1257,7 @@ static PVRSRV_ERROR SysUnmapRegisters(IMG_VOID)
 
 				SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNMAP_SGX_REGS);
 			}
-#endif	/* #if !(defined(NO_HARDWARE) && defined(__linux__)) */
+#endif	/* #if !(defined(NO_HARDWARE)) */
 
 			psDevInfo->pvRegsBaseKM = IMG_NULL;
 			psDevInfo->ui32RegSize          = 0;
@@ -1492,13 +1370,12 @@ PVRSRV_ERROR SysSystemPrePowerState(PVRSRV_SYS_POWER_STATE eNewPowerState)
 			 * Unmap the system-level registers.
 			 */
 			SysUnmapRegisters();
-#ifdef	__linux__
+
 			eError = OSPCISuspendDev(gsSysSpecificData.hSGXPCI);
 			if (eError != PVRSRV_OK)
 			{
 				PVR_DPF((PVR_DBG_ERROR,"SysSystemPrePowerState: OSPCISuspendDev failed (%d)", eError));
 			}
-#endif
 		}
 	}
 
@@ -1527,13 +1404,12 @@ PVRSRV_ERROR SysSystemPostPowerState(PVRSRV_SYS_POWER_STATE eNewPowerState)
 		if ((gpsSysData->eCurrentPowerState == PVRSRV_SYS_POWER_STATE_D3) &&
 			(eNewPowerState < PVRSRV_SYS_POWER_STATE_D3))
 		{
-#ifdef	__linux__
 			eError = OSPCIResumeDev(gsSysSpecificData.hSGXPCI);
 			if (eError != PVRSRV_OK)
 			{
 				PVR_DPF((PVR_DBG_ERROR,"SysSystemPostPowerState: OSPCIResumeDev failed (%d)", eError));
 			}
-#endif
+
 			/*
 				Returning from D3 state.
 				Find the device again as it may have been remapped.

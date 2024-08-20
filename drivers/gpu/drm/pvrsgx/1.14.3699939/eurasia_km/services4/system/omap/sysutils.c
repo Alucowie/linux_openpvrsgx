@@ -42,8 +42,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /* Pull in the correct system dependent sysutils source */
 
-#if defined(__linux__)
 #include "sysutils_linux.c"
+
 #if defined(SYS_OMAP_HAS_DVFS_FRAMEWORK)
 #include "sgxfreq.c"
 #include "sgxfreq_onoff.c"
@@ -53,11 +53,4 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #if (defined(CONFIG_THERMAL) || defined(CONFIG_THERMAL_FRAMEWORK))
 #include "sgxfreq_cool.c"
 #endif
-#endif
-#endif
-
-
-
-#if defined(__QNXNTO__) 
-#include "sysutils_nto.c"
 #endif

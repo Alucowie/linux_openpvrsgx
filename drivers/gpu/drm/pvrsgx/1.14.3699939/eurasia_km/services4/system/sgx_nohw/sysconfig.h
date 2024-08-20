@@ -66,9 +66,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 
-#if defined(__linux__)
 #define	SYS_SGX_DEV_NAME	"sgxnohw"
-#endif	/* defined(__linux__) */
 
 /*****************************************************************************
  * system specific data structures

@@ -68,7 +68,6 @@ void SetCoeffs(PVRPDP_DEVINFO *psDevInfo, unsigned long uiPLL, unsigned long uiD
 void SysSetPDP1Clk (PVRPDP_DEVINFO *psDevInfo, unsigned long uiClkInHz);
 void GTFCalcFromRefresh(PDLMODE psUser, PHVTIMEREGS psHVTRegs);
 
-#if defined(__linux__)
 typedef double PDP_DOUBLE;
 
 
@@ -106,13 +105,6 @@ static inline double floor(double x)
 
 	return x;
 }
-
-#else	/* defined(__linux__) */
-typedef IMG_DOUBLE PDP_DOUBLE;
-
-#define	PDP_FPU_BEGIN()
-#define	PDP_FPU_END()
-#endif	/* defined(__linux__) */
 
 #endif /*  __VESAGTF_H__ */
 

@@ -54,32 +54,13 @@ extern "C" {
  */
 
 
-#ifdef __linux__
-
-		#include <linux/ioctl.h>
+#include <linux/ioctl.h>
     /*!< Nov 2006: according to ioctl-number.txt 'g' wasn't in use. */
     #define PVRSRV_IOC_GID      'g'
     #define PVRSRV_IO(INDEX)    _IO(PVRSRV_IOC_GID, INDEX, PVRSRV_BRIDGE_PACKAGE)
     #define PVRSRV_IOW(INDEX)   _IOW(PVRSRV_IOC_GID, INDEX, PVRSRV_BRIDGE_PACKAGE)
     #define PVRSRV_IOR(INDEX)   _IOR(PVRSRV_IOC_GID, INDEX, PVRSRV_BRIDGE_PACKAGE)
     #define PVRSRV_IOWR(INDEX)  _IOWR(PVRSRV_IOC_GID, INDEX, PVRSRV_BRIDGE_PACKAGE)
-
-#else /* __linux__ */
-
- #if  defined(__QNXNTO__)
-			#define PVRSRV_IOC_GID      (0x0UL)
-		#else
-			#error Unknown platform: Cannot define ioctls
-		#endif
-
-	#define PVRSRV_IO(INDEX)    (PVRSRV_IOC_GID + (INDEX))
-	#define PVRSRV_IOW(INDEX)   (PVRSRV_IOC_GID + (INDEX))
-	#define PVRSRV_IOR(INDEX)   (PVRSRV_IOC_GID + (INDEX))
-	#define PVRSRV_IOWR(INDEX)  (PVRSRV_IOC_GID + (INDEX))
-
-	#define PVRSRV_BRIDGE_BASE                  PVRSRV_IOC_GID
-#endif /* __linux__ */
-
 
 /*
  * Note *REMEMBER* to update PVRSRV_BRIDGE_LAST_CMD (below) if you add any new
@@ -1486,7 +1467,6 @@ typedef struct PVRSRV_BRIDGE_OUT_GETFREEDEVICEMEM_TAG
 } PVRSRV_BRIDGE_OUT_GETFREEDEVICEMEM;
 
 
-//#ifdef LINUX
 /******************************************************************************
  *	'bridge out' get full map data
  *****************************************************************************/
@@ -1526,7 +1506,6 @@ typedef struct PVRSRV_BRIDGE_OUT_RELEASE_MMAP_DATA_TAG
     /* Size of mapping */
     IMG_SIZE_T			uiRealByteSize;
 } PVRSRV_BRIDGE_OUT_RELEASE_MMAP_DATA;
-//#endif
 
 typedef struct PVRSRV_BRIDGE_IN_COMPAT_CHECK
 {

@@ -540,13 +540,13 @@ IMG_VOID OSBreakResourceLock (PVRSRV_RESOURCE *psResource, IMG_UINT32 ui32ID)
 ******************************************************************************/
 PVRSRV_ERROR OSCreateResource(PVRSRV_RESOURCE *psResource)
 {
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	PVRSRV_ERROR eError = PVRSRV_OK;
 #endif
 
     psResource->ui32ID = 0;
     psResource->ui32Lock = 0;
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	psResource->pOSSyncPrimitive = IMG_NULL;
 
 	eError = OSAllocMem(PVRSRV_OS_PAGEABLE_HEAP, sizeof(spinlock_t), (IMG_VOID**)&psResource->pOSSyncPrimitive, IMG_NULL,
@@ -559,7 +559,7 @@ PVRSRV_ERROR OSCreateResource(PVRSRV_RESOURCE *psResource)
 	}
 
 	spin_lock_init((spinlock_t*)psResource->pOSSyncPrimitive);
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 
 	return PVRSRV_OK;
 }
@@ -579,12 +579,12 @@ PVRSRV_ERROR OSCreateResource(PVRSRV_RESOURCE *psResource)
 ******************************************************************************/
 PVRSRV_ERROR OSDestroyResource (PVRSRV_RESOURCE *psResource)
 {
-#if !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__)
+#if !defined(PVR_LINUX_USING_WORKQUEUES)
 	if (psResource->pOSSyncPrimitive)
 	{
 		OSFreeMem(PVRSRV_OS_PAGEABLE_HEAP, sizeof(spinlock_t), (IMG_VOID*)psResource->pOSSyncPrimitive, IMG_NULL);
 	}
-#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) && defined(__linux__) */
+#endif /* !defined(PVR_LINUX_USING_WORKQUEUES) */
 
     OSBreakResourceLock (psResource, psResource->ui32ID);
 

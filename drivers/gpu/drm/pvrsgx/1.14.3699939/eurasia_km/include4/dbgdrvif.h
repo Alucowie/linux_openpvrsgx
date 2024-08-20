@@ -43,21 +43,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef _DBGDRVIF_
 #define _DBGDRVIF_
 
-
-#if defined(__linux__)
-
 #define FILE_DEVICE_UNKNOWN             0
 #define METHOD_BUFFERED                 0
 #define FILE_ANY_ACCESS                 0
 
 #define CTL_CODE( DeviceType, Function, Method, Access ) (Function) 
 #define MAKEIOCTLINDEX(i)	((i) & 0xFFF)
-
-#else
-
-#include "ioctldef.h"
-
-#endif
 
 /*****************************************************************************
  Stream mode stuff.
@@ -367,13 +358,10 @@ typedef struct _DBGKM_SERVICE_TABLE_
 	IMG_UINT32 	(IMG_CALLCONV *pfnWritePersist)			(PDBG_STREAM psStream,IMG_UINT8 *pui8InBuf,IMG_UINT32 ui32InBuffSize,IMG_UINT32 ui32Level);
 } DBGKM_SERVICE_TABLE, *PDBGKM_SERVICE_TABLE;
 
-#if defined(__linux__)
 /*****************************************************************************
  Function to export service table from debug driver to the PDUMP component.
 *****************************************************************************/
 IMG_VOID DBGDrvGetServiceTable(DBGKM_SERVICE_TABLE **fn_table);
-#endif
-
 
 #endif
 /*****************************************************************************

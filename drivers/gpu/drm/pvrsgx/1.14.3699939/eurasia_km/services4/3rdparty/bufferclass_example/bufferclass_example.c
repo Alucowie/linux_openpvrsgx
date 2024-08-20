@@ -63,11 +63,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  POWERVR Services
  - IMG is not providing a buffer device driver implementation.
  **************************************************************************/
-#if defined(__linux__)
 #include <linux/string.h>
-#else
-#include <string.h>
-#endif
 
 #include "bufferclass_example.h"
 

@@ -49,12 +49,8 @@ extern "C" {
 
 #include "sgxdefs.h"
 
-#if (defined(__linux__) || defined(__QNXNTO__)) && !defined(USE_CODE)
-	#if defined(__KERNEL__)
-		#include <asm/unistd.h>
-	#else
-		#include <unistd.h>
-	#endif
+#if !defined(USE_CODE)
+	#include <asm/unistd.h>
 #endif
 
 /******************************************************************************
@@ -503,9 +499,6 @@ typedef struct _SGX_KICKTA_DUMP_BUFFER_
 #endif
 	IMG_PCHAR			pszName;							/*< Name of buffer */
 
-#if defined (__QNXNTO__)
-	IMG_UINT32          ui32NameLength;                     /*< Number of characters in buffer name */
-#endif
 } SGX_KICKTA_DUMP_BUFFER, *PSGX_KICKTA_DUMP_BUFFER;
 
 #ifdef PDUMP

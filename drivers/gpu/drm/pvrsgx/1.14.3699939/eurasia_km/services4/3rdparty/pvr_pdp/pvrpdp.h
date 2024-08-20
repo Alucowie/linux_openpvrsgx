@@ -333,11 +333,6 @@ unsigned long PDPClockus (void);
 void  PDPWaitus (unsigned long ulTimeus);
 #endif
 
-#if !defined(__linux__)
-unsigned long PCIReadDword(unsigned long ulBus, unsigned long ulDev, unsigned long ulFunc, unsigned long ulReg);
-void PCIWriteDword(unsigned long ulBus, unsigned long ulDev, unsigned long ulFunc, unsigned long ulReg, unsigned long ulValue);
-#endif
-
 /* PVRPDP hardware details */
 #define PVRPDP_STR1SURF			0x0000
 #define PVRPDP_STR1ADDRCTRL		0x0004

@@ -81,7 +81,6 @@ extern "C" {
 
 #if defined(PVRSRV_NEED_PVR_ASSERT)
 
-#if defined(LINUX) && defined(__KERNEL__)
 /* In Linux kernel mode, use BUG() directly. This produces the correct
    filename and line number in the panic message. */
 #define PVR_ASSERT(EXPR) do											\
@@ -94,33 +93,9 @@ extern "C" {
 		}															\
 	} while (0)
 
-#else /* defined(LINUX) && defined(__KERNEL__) */
 
-IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVDebugAssertFail(const IMG_CHAR *pszFile,
-													   IMG_UINT32 ui32Line);
-
-#if defined(LINUX)
-	#define PVR_ASSERT(EXPR) do								\
-		{													\
-			if (!(EXPR))									\
-				PVRSRVDebugAssertFail(__FILE__, __LINE__);	\
-		} while (0)
-#else
-    #if defined (__QNXNTO__)
-	    #define PVR_ASSERT(EXPR) if (!(EXPR)) PVRSRVDebugAssertFail(__FILE__, __LINE__);
-    #else
-	    #define PVR_ASSERT(EXPR) if (!(EXPR)) PVRSRVDebugAssertFail(__FILE__, __LINE__)
-    #endif
-#endif
-
-#endif /* defined(LINUX) && defined(__KERNEL__) */
-
-
-			#if defined(LINUX) && defined(__KERNEL__)
-				#define PVR_DBG_BREAK BUG()
-			#else
-				#define PVR_DBG_BREAK PVRSRVDebugAssertFail(__FILE__, __LINE__)
-			#endif
+#define PVR_DBG_BREAK BUG()
+//#define PVR_DBG_BREAK PVRSRVDebugAssertFail(__FILE__, __LINE__)
 
 #else  /* defined(PVRSRV_NEED_PVR_ASSERT) */
 

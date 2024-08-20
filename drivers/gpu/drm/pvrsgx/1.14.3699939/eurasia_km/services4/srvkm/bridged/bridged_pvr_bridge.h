@@ -49,11 +49,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 extern "C" {
 #endif
 
-#if defined(__linux__)
 #define PVRSRV_GET_BRIDGE_ID(X)	_IOC_NR(X)
-#else
-#define PVRSRV_GET_BRIDGE_ID(X)	((X) - PVRSRV_IOWR(PVRSRV_BRIDGE_UMKM_CMD_FIRST))
-#endif
 
 #ifndef ENOMEM
 #define ENOMEM	12

@@ -43,11 +43,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "services_headers.h"
 
-#ifndef __linux__
-#warning Reference count debugging is not thread-safe on this platform
-#define PVRSRV_LOCK_CCB()
-#define PVRSRV_UNLOCK_CCB()
-#else /* __linux__ */
 #include <linux/spinlock.h>
 static DEFINE_SPINLOCK(gsCCBLock);
 #define PVRSRV_LOCK_CCB() \
@@ -57,7 +52,6 @@ static DEFINE_SPINLOCK(gsCCBLock);
 #define PVRSRV_UNLOCK_CCB()	\
 		spin_unlock_irqrestore(&gsCCBLock, flags); \
 	}
-#endif /* __linux__ */
 
 #define PVRSRV_REFCOUNT_CCB_MAX			512
 #define PVRSRV_REFCOUNT_CCB_MESG_MAX	80
@@ -68,17 +62,10 @@ static DEFINE_SPINLOCK(gsCCBLock);
 #define PVRSRV_REFCOUNT_CCB_DEBUG_BM_BUF2	(1U << 3)
 #define PVRSRV_REFCOUNT_CCB_DEBUG_BM_XPROC	(1U << 4)
 
-#if defined(__linux__)
 #define PVRSRV_REFCOUNT_CCB_DEBUG_MMAP		(1U << 16)
 #define PVRSRV_REFCOUNT_CCB_DEBUG_MMAP2		(1U << 17)
 #define PVRSRV_REFCOUNT_CCB_DEBUG_ION_SYNC	(1U << 18)
 #define PVRSRV_REFCOUNT_CCB_DEBUG_DMABUF_SYNC	(1U << 19)
-#else
-#define PVRSRV_REFCOUNT_CCB_DEBUG_MMAP		0
-#define PVRSRV_REFCOUNT_CCB_DEBUG_MMAP2		0
-#define PVRSRV_REFCOUNT_CCB_DEBUG_ION_SYNC	0
-#define PVRSRV_REFCOUNT_CCB_DEBUG_DMABUF_SYNC	0
-#endif
 
 #define PVRSRV_REFCOUNT_CCB_DEBUG_ALL		~0U
 
@@ -461,8 +448,6 @@ skip:
 	gXProcWorkaroundShareData[ui32Index].ui32RefCount--;
 }
 
-#if defined(__linux__)
-
 /* mmap refcounting is Linux specific */
 
 IMG_INTERNAL
@@ -752,7 +737,5 @@ skip:
 	PVRSRVDmaBufSyncRelease(psDmaBufSyncInfo);
 }
 #endif /* defined (SUPPORT_DMABUF) */
-
-#endif /* defined(__linux__) */
 
 #endif /* defined(PVRSRV_REFCOUNT_DEBUG) */

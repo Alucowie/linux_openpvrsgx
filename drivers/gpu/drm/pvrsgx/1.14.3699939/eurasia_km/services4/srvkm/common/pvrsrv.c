@@ -1008,9 +1008,6 @@ PVRSRV_ERROR IMG_CALLCONV PollForValueKM (volatile IMG_UINT32*	pui32LinMemAddr,
 #if defined (EMULATOR)
 	{
 		PVR_UNREFERENCED_PARAMETER(bAllowPreemption);
-		#if !defined(__linux__)
-		PVR_UNREFERENCED_PARAMETER(ui32PollPeriodus);
-		#endif	
 		
 		/* For the Emulator we want the system to stop when a lock-up is detected so the state can be analysed.
 		 * Also the Emulator is much slower than real silicon so timeouts are not valid. 
@@ -1022,11 +1019,7 @@ PVRSRV_ERROR IMG_CALLCONV PollForValueKM (volatile IMG_UINT32*	pui32LinMemAddr,
 
 		do
 		{
-			#if defined(__linux__)
 			OSWaitus(ui32PollPeriodus);
-			#else
-			OSReleaseThreadQuanta();
-			#endif	
 
 			if((*pui32LinMemAddr & ui32Mask) == ui32Value)
 			{

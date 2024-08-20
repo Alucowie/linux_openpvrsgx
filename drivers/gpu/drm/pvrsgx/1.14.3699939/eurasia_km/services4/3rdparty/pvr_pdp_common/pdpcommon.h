@@ -53,30 +53,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define PVRPDP_DEVICE_ID_PCIE_EMULATOR		0x1CE3
 #define PVRPDP_DEVICE_ID_PCIE_FPGA			0x1CF3
 
-#if !defined(__linux__)
-/* PCI/PCIe config space structure */
-typedef struct
-{
-	union
-	{
-		unsigned char   aui8PCISpace[256];
-		unsigned short  aui16PCISpace[128];
-		unsigned long   aui32PCISpace[64];
-
-		struct
-		{
-			unsigned short  ui16VenID;
-			unsigned short  ui16DevID;
-			unsigned short  ui16PCICmd;
-			unsigned short  ui16PCIStatus;
-		}s;
-	}u;
-	
-	IMG_UINT32 aui32BAROffset[6];
-	IMG_UINT32 aui32BARSize[6];
-} PCICONFIG_SPACE, *PPCICONFIG_SPACE;
-#endif
-
 /* PCI register & memory defines.. */
 #define PCI_BASEREG_OFFSET_DWORDS		4
 

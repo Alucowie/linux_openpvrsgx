@@ -41,11 +41,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
 
-#if !defined(LINUX) && !defined(__QNXNTO__)
-#include <ntddk.h>
-#include <windef.h>
-#endif
-
 #include "img_types.h"
 #include "pvr_debug.h"
 #include "dbgdrvif.h"

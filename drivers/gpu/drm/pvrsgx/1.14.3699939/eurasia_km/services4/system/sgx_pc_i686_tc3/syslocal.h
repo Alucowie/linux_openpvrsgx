@@ -94,9 +94,7 @@ IMG_CHAR *SysCreateVersionString(IMG_CPU_PHYADDR sRegRegion);
 typedef struct _SYS_SPECIFIC_DATA_TAG_
 {
 	IMG_UINT32 ui32SysSpecificData;
-#ifdef	__linux__
 	PVRSRV_PCI_DEV_HANDLE hSGXPCI;
-#endif
 #if defined(LDM_PCI) || defined(SUPPORT_DRI_DRM)
 	struct pci_dev *psPCIDev;
 #endif

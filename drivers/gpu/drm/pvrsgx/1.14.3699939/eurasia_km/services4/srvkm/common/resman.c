@@ -42,7 +42,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "services_headers.h"
 #include "resman.h"
 
-#ifdef __linux__
 #include <linux/version.h>
 
 #include <linux/sched.h>
@@ -61,13 +60,6 @@ static DEFINE_MUTEX(lock);
 } while (0)
 
 #define RELEASE_SYNC_OBJ mutex_unlock(&lock)
-
-#else
-
-#define ACQUIRE_SYNC_OBJ
-#define RELEASE_SYNC_OBJ
-
-#endif
 
 #define RESMAN_SIGNATURE 0x12345678
 

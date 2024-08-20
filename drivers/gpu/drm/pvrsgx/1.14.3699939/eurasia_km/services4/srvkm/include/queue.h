@@ -89,12 +89,10 @@ IMG_VOID QueueDumpDebugInfo(IMG_VOID);
 IMG_IMPORT
 PVRSRV_ERROR PVRSRVProcessQueues (IMG_BOOL		bFlush);
 
-#if defined(__linux__) && defined(__KERNEL__) 
 #include <linux/types.h>
 #include <linux/seq_file.h>
 void* ProcSeqOff2ElementQueue(struct seq_file * sfile, loff_t off);
 void ProcSeqShowQueue(struct seq_file *sfile,void* el);
-#endif
 
 
 IMG_IMPORT

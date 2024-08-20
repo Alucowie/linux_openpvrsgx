@@ -40,6 +40,4 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /* Pull in the correct system dependent sysutils source */
 
-#if defined(__linux__)
 #include "sysutils_linux.c"
-#endif

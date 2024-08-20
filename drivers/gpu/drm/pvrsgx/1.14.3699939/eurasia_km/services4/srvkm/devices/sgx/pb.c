@@ -50,10 +50,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pdump_km.h"
 #include "sgxutils.h"
 
-#if !defined(__linux__) && !defined(__QNXNTO__)
-#pragma message("FIXME: Review use of OS_PAGEABLE vs OS_NON_PAGEABLE")
-#endif
-
 #include "lists.h"
 
 static IMPLEMENT_LIST_INSERT(PVRSRV_STUB_PBDESC)

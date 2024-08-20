@@ -40,12 +40,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifdef LINUX
 #include <linux/string.h>
-#endif
-#ifdef __QNXNTO__
-#include <string.h>
-#endif
 
 #include "img_types.h"
 #include "pvr_debug.h"
@@ -866,11 +861,6 @@ static void Write(PDBG_STREAM psStream,IMG_PUINT8 pui8Data,IMG_UINT32 ui32InBuff
 *****************************************************************************/
 void MonoOut(IMG_CHAR * pszString,IMG_BOOL bNewLine)
 {
-#if defined (_WIN64)
-	PVR_UNREFERENCED_PARAMETER(pszString);
-	PVR_UNREFERENCED_PARAMETER(bNewLine);
-
-#else
 	IMG_UINT32 	i;
 	IMG_CHAR *	pScreen;
 
@@ -909,7 +899,6 @@ void MonoOut(IMG_CHAR * pszString,IMG_BOOL bNewLine)
 
 		HostMemSet((IMG_VOID *)(DBGDRIV_MONOBASE + (160 * (g_ui32MonoLines - 1))),0,160);
 	}
-#endif	
 }
 
 /*!****************************************************************************

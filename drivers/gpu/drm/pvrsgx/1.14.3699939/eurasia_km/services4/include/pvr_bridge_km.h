@@ -53,7 +53,7 @@ extern "C" {
 /******************************************************************************
  * Function prototypes
  *****************************************************************************/
-#if defined(__linux__)
+
 PVRSRV_ERROR LinuxBridgeInit(IMG_VOID);
 IMG_VOID LinuxBridgeDeInit(IMG_VOID);
 
@@ -61,7 +61,6 @@ IMG_VOID LinuxBridgeDeInit(IMG_VOID);
 extern IMG_UINT64 g_ui64MemInfoID;
 #endif
 
-#endif
 IMG_IMPORT
 IMG_VOID IMG_CALLCONV PVRSRVCompatCheckKM(PVRSRV_BRIDGE_IN_COMPAT_CHECK *psUserModeDDKDetails, PVRSRV_BRIDGE_RETURN *psRetOUT);
 

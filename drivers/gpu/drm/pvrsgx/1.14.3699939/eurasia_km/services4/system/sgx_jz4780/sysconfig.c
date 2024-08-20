@@ -504,7 +504,6 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 	}
 	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_ENABLE_LISR);
 #endif 
-#if defined(__linux__)
 	
 	gpsSysData->pszVersionString = SysCreateVersionString();
 	if (!gpsSysData->pszVersionString)
@@ -515,7 +514,6 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 	{
 		PVR_TRACE(("SysFinalise: Version string: %s", gpsSysData->pszVersionString));
 	}
-#endif
 
 #if defined(SUPPORT_ACTIVE_POWER_MANAGEMENT)
 	

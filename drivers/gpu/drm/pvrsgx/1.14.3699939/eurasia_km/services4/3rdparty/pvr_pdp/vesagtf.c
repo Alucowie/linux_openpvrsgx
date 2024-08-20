@@ -39,12 +39,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#if !defined(__linux__)
-#include <math.h>
-#else
 #include "linux/kernel.h"
 #include "asm/string.h"
-#endif
 
 /* IMG services headers */
 #include "img_defs.h"

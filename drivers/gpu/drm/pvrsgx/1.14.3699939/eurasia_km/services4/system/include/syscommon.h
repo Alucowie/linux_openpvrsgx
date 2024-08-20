@@ -56,7 +56,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_debug.h"
 #include "services.h"
 
-#if defined(NO_HARDWARE) && defined(__linux__) && defined(__KERNEL__)
+#if defined(NO_HARDWARE)
 #include <asm/io.h>
 #endif
 
@@ -298,10 +298,10 @@ static INLINE IMG_VOID SysDeinitialiseCommon(SYS_DATA *psSysData)
  * in that they are always intended for use with real hardware, even on
  * NO_HARDWARE systems.
  */
-#if !(defined(NO_HARDWARE) && defined(__linux__) && defined(__KERNEL__))
+#if !(defined(NO_HARDWARE))
 #define	SysReadHWReg(p, o) OSReadHWReg(p, o)
 #define SysWriteHWReg(p, o, v) OSWriteHWReg(p, o, v)
-#else	/* !(defined(NO_HARDWARE) && defined(__linux__)) */
+#else	/* !(defined(NO_HARDWARE)) */
 /*!
 ******************************************************************************
 
@@ -345,7 +345,7 @@ static inline IMG_VOID SysWriteHWReg(IMG_PVOID pvLinRegBaseAddr, IMG_UINT32 ui32
 {
 	writel(ui32Value, pvLinRegBaseAddr + ui32Offset);
 }
-#endif	/* !(defined(NO_HARDWARE) && defined(__linux__)) */
+#endif	/* !(defined(NO_HARDWARE)) */
 
 #if defined(__cplusplus)
 }

@@ -41,8 +41,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #if !defined(__SYSLOCAL_H__)
 #define __SYSLOCAL_H__
 
-#if defined(__linux__)
-
 #include <linux/version.h>
 #include <linux/clk.h>
 #include <linux/mutex.h>
@@ -61,8 +59,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #if !defined(PVR_LINUX_USING_WORKQUEUES)
 #error "PVR_LINUX_USING_WORKQUEUES must be set"
 #endif
-
-#endif /* defined(__linux__) */
 
 #if defined (__cplusplus)
 extern "C" {
@@ -114,16 +110,11 @@ typedef struct _SYS_SPECIFIC_DATA_TAG_
 	IMG_UINT32	ui32SysSpecificData;
 	PVRSRV_DEVICE_NODE *psSGXDevNode;
 	IMG_BOOL	bSGXInitComplete;
-#if !defined(__linux__)
-	IMG_BOOL	bSGXClocksEnabled;
-#endif
 	IMG_UINT32	ui32SrcClockDiv;
-#if defined(__linux__)
 	IMG_BOOL	bSysClocksOneTimeInit;
 	atomic_t	sSGXClocksEnabled;
 	struct mutex	sPowerLock;
 	IMG_BOOL	bPMRuntimeGetSync;
-#endif	/* defined(__linux__) */
 } SYS_SPECIFIC_DATA;
 
 extern SYS_SPECIFIC_DATA *gpsSysSpecificData;
@@ -136,49 +127,11 @@ IMG_BOOL WrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
 IMG_VOID UnwrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
 #endif
 
-#if defined(__linux__)
-
 PVRSRV_ERROR SysPMRuntimeRegister(void);
 PVRSRV_ERROR SysPMRuntimeUnregister(void);
 
 PVRSRV_ERROR SysDvfsInitialize(SYS_SPECIFIC_DATA *psSysSpecificData);
 PVRSRV_ERROR SysDvfsDeinitialize(SYS_SPECIFIC_DATA *psSysSpecificData);
-
-#else /* defined(__linux__) */
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysPMRuntimeRegister)
-#endif
-static INLINE PVRSRV_ERROR SysPMRuntimeRegister(void)
-{
-	return PVRSRV_OK;
-}
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysPMRuntimeUnregister)
-#endif
-static INLINE PVRSRV_ERROR SysPMRuntimeUnregister(void)
-{
-	return PVRSRV_OK;
-}
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysDvfsInitialize)
-#endif
-static INLINE PVRSRV_ERROR SysDvfsInitialize(void)
-{
-	return PVRSRV_OK;
-}
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysDvfsDeinitialize)
-#endif
-static INLINE PVRSRV_ERROR SysDvfsDeinitialize(void)
-{
-	return PVRSRV_OK;
-}
-
-#endif /* defined(__linux__) */
 
 #if defined(__cplusplus)
 }

@@ -64,7 +64,7 @@ $(OUT)/target/kbuild/%.c: $(TOP)/%.c
 	@if [ ! -e $(dir $@) ]; then mkdir -p $(dir $@); fi
 	@if [ ! -h $@ ]; then ln -sf $< $@; fi
 
-ccflags-y += -D__linux__ -include $(OUT)/config_kernel.h \
+ccflags-y += -include $(OUT)/config_kernel.h \
  -I$(OUT)/include \
  -I$(TOP)/include4 \
  -I$(TOP)/services4/include \

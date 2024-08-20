@@ -116,31 +116,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * system specific configs
  *****************************************************************************/
  
- 
-#if !defined(__linux__)
-/*!
- *****************************************************************************
-	 PCI Config space mapping structures
- ****************************************************************************/
-typedef struct  
-{
-	union
-	{
-		IMG_UINT8	aui8PCISpace[256];
-		IMG_UINT16	aui16PCISpace[128];
-		IMG_UINT32	aui32PCISpace[64];
-		struct  
-		{
-			IMG_UINT16	ui16VenID;
-			IMG_UINT16	ui16DevID;
-			IMG_UINT16	ui16PCICmd;
-			IMG_UINT16	ui16PCIStatus;
-		}s;
-	}u;
-
-} PCICONFIG_SPACE, *PPCICONFIG_SPACE;
-#endif
-
 /*! Some other interesting registers */
 #define SYS_SGX_DEV_ID_16_PCI_OFFSET   1
 #define SYS_SGX_VEN_ID_16_PCI_OFFSET   0

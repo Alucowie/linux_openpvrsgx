@@ -40,10 +40,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
 
-#ifdef LINUX
 #include <asm/uaccess.h>
 #include "pvr_uaccess.h"
-#endif /* LINUX */
 
 #include "img_types.h"
 #include "dbgdrvif.h"
@@ -69,14 +67,10 @@ static IMG_UINT32 DBGDIOCDrivCreateStream(IMG_VOID * pvInBuffer, IMG_VOID * pvOu
 {
 	PDBG_IN_CREATESTREAM psIn;
 	IMG_VOID * *ppvOut;
-	#ifdef LINUX
 	static IMG_CHAR name[32];
-	#endif
 
 	psIn = (PDBG_IN_CREATESTREAM) pvInBuffer;
 	ppvOut = (IMG_VOID * *) pvOutBuffer;
-
-	#ifdef LINUX
 
 	if(pvr_copy_from_user(name, psIn->u.pszName, 32) != 0)
 	{
@@ -84,11 +78,6 @@ static IMG_UINT32 DBGDIOCDrivCreateStream(IMG_VOID * pvInBuffer, IMG_VOID * pvOu
 	}
 
 	*ppvOut = ExtDBGDrivCreateStream(name, psIn->ui32CapMode, psIn->ui32OutMode, 0, psIn->ui32Pages);
-
-	#else
-	*ppvOut = ExtDBGDrivCreateStream(psIn->u.pszName, psIn->ui32CapMode, psIn->ui32OutMode, DEBUG_FLAGS_NO_BUF_EXPANDSION, psIn->ui32Pages);
-	#endif
-
 
 	return(IMG_TRUE);
 }

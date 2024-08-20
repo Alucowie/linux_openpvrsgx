@@ -83,11 +83,7 @@ typedef		enum	img_tag_TriStateSwitch
  * unused parameter in a function parameter list, eg `int unref__ var'. This
  * should only be used in GCC build environments, for example, in files that
  * compile only on Linux. Other files should use UNREFERENCED_PARAMETER */
-#ifdef __GNUC__
 #define unref__ __attribute__ ((unused))
-#else
-#define unref__
-#endif
 
 /*
 	Wide character definitions
@@ -101,18 +97,11 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
 #define _TCHAR_DEFINED
 #endif /* #ifndef _TCHAR_DEFINED */
 
-
-			#if defined(__linux__) || defined(__QNXNTO__) || defined(__METAG)
-
-				#define IMG_CALLCONV
-				#define IMG_INTERNAL	__attribute__((visibility("hidden")))
-				#define IMG_EXPORT		__attribute__((visibility("default")))
-				#define IMG_IMPORT
-				#define IMG_RESTRICT	__restrict__
-
-			#else
-					#error("define an OS")
-			#endif
+#define IMG_CALLCONV
+#define IMG_INTERNAL	__attribute__((visibility("hidden")))
+#define IMG_EXPORT		__attribute__((visibility("default")))
+#define IMG_IMPORT
+#define IMG_RESTRICT	__restrict__
 
 // Use default definition if not overridden
 #ifndef IMG_ABORT
@@ -129,11 +118,7 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
 
 #define IMG_CONST const
 
-#if defined(__GNUC__)
 #define IMG_FORMAT_PRINTF(x,y)		__attribute__((format(printf,x,y)))
-#else
-#define IMG_FORMAT_PRINTF(x,y)
-#endif
 
 /*
  * Cleanup request defines
@@ -141,24 +126,16 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
 #define  CLEANUP_WITH_POLL		IMG_FALSE
 #define  FORCE_CLEANUP			IMG_TRUE
 
-#if defined (_WIN64)
-#define IMG_UNDEF	(~0ULL)
-#else
 #define IMG_UNDEF	(~0UL)
-#endif
 
 /*
    Do the right thing when using printf to output cpu addresses,
    depending on architecture.
  */
-#if defined (_WIN64)
-    #define UINTPTR_FMT "%016llX"
+#if defined (__x86_64__)
+#define UINTPTR_FMT "%016lX"
 #else
-    #if defined (__x86_64__)
-        #define UINTPTR_FMT "%016lX"
-    #else
-        #define UINTPTR_FMT "%08lX"
-    #endif
+#define UINTPTR_FMT "%08lX"
 #endif
 
 /* 
@@ -195,15 +172,8 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
    64 bit Linux builds, or Win32/64 builds), a size_t (or IMG_SIZE_T) can be
    passed to printf-type functions without a cast.
 */
-#if defined LINUX
-	/* Use C99 format specifier where possible */
-	#define SIZE_T_FMT_LEN "z"
-#elif  defined _WIN64
-	#define SIZE_T_FMT_LEN "I"
-#else
-	#define SIZE_T_FMT_LEN "l" /* May need to be updated as required, for other OSs */
-#endif
-
+/* Use C99 format specifier where possible */
+#define SIZE_T_FMT_LEN "z"
 
 #if defined (__x86_64__)
 	#define IMG_UINT64_FMT "l"

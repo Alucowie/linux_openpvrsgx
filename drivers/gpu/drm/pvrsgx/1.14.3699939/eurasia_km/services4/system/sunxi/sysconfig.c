@@ -146,16 +146,9 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 	}
 	gsSGXDeviceMap.sRegsCpuPBase = sCpuPAddr;
 	gsSGXDeviceMap.sRegsSysPBase = SysCpuPAddrToSysPAddr(gsSGXDeviceMap.sRegsCpuPBase);
-#if defined(__linux__)
+
 	/* Indicate the registers are already mapped */
 	gsSGXDeviceMap.pvRegsCpuVBase = gsSGXRegsCPUVAddr;
-#else
-	/*
-	 * FIXME: Could we just use the virtual address returned by
-	 * OSBaseAllocContigMemory?
-	 */
-	gsSGXDeviceMap.pvRegsCpuVBase = IMG_NULL;
-#endif
 
 	OSMemSet(gsSGXRegsCPUVAddr, 0, gsSGXDeviceMap.ui32RegsSize);
 
@@ -520,7 +513,7 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 	SysEnableSGXInterrupts(gpsSysData);
 #endif
 #endif /* defined(SYS_USING_INTERRUPTS) */
-#if defined(__linux__)
+
 	/* Create a human readable version string for this system */
 	gpsSysData->pszVersionString = SysCreateVersionString();
 	if (!gpsSysData->pszVersionString)
@@ -531,7 +524,6 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 	{
 		PVR_TRACE(("SysFinalise: Version string: %s", gpsSysData->pszVersionString));
 	}
-#endif
 
 #if defined(SUPPORT_ACTIVE_POWER_MANAGEMENT)
 	/* SGX defaults to D3 power state */

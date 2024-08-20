@@ -765,7 +765,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVUnmapPhysToUserSpace(IMG_CONST PVRSRV_DEV_DATA *
 										IMG_PVOID pvUserAddr,
 										IMG_PVOID pvProcess);
 
-#if defined(LINUX)
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVExportDeviceMem2(IMG_CONST PVRSRV_DEV_DATA	*psDevData,
 												 PVRSRV_CLIENT_MEM_INFO		*psMemInfo,
@@ -776,8 +775,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceMemory2(IMG_CONST PVRSRV_DEV_DATA	*psDe
 												 IMG_INT					iFd,
 												 IMG_HANDLE					hDstDevMemHeap,
 												 PVRSRV_CLIENT_MEM_INFO		**ppsDstMemInfo);
-#endif /* defined(LINUX) */
-
 #if defined(SUPPORT_ION)
 PVRSRV_ERROR PVRSRVMapIonHandle(const PVRSRV_DEV_DATA *psDevData,
 								IMG_HANDLE hDevMemHeap,
@@ -1325,7 +1322,7 @@ static INLINE IMG_VOID PVRSRVPostSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphore, I
 
 
 /* Non-exported APIs */
-#if defined(DEBUG) && (defined(__linux__) || defined(__QNXNTO__) )
+#if defined(DEBUG)
 IMG_IMPORT IMG_PVOID IMG_CALLCONV PVRSRVAllocUserModeMemTracking(IMG_SIZE_T ui32Size, IMG_CHAR *pszFileName, IMG_UINT32 ui32LineNumber);
 
 IMG_IMPORT IMG_PVOID IMG_CALLCONV PVRSRVCallocUserModeMemTracking(IMG_SIZE_T ui32Size, IMG_CHAR *pszFileName, IMG_UINT32 ui32LineNumber);

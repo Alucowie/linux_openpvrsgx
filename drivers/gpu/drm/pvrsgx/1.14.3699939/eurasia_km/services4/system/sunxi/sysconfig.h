@@ -66,14 +66,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define DEVICE_MSVDX_INTERRUPT		(1<<1)
 #define DEVICE_DISP_INTERRUPT		(1<<2)
 
-#if defined(__linux__)
-
 #if defined(PVR_LDM_PLATFORM_PRE_REGISTERED_DEV)
 #define	SYS_SGX_DEV_NAME	PVR_LDM_PLATFORM_PRE_REGISTERED_DEV
 #else
 #define	SYS_SGX_DEV_NAME	"sunxi_gpu"
 #endif	/* defined(PVR_LDM_PLATFORM_PRE_REGISTERED_DEV) */
-#endif	/* defined(__linux__) */
 
 /*****************************************************************************
  * system specific data structures

@@ -108,7 +108,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define DEVICE_MSVDX_INTERRUPT		(1<<1)
 #define DEVICE_DISP_INTERRUPT		(1<<2)
 
-#if defined(__linux__)
 #if defined(PVR_LDM_DEVICE_TREE)
 #if !defined(SYS_SGX_DEV_NAME)
 #if (AM_VERSION == 5)
@@ -133,7 +132,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif	/* defined(PVR_LDM_PLATFORM_PRE_REGISTERED_DEV) */
 #endif
 #endif	/* defined(PVR_LDM_DEVICE_TREE) */
-#endif	/* defined(__linux__) */
 
 /*****************************************************************************
  * system specific data structures

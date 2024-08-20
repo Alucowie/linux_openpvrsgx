@@ -93,7 +93,6 @@ endif
 #
 
 ccflags-y += \
-	-DLINUX -D__linux__ \
 	-DPVR_BUILD_DIR="\"omap_sgx\"" \
 	-DPVR_LDM_DRIVER_REGISTRATION_NAME="\"pvrsrvkm"\" \
 	-DPVRSRV_MODNAME="\"pvrsrvkm"\" \

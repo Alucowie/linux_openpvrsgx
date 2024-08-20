@@ -77,20 +77,12 @@ typedef signed long		IMG_INT32,	*IMG_PINT32;
 #if  defined(USE_CODE)
 	typedef unsigned __int64	IMG_UINT64, *IMG_PUINT64;
 	typedef __int64				IMG_INT64,  *IMG_PINT64;
-#elif defined(LINUX) && defined (__x86_64)
+#elif defined (__x86_64)
 	typedef unsigned long		IMG_UINT64,	*IMG_PUINT64;
 	typedef long 				IMG_INT64,	*IMG_PINT64;
-#elif defined(LINUX) || defined(__METAG) || defined (__QNXNTO__)
+#else
 	typedef unsigned long long		IMG_UINT64,	*IMG_PUINT64;
 	typedef long long 				IMG_INT64,	*IMG_PINT64;
-#else
-	#error("define an OS")
-#endif
-
-#if !(defined(LINUX) && defined (__KERNEL__))
-/* Linux kernel mode does not use floating point */
-typedef float			IMG_FLOAT,	*IMG_PFLOAT;
-typedef double			IMG_DOUBLE, *IMG_PDOUBLE;
 #endif
 
 typedef	enum tag_img_bool
@@ -104,21 +96,14 @@ typedef void            IMG_VOID, *IMG_PVOID;
 
 typedef IMG_INT32       IMG_RESULT;
 
-#if defined(_WIN64)
-	typedef unsigned __int64	IMG_UINTPTR_T;
-    typedef signed   __int64    IMG_INTPTR_T;
-	typedef signed __int64		IMG_PTRDIFF_T;
-	typedef IMG_UINT64			IMG_SIZE_T;
+#if defined (__x86_64__)
+typedef IMG_UINT64		IMG_SIZE_T;
+typedef unsigned long   IMG_UINTPTR_T;
+typedef signed long     IMG_INTPTR_T;
 #else
-    #if defined (__x86_64__)
-    	typedef IMG_UINT64		IMG_SIZE_T;
-        typedef unsigned long   IMG_UINTPTR_T;
-        typedef signed long     IMG_INTPTR_T;
-    #else
-    	typedef IMG_UINT32		IMG_SIZE_T;
-        typedef unsigned long	IMG_UINTPTR_T;
-        typedef signed long     IMG_INTPTR_T;
-    #endif
+typedef IMG_UINT32		IMG_SIZE_T;
+typedef unsigned long	IMG_UINTPTR_T;
+typedef signed long     IMG_INTPTR_T;
 #endif
 
 typedef IMG_PVOID       IMG_HANDLE;

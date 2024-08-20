@@ -94,8 +94,6 @@ void PVRSRVBMXProcIncRef2(const IMG_CHAR *pszFile, IMG_INT iLine,
 void PVRSRVBMXProcDecRef2(const IMG_CHAR *pszFile, IMG_INT iLine,
 						  IMG_UINT32 ui32Index);
 
-#if defined(__linux__)
-
 /* mmap refcounting is Linux specific */
 #include "mmap.h"
 
@@ -151,8 +149,6 @@ void PVRSRVDmaBufSyncInfoDecRef2(const IMG_CHAR *pszFile, IMG_INT iLine,
 									PVRSRV_DMABUF_SYNC_INFO *psDmaBufSyncInfo,
 									PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo);
 #endif /* defined (SUPPORT_DMABUF) */
-
-#endif /* defined(__linux__) */
 
 #else /* defined(PVRSRV_REFCOUNT_DEBUG) */
 
@@ -211,8 +207,6 @@ static INLINE void PVRSRVBMXProcDecRef(IMG_UINT32 ui32Index)
 {
 	gXProcWorkaroundShareData[ui32Index].ui32RefCount--;
 }
-
-#if defined(__linux__)
 
 /* mmap refcounting is Linux specific */
 #include "mmap.h"
@@ -282,8 +276,6 @@ static INLINE void PVRSRVDmaBufSyncInfoDecRef(PVRSRV_DMABUF_SYNC_INFO *psDmaBufS
 	PVRSRVDmaBufSyncRelease(psDmaBufSyncInfo);
 }
 #endif	/* defined (SUPPORT_DMABUF) */
-
-#endif /* defined(__linux__) */
 
 #endif /* defined(PVRSRV_REFCOUNT_DEBUG) */
 

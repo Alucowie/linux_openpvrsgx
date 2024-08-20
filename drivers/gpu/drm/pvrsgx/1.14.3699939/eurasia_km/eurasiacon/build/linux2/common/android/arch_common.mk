@@ -51,8 +51,7 @@ _CLANG	:= $(shell ../tools/cc-check.sh --clang --cc $(_CC))
 
 SYS_CFLAGS := \
  -fno-short-enums \
- -funwind-tables \
- -D__linux__
+ -funwind-tables
 SYS_INCLUDES := \
  -isystem $(ANDROID_ROOT)/bionic/libc/arch-$(ANDROID_ARCH)/include \
  -isystem $(ANDROID_ROOT)/bionic/libc/include \

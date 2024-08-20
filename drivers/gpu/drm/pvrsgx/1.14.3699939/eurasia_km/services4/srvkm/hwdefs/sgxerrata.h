@@ -467,11 +467,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 #if !defined(SGX_CORE_DEFINED)
-#if defined (__GNUC__)
 	#warning "sgxerrata.h: SGX Core Version unspecified"
-#else
-	#pragma message("sgxerrata.h: SGX Core Version unspecified")
-#endif
 #endif
 
 /* restore warning */

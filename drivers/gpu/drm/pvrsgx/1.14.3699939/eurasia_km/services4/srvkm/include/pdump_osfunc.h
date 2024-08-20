@@ -60,36 +60,6 @@ extern "C" {
 #define MAX_PDUMP_STRING_LENGTH (256)
 
 
-#if defined(__QNXNTO__)
-
-#define PDUMP_GET_SCRIPT_STRING()	\
-	IMG_CHAR pszScript[MAX_PDUMP_STRING_LENGTH];		\
-	IMG_UINT32	ui32MaxLen = MAX_PDUMP_STRING_LENGTH-1;	\
-	IMG_HANDLE	hScript = (IMG_HANDLE)pszScript;
-
-#define PDUMP_GET_MSG_STRING()		\
-	IMG_CHAR pszMsg[MAX_PDUMP_STRING_LENGTH];			\
-	IMG_UINT32	ui32MaxLen = MAX_PDUMP_STRING_LENGTH-1;
-
-#define PDUMP_GET_FILE_STRING()		\
-	IMG_CHAR	pszFileName[MAX_PDUMP_STRING_LENGTH];	\
-	IMG_UINT32	ui32MaxLen = MAX_PDUMP_STRING_LENGTH-1;
-
-#define PDUMP_GET_SCRIPT_AND_FILE_STRING()		\
-	IMG_CHAR 	pszScript[MAX_PDUMP_STRING_LENGTH];		\
-	IMG_CHAR	pszFileName[MAX_PDUMP_STRING_LENGTH];	\
-	IMG_UINT32	ui32MaxLenScript = MAX_PDUMP_STRING_LENGTH-1;	\
-	IMG_UINT32	ui32MaxLenFileName = MAX_PDUMP_STRING_LENGTH-1;	\
-	IMG_HANDLE	hScript = (IMG_HANDLE)pszScript;
-
-#define PDUMP_LOCK(args...)
-#define PDUMP_UNLOCK(args...)
-#define PDUMP_LOCK_MSG(args...)
-#define PDUMP_UNLOCK_MSG(args...)
-
-#else  /* __QNXNTO__ */
-
-
 	/*
 	 * Linux
 	 */
@@ -164,8 +134,6 @@ extern "C" {
 	 * @return	error none
 	 */
 	IMG_VOID PDumpOSUnlockMessageBuffer(IMG_VOID);
-
-#endif /* __QNXNTO__ */
 
 	/*!
 	 * @name	PDumpOSGetScriptString

@@ -71,9 +71,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "ttrace.h"
 #include "ttrace_tokens.h"
 
-#if defined (__linux__) || defined(__QNXNTO__)
 #include "mmap.h"
-#endif
 
 
 #if defined(PVR_ANDROID_NATIVE_WINDOW_HAS_SYNC)
@@ -639,11 +637,8 @@ PVRSRVAllocDeviceMemBW(IMG_UINT32 ui32BridgeID,
 	psAllocDeviceMemOUT->sClientMemInfo.pvLinAddrKM =
 			psMemInfo->pvLinAddrKM;
 
-#if defined (__linux__)
 	psAllocDeviceMemOUT->sClientMemInfo.pvLinAddr = 0;
-#else
-	psAllocDeviceMemOUT->sClientMemInfo.pvLinAddr = psMemInfo->pvLinAddrKM;
-#endif
+	//psAllocDeviceMemOUT->sClientMemInfo.pvLinAddr = psMemInfo->pvLinAddrKM;
 	psAllocDeviceMemOUT->sClientMemInfo.sDevVAddr = psMemInfo->sDevVAddr;
 	psAllocDeviceMemOUT->sClientMemInfo.ui32Flags = psMemInfo->ui32Flags;
 	psAllocDeviceMemOUT->sClientMemInfo.uAllocSize = psMemInfo->uAllocSize;
@@ -1700,7 +1695,6 @@ PVRMMapOSMemHandleToMMapDataBW(IMG_UINT32 ui32BridgeID,
 {
 	PVRSRV_BRIDGE_ASSERT_CMD(ui32BridgeID, PVRSRV_BRIDGE_MHANDLE_TO_MMAP_DATA);
 
-#if defined (__linux__) || defined (__QNXNTO__)
 	psMMapDataOUT->eError =
 		PVRMMapOSMemHandleToMMapData(psPerProc,
 										psMMapDataIN->hMHandle,
@@ -1708,12 +1702,6 @@ PVRMMapOSMemHandleToMMapDataBW(IMG_UINT32 ui32BridgeID,
 										&psMMapDataOUT->uiByteOffset,
 										&psMMapDataOUT->uiRealByteSize,
 										&psMMapDataOUT->uiUserVAddr);
-#else
-	PVR_UNREFERENCED_PARAMETER(psPerProc);
-	PVR_UNREFERENCED_PARAMETER(psMMapDataIN);
-
-	psMMapDataOUT->eError = PVRSRV_ERROR_NOT_SUPPORTED;
-#endif
 	return 0;
 }
 
@@ -1726,20 +1714,12 @@ PVRMMapReleaseMMapDataBW(IMG_UINT32 ui32BridgeID,
 {
 	PVRSRV_BRIDGE_ASSERT_CMD(ui32BridgeID, PVRSRV_BRIDGE_RELEASE_MMAP_DATA);
 
-#if defined (__linux__) || defined (__QNXNTO__)
 	psMMapDataOUT->eError =
 		PVRMMapReleaseMMapData(psPerProc,
 										psMMapDataIN->hMHandle,
 										&psMMapDataOUT->bMUnmap,
 										&psMMapDataOUT->uiRealByteSize,
 										&psMMapDataOUT->uiUserVAddr);
-#else
-
-	PVR_UNREFERENCED_PARAMETER(psPerProc);
-	PVR_UNREFERENCED_PARAMETER(psMMapDataIN);
-
-	psMMapDataOUT->eError = PVRSRV_ERROR_NOT_SUPPORTED;
-#endif
 	return 0;
 }
 
@@ -3681,9 +3661,7 @@ PVRSRVInitSrvConnectBW(IMG_UINT32 ui32BridgeID,
 		return 0;
 	}
 
-#if defined (__linux__) || defined (__QNXNTO__)
 	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RUNNING, IMG_TRUE);
-#endif
 	psPerProc->bInitProcess = IMG_TRUE;
 
 	psRetOUT->eError = PVRSRV_OK;
@@ -4806,9 +4784,11 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 {
 	IMG_VOID   * psBridgeIn;
 	IMG_VOID   * psBridgeOut;
+	SYS_DATA   * psSysData;
 	BridgeWrapperFunction pfBridgeHandler;
 	IMG_UINT32   ui32BridgeID = psBridgePackageKM->ui32BridgeID;
 	IMG_INT      err          = -EFAULT;
+
 
 #if defined(DEBUG_TRACE_BRIDGE_KM)
 	PVR_DPF((PVR_DBG_ERROR, "%s: %s",
@@ -4860,49 +4840,39 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 		}
 	}
 
-#if defined(__linux__)
+	SysAcquireData(&psSysData);
+
+	/* We have already set up some static buffers to store our ioctl data... */
+	psBridgeIn = ((ENV_DATA *)psSysData->pvEnvSpecificData)->pvBridgeData;
+	psBridgeOut = (IMG_PVOID)((IMG_PBYTE)psBridgeIn + PVRSRV_MAX_BRIDGE_IN_SIZE);
+
+	/* check we are not using a bigger bridge than allocated */
+	if((psBridgePackageKM->ui32InBufferSize > PVRSRV_MAX_BRIDGE_IN_SIZE) || 
+		(psBridgePackageKM->ui32OutBufferSize > PVRSRV_MAX_BRIDGE_OUT_SIZE))
 	{
-		/* This should be moved into the linux specific code */
-		SYS_DATA *psSysData;
+		goto return_fault;
+	}
 
-		SysAcquireData(&psSysData);
 
-		/* We have already set up some static buffers to store our ioctl data... */
-		psBridgeIn = ((ENV_DATA *)psSysData->pvEnvSpecificData)->pvBridgeData;
-		psBridgeOut = (IMG_PVOID)((IMG_PBYTE)psBridgeIn + PVRSRV_MAX_BRIDGE_IN_SIZE);
+	if(psBridgePackageKM->ui32InBufferSize > 0)
+	{
+		if(!OSAccessOK(PVR_VERIFY_READ,
+						psBridgePackageKM->pvParamIn,
+						psBridgePackageKM->ui32InBufferSize))
+		{
+			PVR_DPF((PVR_DBG_ERROR, "%s: Invalid pvParamIn pointer", __FUNCTION__));
+		}
 
-		/* check we are not using a bigger bridge than allocated */
-		if((psBridgePackageKM->ui32InBufferSize > PVRSRV_MAX_BRIDGE_IN_SIZE) || 
-			(psBridgePackageKM->ui32OutBufferSize > PVRSRV_MAX_BRIDGE_OUT_SIZE))
+		if(CopyFromUserWrapper(psPerProc,
+					       ui32BridgeID,
+							   psBridgeIn,
+							   psBridgePackageKM->pvParamIn,
+							   psBridgePackageKM->ui32InBufferSize)
+		  != PVRSRV_OK)
 		{
 			goto return_fault;
 		}
-
-
-		if(psBridgePackageKM->ui32InBufferSize > 0)
-		{
-			if(!OSAccessOK(PVR_VERIFY_READ,
-							psBridgePackageKM->pvParamIn,
-							psBridgePackageKM->ui32InBufferSize))
-			{
-				PVR_DPF((PVR_DBG_ERROR, "%s: Invalid pvParamIn pointer", __FUNCTION__));
-			}
-
-			if(CopyFromUserWrapper(psPerProc,
-					               ui32BridgeID,
-								   psBridgeIn,
-								   psBridgePackageKM->pvParamIn,
-								   psBridgePackageKM->ui32InBufferSize)
-			  != PVRSRV_OK)
-			{
-				goto return_fault;
-			}
-		}
 	}
-#else
-	psBridgeIn  = psBridgePackageKM->pvParamIn;
-	psBridgeOut = psBridgePackageKM->pvParamOut;
-#endif
 
 	if(ui32BridgeID >= (BRIDGE_DISPATCH_TABLE_ENTRY_COUNT))
 	{
@@ -4927,8 +4897,6 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 		}
 	}
 
-#if defined(__linux__)
-	/* This should be moved into the linux specific code */
 	if(CopyToUserWrapper(psPerProc,
 						 ui32BridgeID,
 						 psBridgePackageKM->pvParamOut,
@@ -4938,7 +4906,6 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 	{
 		goto return_fault;
 	}
-#endif
 
 	err = 0;
 return_fault:

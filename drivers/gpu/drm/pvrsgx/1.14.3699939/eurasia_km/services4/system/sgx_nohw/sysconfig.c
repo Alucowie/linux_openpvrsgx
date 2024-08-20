@@ -112,16 +112,8 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 	gsSGXDeviceMap.ui32RegsSize = SGX_REG_SIZE;
 	OSMemSet(gsSGXRegsCPUVAddr, 0, SGX_REG_SIZE);
 
-#if defined(__linux__)
 	/* Indicate the registers are already mapped */
 	gsSGXDeviceMap.pvRegsCpuVBase = gsSGXRegsCPUVAddr;
-#else
-	/*
-	 * FIXME: Could we just use the virtual address returned by
-	 * OSBaseAllocContigMemory?
-	 */
-	gsSGXDeviceMap.pvRegsCpuVBase = IMG_NULL;
-#endif
 
 #if defined(SGX_FEATURE_HOST_PORT)
 	/* HostPort: */
@@ -771,11 +763,7 @@ PVRSRV_ERROR SysOEMFunction(IMG_UINT32	ui32ID,
 		(ulOutSize == sizeof(PVRSRV_DC_OEM_JTABLE)))
 	{
 		PVRSRV_DC_OEM_JTABLE *psOEMJTable = (PVRSRV_DC_OEM_JTABLE*)pvOut;
-#if  defined (__QNXNTO__)
-		psOEMJTable->pfnOEMBridgeDispatch = IMG_NULL;
-#else
 		psOEMJTable->pfnOEMBridgeDispatch = &PVRSRV_BridgeDispatchKM;
-#endif
 
 		return PVRSRV_OK;
 	}

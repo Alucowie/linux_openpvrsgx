@@ -59,12 +59,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "ttrace.h"
 #include "sgxmmu.h"
 
-#ifdef __linux__
 #include <linux/kernel.h>	// sprintf
 #include <linux/string.h>	// strncpy, strlen
-#else
-#include <stdio.h>
-#endif
 
 IMG_UINT64 ui64KickCount;
 

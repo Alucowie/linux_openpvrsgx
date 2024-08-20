@@ -66,11 +66,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  - IMG is not providing a display driver implementation.
  **************************************************************************/
 
-#if defined(__linux__)
 #include <linux/string.h>
-#else
-#include <string.h>
-#endif
 
 /* IMG services headers */
 #include "img_defs.h"
