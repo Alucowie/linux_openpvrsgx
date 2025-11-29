@@ -90,11 +90,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 #if defined(SUPPORT_LINUX_X86_PAT)
-	#if defined(SUPPORT_LINUX_X86_WRITECOMBINE)
 		#define IOREMAP_WC(pa, bytes) ioremap_wc(pa, bytes)
-	#else
-		#define IOREMAP_WC(pa, bytes) ioremap_nocache(pa, bytes)
-	#endif
 #else
 	#if defined(__arm__)
 		#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27))
