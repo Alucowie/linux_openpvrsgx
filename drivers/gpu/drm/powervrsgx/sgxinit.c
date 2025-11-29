@@ -65,7 +65,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "lists.h"
 #include "srvkm.h"
-#include "ttrace.h"
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(3,7,0))
 //#include <soc.h>
@@ -1552,10 +1551,6 @@ IMG_VOID SGXDumpDebugInfo (PVRSRV_SGXDEV_INFO	*psDevInfo,
 		}
 		#endif /* PVRSRV_DUMP_KERNEL_CCB */
 	}
-	#if defined (TTRACE)
-	PVRSRVDumpTimeTraceBuffers();
-	#endif
-
 }
 
 

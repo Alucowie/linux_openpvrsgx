@@ -56,7 +56,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "osfunc.h"
 #include "pvr_debug.h"
 #include "sgxutils.h"
-#include "ttrace.h"
 
 #ifdef __linux__
 #include <linux/kernel.h>	// sprintf
@@ -615,15 +614,6 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 	psSGXHostCtl->ui32InterruptClearFlags |= PVRSRV_USSE_EDM_INTERRUPT_ACTIVE_POWER;
 
 	OSWriteMemoryBarrier();
-
-	/* Order is importent for post processor! */
-	PVR_TTRACE_UI32(PVRSRV_TRACE_GROUP_MKSYNC, PVRSRV_TRACE_CLASS_NONE,
-			MKSYNC_TOKEN_KERNEL_CCB_OFFSET, *psKernelCCB->pui32WriteOffset);
-	PVR_TTRACE_UI32(PVRSRV_TRACE_GROUP_MKSYNC, PVRSRV_TRACE_CLASS_NONE,
-			MKSYNC_TOKEN_CORE_CLK, psDevInfo->ui32CoreClockSpeed);
-	PVR_TTRACE_UI32(PVRSRV_TRACE_GROUP_MKSYNC, PVRSRV_TRACE_CLASS_NONE,
-			MKSYNC_TOKEN_UKERNEL_CLK, psDevInfo->ui32uKernelTimerClock);
-
 
 #if defined(FIX_HW_BRN_26620) && defined(SGX_FEATURE_SYSTEM_CACHE) && !defined(SGX_BYPASS_SYSTEM_CACHE)
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM,

@@ -45,9 +45,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "handle.h"
 #include "perproc.h"
 #include "osperproc.h"
-#if defined(TTRACE)
-#include "ttrace.h"
-#endif
 
 #define	HASH_TAB_INIT_SIZE 32
 
@@ -270,9 +267,6 @@ PVRSRV_ERROR PVRSRVPerProcessDataConnect(IMG_UINT32	ui32PID, IMG_UINT32 ui32Flag
 			PVR_DPF((PVR_DBG_ERROR, "PVRSRVPerProcessDataConnect: Couldn't register with the resource manager"));
 			goto failure;
 		}
-#if defined (TTRACE)
-		PVRSRVTimeTraceBufferCreate(ui32PID);
-#endif
 	}
 	
 	psPerProc->ui32RefCount++;
@@ -323,10 +317,6 @@ IMG_VOID PVRSRVPerProcessDataDisconnect(IMG_UINT32	ui32PID)
 
 			/* Close the Resource Manager connection */
 			PVRSRVResManDisconnect(psPerProc->hResManContext, IMG_FALSE);
-
-#if defined (TTRACE)
-			PVRSRVTimeTraceBufferDestroy(ui32PID);
-#endif
 
 			/* Free the per-process data */
 			eError = FreePerProcessData(psPerProc);
