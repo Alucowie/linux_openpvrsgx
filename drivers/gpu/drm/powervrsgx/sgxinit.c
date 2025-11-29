@@ -1070,7 +1070,6 @@ static PVRSRV_ERROR DevDeInitSGX (IMG_VOID *pvDeviceNode)
 		return PVRSRV_OK;
 	}
 
-#if defined(SUPPORT_HW_RECOVERY)
 	if (psDevInfo->hTimer)
 	{
 		eError = OSRemoveTimer(psDevInfo->hTimer);
@@ -1081,7 +1080,6 @@ static PVRSRV_ERROR DevDeInitSGX (IMG_VOID *pvDeviceNode)
 		}
 		psDevInfo->hTimer = IMG_NULL;
 	}
-#endif /* SUPPORT_HW_RECOVERY */
 
 #if defined(SUPPORT_EXTERNAL_SYSTEM_CACHE)
 	/* unmap the external system cache control registers  */
@@ -1661,7 +1659,6 @@ IMG_VOID HWRecoveryResetSGX (PVRSRV_DEVICE_NODE *psDeviceNode,
 }
 
 
-#if defined(SUPPORT_HW_RECOVERY)
 /*!
 ******************************************************************************
 
@@ -1799,7 +1796,6 @@ SGX_NoUKernel_LockUp:
 		HWRecoveryResetSGX(psDeviceNode, 0, ISR_ID);
 	}
 }
-#endif /* defined(SUPPORT_HW_RECOVERY) */
 
 
 
@@ -3088,13 +3084,8 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 		case SGX_MISC_INFO_REQUEST_LOCKUPS:
 		{
-#if defined(SUPPORT_HW_RECOVERY)
 			psMiscInfo->uData.sLockups.ui32uKernelDetectedLockups = psDevInfo->psSGXHostCtl->ui32uKernelDetectedLockups;
 			psMiscInfo->uData.sLockups.ui32HostDetectedLockups = psDevInfo->psSGXHostCtl->ui32HostDetectedLockups;
-#else
-			psMiscInfo->uData.sLockups.ui32uKernelDetectedLockups = 0;
-			psMiscInfo->uData.sLockups.ui32HostDetectedLockups = 0;
-#endif
 			return PVRSRV_OK;
 		}
 

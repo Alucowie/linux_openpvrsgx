@@ -210,13 +210,10 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	IMG_UINT32				*pui32BIFResetPD;
 	IMG_UINT32				*pui32BIFResetPT;
 
-
-#if defined(SUPPORT_HW_RECOVERY)
 	/* Timeout callback handle */
 	IMG_HANDLE				hTimer;
 	/* HW recovery Time stamp */
 	IMG_UINT32				ui32TimeStamp;
-#endif
 
 	/* Number of SGX resets */
 	IMG_UINT32				ui32NumResets;

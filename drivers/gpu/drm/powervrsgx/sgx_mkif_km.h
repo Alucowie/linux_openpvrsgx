@@ -113,11 +113,9 @@ typedef struct _SGXMKIF_HOST_CTL_
 #if defined(FIX_HW_BRN_28889)
 	volatile IMG_UINT32		ui32InvalStatus;			/*!< Microkernel BIF Cache Invalidate status */
 #endif
-#if defined(SUPPORT_HW_RECOVERY)
 	IMG_UINT32				ui32uKernelDetectedLockups;	/*!< counter relating to the number of lockups the uKernel has detected */
 	IMG_UINT32				ui32HostDetectedLockups;	/*!< counter relating to the number of lockups the host has detected */
 	IMG_UINT32				ui32HWRecoverySampleRate;	/*!< SGX lockup detection rate (in multiples of the timer period) */
-#endif /* SUPPORT_HW_RECOVERY*/
 	IMG_UINT32				ui32uKernelTimerClock;		/*!< SGX ukernel timer period (in clocks) */
 	IMG_UINT32				ui32ActivePowManSampleRate;	/*!< SGX Active Power latency period (in multiples of the timer period) */
 	IMG_UINT32				ui32InterruptFlags; 		/*!< Interrupt flags - PVRSRV_USSE_EDM_INTERRUPT_xxx */

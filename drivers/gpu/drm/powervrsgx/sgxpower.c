@@ -49,7 +49,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pdump_km.h"
 
 
-#if defined(SUPPORT_HW_RECOVERY)
 static PVRSRV_ERROR SGXAddTimer(PVRSRV_DEVICE_NODE		*psDeviceNode,
 								SGX_TIMING_INFORMATION	*psSGXTimingInfo,
 								IMG_HANDLE				*phTimer)
@@ -68,7 +67,6 @@ static PVRSRV_ERROR SGXAddTimer(PVRSRV_DEVICE_NODE		*psDeviceNode,
 
 	return PVRSRV_OK;
 }
-#endif /* SUPPORT_HW_RECOVERY*/
 
 
 /*!
@@ -96,7 +94,6 @@ static PVRSRV_ERROR SGXUpdateTimingInfo(PVRSRV_DEVICE_NODE	*psDeviceNode)
 	psSGXTimingInfo = &sSGXTimingInfo;
 	SysGetSGXTimingInformation(psSGXTimingInfo);
 
-#if defined(SUPPORT_HW_RECOVERY)
 	{
 		PVRSRV_ERROR			eError;
 		IMG_UINT32	ui32OlduKernelFreq;
@@ -110,7 +107,7 @@ static PVRSRV_ERROR SGXUpdateTimingInfo(PVRSRV_DEVICE_NODE	*psDeviceNode)
 					The ukernel timer frequency has changed.
 				*/
 				IMG_HANDLE hNewTimer;
-				
+
 				eError = SGXAddTimer(psDeviceNode, psSGXTimingInfo, &hNewTimer);
 				if (eError == PVRSRV_OK)
 				{
@@ -139,7 +136,6 @@ static PVRSRV_ERROR SGXUpdateTimingInfo(PVRSRV_DEVICE_NODE	*psDeviceNode)
 		psDevInfo->psSGXHostCtl->ui32HWRecoverySampleRate =
 			psSGXTimingInfo->ui32uKernelFreq / psSGXTimingInfo->ui32HWRecoveryFreq;
 	}
-#endif /* SUPPORT_HW_RECOVERY*/
 
 	/* Copy the SGX clock speed for use in the kernel */
 	psDevInfo->ui32CoreClockSpeed = psSGXTimingInfo->ui32CoreClockSpeed;
@@ -202,7 +198,6 @@ static PVRSRV_ERROR SGXUpdateTimingInfo(PVRSRV_DEVICE_NODE	*psDeviceNode)
 ******************************************************************************/
 static IMG_VOID SGXStartTimer(PVRSRV_SGXDEV_INFO	*psDevInfo)
 {
-	#if defined(SUPPORT_HW_RECOVERY)
 	PVRSRV_ERROR	eError;
 
 	eError = OSEnableTimer(psDevInfo->hTimer);
@@ -210,9 +205,6 @@ static IMG_VOID SGXStartTimer(PVRSRV_SGXDEV_INFO	*psDevInfo)
 	{
 		PVR_DPF((PVR_DBG_ERROR,"SGXStartTimer : Failed to enable host timer"));
 	}
-	#else
-	PVR_UNREFERENCED_PARAMETER(psDevInfo);
-	#endif /* SUPPORT_HW_RECOVERY */
 }
 
 
@@ -296,7 +288,6 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 		IMG_UINT32			ui32Core;
 		IMG_UINT32			ui32CoresEnabled;
 
-		#if defined(SUPPORT_HW_RECOVERY)
 		/* Disable timer callback for HW recovery */
 		eError = OSDisableTimer(psDevInfo->hTimer);
 		if (eError != PVRSRV_OK)
@@ -304,7 +295,6 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 			PVR_DPF((PVR_DBG_ERROR,"SGXPrePowerState: Failed to disable timer"));
 			return eError;
 		}
-		#endif /* SUPPORT_HW_RECOVERY */
 
 		if (eNewPowerState == PVRSRV_DEV_POWER_STATE_OFF)
 		{
