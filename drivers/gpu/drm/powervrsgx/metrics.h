@@ -39,8 +39,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef _METRICS_
-#define _METRICS_
+#ifndef __METRICS_H__
+#define __METRICS_H__
 
 
 typedef struct 
@@ -107,59 +107,7 @@ extern IMG_VOID   PVRSRVOutputMetricTotals(IMG_VOID);
 
 #endif /* defined(__sh__) */
 
-<<<<<<< HEAD
-#if defined(__cplusplus)
-}
-#endif
-
-
-||||||| parent of 046516d00deb (remove __cplusplus blocks)
-
-
-#else /* defined(DEBUG) || defined(TIMING) */
-
-
-
-#define PVRSRV_TIME_START(X)
-#define PVRSRV_TIME_SUSPEND(X)
-#define PVRSRV_TIME_RESUME(X)
-#define PVRSRV_TIME_STOP(X)
-#define PVRSRV_TIME_RESET(X)
-
-#define PVRSRVSetupMetricTimers(X)
-#define PVRSRVOutputMetricTotals()
-
-
-
-#endif /* defined(DEBUG) || defined(TIMING) */
-
-#if defined(__cplusplus)
-}
-#endif
-
-
-=======
-
-
-#else /* defined(DEBUG) || defined(TIMING) */
-
-
-
-#define PVRSRV_TIME_START(X)
-#define PVRSRV_TIME_SUSPEND(X)
-#define PVRSRV_TIME_RESUME(X)
-#define PVRSRV_TIME_STOP(X)
-#define PVRSRV_TIME_RESET(X)
-
-#define PVRSRVSetupMetricTimers(X)
-#define PVRSRVOutputMetricTotals()
-
-
-
-#endif /* defined(DEBUG) || defined(TIMING) */
-
->>>>>>> 046516d00deb (remove __cplusplus blocks)
-#endif /* _METRICS_ */
+#endif /* __METRICS_H__ */
 
 /**************************************************************************
  End of file (metrics.h)

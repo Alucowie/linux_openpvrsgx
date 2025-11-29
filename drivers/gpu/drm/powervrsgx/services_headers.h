@@ -42,8 +42,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
 
-#ifndef SERVICES_HEADERS_H
-#define SERVICES_HEADERS_H
+#ifndef __SERVICES_HEADERS_H__
+#define __SERVICES_HEADERS_H__
 
 #include "img_defs.h"
 #include "services.h"
@@ -59,5 +59,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "osfunc.h"
 #include "refcount.h"
 
-#endif /* SERVICES_HEADERS_H */
+#endif /* __SERVICES_HEADERS_H__ */
 

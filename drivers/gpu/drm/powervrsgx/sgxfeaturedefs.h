@@ -38,6 +38,9 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
+#ifndef __SGXFEATUREDEFS_H__
+#define __SGXFEATUREDEFS_H__
+
 	#define SGX_CORE_FRIENDLY_NAME							"SGX530"
 	#define SGX_CORE_ID										SGX_CORE_ID_530
 	#define SGX_FEATURE_ADDRESS_SPACE_SIZE					(28)
@@ -109,6 +112,7 @@ must be defined when SGX_FEATURE_MP is defined
 
 #include "img_types.h"
 
+#endif /* __SGXFEATUREDEFS_H__ */
 /******************************************************************************
  End of file (sgxfeaturedefs.h)
 ******************************************************************************/

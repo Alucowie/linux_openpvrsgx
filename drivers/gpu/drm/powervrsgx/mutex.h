@@ -40,8 +40,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
 
-#ifndef __INCLUDED_LINUX_MUTEX_H_
-#define __INCLUDED_LINUX_MUTEX_H_
+#ifndef __MUTEX_H__
+#define __MUTEX_H__
 
 #include <linux/version.h>
 
@@ -86,5 +86,4 @@ extern IMG_VOID LinuxUnLockMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex);
 extern IMG_BOOL LinuxIsLockedMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex);
 
 
-#endif /* __INCLUDED_LINUX_MUTEX_H_ */
-
+#endif /* __MUTEX_H__ */

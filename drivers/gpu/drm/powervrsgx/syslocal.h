@@ -24,7 +24,7 @@
  *
  ******************************************************************************/
 
-#if !defined(__SYSLOCAL_H__)
+#ifndef __SYSLOCAL_H__
 #define __SYSLOCAL_H__
 
 #if defined(__linux__)
@@ -143,4 +143,4 @@ IMG_VOID UnwrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
 PVRSRV_ERROR SysPMRuntimeRegister(void);
 PVRSRV_ERROR SysPMRuntimeUnregister(void);
 
-#endif	
+#endif /* __SYSLOCAL_H__ */

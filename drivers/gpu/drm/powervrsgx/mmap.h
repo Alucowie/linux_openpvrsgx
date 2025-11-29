@@ -39,7 +39,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#if !defined(__MMAP_H__)
+#ifndef __MMAP_H__
 #define __MMAP_H__
 
 #include <linux/mm.h>
@@ -235,4 +235,3 @@ int PVRMMap(struct file* pFile, struct vm_area_struct* ps_vma);
 
 
 #endif	/* __MMAP_H__ */
-

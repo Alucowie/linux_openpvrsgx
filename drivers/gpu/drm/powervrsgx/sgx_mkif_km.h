@@ -40,7 +40,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#if !defined (__SGX_MKIF_KM_H__)
+#ifndef __SGX_MKIF_KM_H__
 #define __SGX_MKIF_KM_H__
 
 #include "img_types.h"
@@ -469,5 +469,3 @@ typedef struct _SGXMKIF_HWPERF_CB_
 /******************************************************************************
  End of file (sgx_mkif_km.h)
 ******************************************************************************/
-
-

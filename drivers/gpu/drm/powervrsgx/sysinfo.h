@@ -24,7 +24,7 @@
  *
  ******************************************************************************/
 
-#if !defined(__SYSINFO_H__)
+#ifndef __SYSINFO_H__
 #define __SYSINFO_H__
 
 #define MAX_HW_TIME_US				(1000000)
@@ -33,4 +33,4 @@
 
 #define SYS_DEVICE_COUNT 15 
 
-#endif	
+#endif /* __SYSINFO_H__ */

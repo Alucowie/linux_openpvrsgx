@@ -24,8 +24,8 @@
  *
  ******************************************************************************/
 
-#if !defined(__SOCCONFIG_H__)
-#define __SOCCONFIG_H__
+#ifndef __SYSCONFIG_H__
+#define __SYSCONFIG_H__
 
 
 #define VS_PRODUCT_NAME	"OMAP3"
@@ -50,5 +50,4 @@
 #define SYS_OMAP3430_GP11TIMER_REGS_SYS_PHYS_BASE	 0x48088028
 #define SYS_OMAP3430_GP11TIMER_TSICR_SYS_PHYS_BASE	 0x48088040
 
- 
-#endif	
+#endif /* __SYSCONFIG_H__ */

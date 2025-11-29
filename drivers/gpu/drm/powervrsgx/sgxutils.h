@@ -39,6 +39,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
+#ifndef __SGXUTILS_H__
+#define __SGXUTILS_H__
 
 #include "perproc.h"
 #include "sgxinfokm.h"
@@ -190,6 +192,7 @@ PVRSRV_ERROR SGXContextSuspend(PVRSRV_DEVICE_NODE	*psDeviceNode,
 							   IMG_DEV_VIRTADDR		*psHWContextDevVAddr,
 							   IMG_BOOL				bResume);
 
+#endif /* __SGXUTILS_H__ */
 /******************************************************************************
  End of file (sgxutils.h)
 ******************************************************************************/

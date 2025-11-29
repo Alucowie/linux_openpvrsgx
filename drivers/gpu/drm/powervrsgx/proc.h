@@ -41,8 +41,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef __SERVICES_PROC_H__
-#define __SERVICES_PROC_H__
+#ifndef __PROC_H__
+#define __PROC_H__
 
 #include <linux/proc_fs.h>	// read_proc_t etc
 #include <linux/seq_file.h> // seq_file
@@ -130,4 +130,4 @@ struct proc_dir_entry* CreatePerProcessProcEntrySeq (
 IMG_VOID RemoveProcEntrySeq(struct proc_dir_entry* proc_entry);
 IMG_VOID RemovePerProcessProcEntrySeq(struct proc_dir_entry* proc_entry);
 
-#endif
+#endif /* __PROC_H__ */

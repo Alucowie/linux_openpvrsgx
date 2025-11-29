@@ -40,8 +40,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef __PVR_BRIDGE_KM_H_
-#define __PVR_BRIDGE_KM_H_
+#ifndef __PVR_BRIDGE_KM_H__
+#define __PVR_BRIDGE_KM_H__
 
 #include "pvr_bridge.h"
 #include "perproc.h"
@@ -385,7 +385,7 @@ PVRSRVFreeSharedSysMemoryKM(PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo);
 IMG_IMPORT PVRSRV_ERROR
 PVRSRVDissociateMemFromResmanKM(PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo);
 
-#endif /* __PVR_BRIDGE_KM_H_ */
+#endif /* __PVR_BRIDGE_KM_H__ */
 
 /******************************************************************************
  End of file (pvr_bridge_km.h)

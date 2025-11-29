@@ -39,8 +39,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
-#ifndef POWER_H
-#define POWER_H
+#ifndef __POWER_H__
+#define __POWER_H__
 
 /*!
  *****************************************************************************
@@ -125,7 +125,7 @@ IMG_VOID PVRSRVDevicePostClockSpeedChange(IMG_UINT32	ui32DeviceIndex,
 										  IMG_BOOL		bIdleDevice,
 										  IMG_VOID		*pvInfo);
 
-#endif /* POWER_H */
+#endif /* __POWER_H__ */
 
 /******************************************************************************
  End of file (power.h)

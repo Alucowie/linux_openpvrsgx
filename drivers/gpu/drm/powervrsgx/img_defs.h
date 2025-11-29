@@ -40,7 +40,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
-#if !defined (__IMG_DEFS_H__)
+#ifndef __IMG_DEFS_H__
 #define __IMG_DEFS_H__
 
 #include "img_types.h"
@@ -142,7 +142,7 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
 #define IMG_UNDEF	(~0UL)
 #endif
 
-#endif /* #if !defined (__IMG_DEFS_H__) */
+#endif /* __IMG_DEFS_H__ */
 /*****************************************************************************
  End of file (IMG_DEFS.H)
 *****************************************************************************/

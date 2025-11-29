@@ -39,8 +39,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef _SGXDEFS_H_
-#define	_SGXDEFS_H_
+#ifndef __SGXDEFS_H__
+#define __SGXDEFS_H__
 
 #include "sgxerrata.h"
 #include "sgxfeaturedefs.h"
@@ -63,7 +63,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  Core specific defines.
 *****************************************************************************/
 
-#endif /* _SGXDEFS_H_ */
+#endif /* __SGXDEFS_H__ */
 
 /*****************************************************************************
  End of file (sgxdefs.h)

@@ -24,7 +24,7 @@
  *
  ******************************************************************************/
 
-#if !defined(__OEMFUNCS_H__)
+#ifndef __OEMFUNCS_H__
 #define __OEMFUNCS_H__
 
 typedef IMG_UINT32   (*PFN_SRV_BRIDGEDISPATCH)( IMG_UINT32  Ioctl,
@@ -44,4 +44,4 @@ typedef struct PVRSRV_DC_OEM_JTABLE_TAG
 
 #define OEM_GET_EXT_FUNCS			(1<<1)
 
-#endif	
+#endif /* __OEMFUNCS_H__ */

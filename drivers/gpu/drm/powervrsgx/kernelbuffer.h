@@ -41,7 +41,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#if !defined (__KERNELBUFFER_H__)
+#ifndef __KERNELBUFFER_H__
 #define __KERNELBUFFER_H__
 
 /*
@@ -86,4 +86,4 @@ typedef IMG_BOOL (*PFN_BC_GET_PVRJTABLE) (PPVRSRV_BC_BUFFER2SRV_KMJTABLE);
 /* Prototype for platforms that access the JTable via linkage */
 IMG_IMPORT IMG_BOOL PVRGetBufferClassJTable(PVRSRV_BC_BUFFER2SRV_KMJTABLE *psJTable);
 
-#endif/* #if !defined (__KERNELBUFFER_H__) */
+#endif/* __KERNELBUFFER_H__ */

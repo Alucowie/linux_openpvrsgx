@@ -41,8 +41,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef _BUFFER_MANAGER_H_
-#define _BUFFER_MANAGER_H_
+#ifndef __BUFFER_MANAGER_H__
+#define __BUFFER_MANAGER_H__
 
 #include "img_types.h"
 #include "ra.h"
@@ -610,4 +610,4 @@ IMG_VOID _BM_XProcIndexRelease(IMG_UINT32 ui32Index);
 	_BM_XProcIndexRelease( x)
 #endif
 
-#endif
+#endif /* __BUFFER_MANAGER_H__ */

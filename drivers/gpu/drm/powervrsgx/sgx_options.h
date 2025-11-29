@@ -39,6 +39,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
+#ifndef __SGX_OPTIONS_H__
+#define __SGX_OPTIONS_H__
 
 /* Each build option listed here is packed into a dword which
  * provides up to 32 flags (or up to 28 flags plus a numeric
@@ -218,3 +220,4 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	OPTIONS_BIT22 |\
 	OPTIONS_HIGHBYTE
 
+#endif /* __SGX_OPTIONS_H__ */

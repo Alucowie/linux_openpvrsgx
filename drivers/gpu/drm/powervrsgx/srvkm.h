@@ -39,8 +39,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef SRVKM_H
-#define SRVKM_H
+#ifndef __SRVKM_H__
+#define __SRVKM_H__
 
 	/**	Use PVR_DPF() unless message is necessary in release build
 	 */
@@ -117,4 +117,4 @@ LOOP_UNTIL_TIMEOUT(MAX_HW_TIME_US)
 IMG_IMPORT
 const IMG_CHAR *PVRSRVGetErrorStringKM(PVRSRV_ERROR eError);
 
-#endif /* SRVKM_H */
+#endif /* __SRVKM_H__ */

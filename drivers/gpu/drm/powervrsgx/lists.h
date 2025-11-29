@@ -40,8 +40,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef __LISTS_UTILS__
-#define __LISTS_UTILS__
+#ifndef __LISTS_H__
+#define __LISTS_H__
 
 /* instruct QAC to ignore warnings about the following custom formatted macros */
 /* PRQA S 0881,3410 ++ */
@@ -343,7 +343,7 @@ DECLARE_LIST_REMOVE(PVRSRV_POWER_DEV);
 IMG_VOID* MatchDeviceKM_AnyVaCb(PVRSRV_DEVICE_NODE* psDeviceNode, va_list va);
 IMG_VOID* MatchPowerDeviceIndex_AnyVaCb(PVRSRV_POWER_DEV *psPowerDev, va_list va);
 
-#endif
+#endif /* __LIST_H__ */
 
 /* re-enable warnings */
 /* PRQA S 0881,3410 -- */

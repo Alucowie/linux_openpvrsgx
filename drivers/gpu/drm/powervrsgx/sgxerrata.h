@@ -41,8 +41,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
-#ifndef _SGXERRATA_KM_H_
-#define _SGXERRATA_KM_H_
+#ifndef __SGXERRATA_H__
+#define __SGXERRATA_H__
 
 /* ignore warnings about unrecognised preprocessing directives in conditional inclusion directives */
 /* PRQA S 3115 ++ */
@@ -73,7 +73,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /* restore warning */
 /* PRQA S 3115 -- */
 
-#endif /* _SGXERRATA_KM_H_ */
+#endif /* __SGXERRATA_H__ */
 
 /******************************************************************************
  End of file (sgxerrata.h)

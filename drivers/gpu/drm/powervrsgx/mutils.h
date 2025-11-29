@@ -40,8 +40,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
-#ifndef __IMG_LINUX_MUTILS_H__
-#define __IMG_LINUX_MUTILS_H__
+#ifndef __MUTILS_H__
+#define __MUTILS_H__
 
 #include <linux/version.h>
 
@@ -98,5 +98,4 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define	IOREMAP_UC(pa, bytes)	ioremap_nocache(pa, bytes)
 
-#endif /* __IMG_LINUX_MUTILS_H__ */
-
+#endif /* __MUTILS_H__ */

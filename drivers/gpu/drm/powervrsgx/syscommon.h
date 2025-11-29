@@ -41,8 +41,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef _SYSCOMMON_H
-#define _SYSCOMMON_H
+#ifndef __SYSCOMMON_H__
+#define __SYSCOMMON_H__
 
 #include "sysconfig.h"      /* System specific system defines */
 #include "sysinfo.h"		/* globally accessible system info */
@@ -328,7 +328,8 @@ static INLINE IMG_VOID SysHighResTimerDestroy(IMG_HANDLE hTimer)
 	SysAcquireData(&psSysData);
 	psSysData->pfnHighResTimerDestroy(hTimer);
 }
-#endif
+
+#endif /* __SYSCOMMON_H__ */
 
 /*****************************************************************************
  End of file (syscommon.h)

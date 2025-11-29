@@ -39,8 +39,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef _RA_H_
-#define _RA_H_
+#ifndef __RA_H__
+#define __RA_H__
 
 #include "img_types.h"
 #include "hash.h"
@@ -286,5 +286,4 @@ PVRSRV_ERROR RA_GetStatsFreeMem(RA_ARENA *pArena,
 
 #endif /* #ifdef RA_STATS */
 
-#endif
-
+#endif /* __RA_H__ */

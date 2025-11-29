@@ -40,8 +40,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
-#ifndef __IMG_LINUX_MM_H__
-#define __IMG_LINUX_MM_H__
+#ifndef __MM_H__
+#define __MM_H__
 
 #include <linux/version.h>
 
@@ -694,5 +694,4 @@ const IMG_CHAR *LinuxMemAreaTypeToString(LINUX_MEM_AREA_TYPE eMemAreaType);
  ******************************************************************************/
 const IMG_CHAR *HAPFlagsToString(IMG_UINT32 ui32Flags);
 
-#endif /* __IMG_LINUX_MM_H__ */
-
+#endif /* __MM_H__ */

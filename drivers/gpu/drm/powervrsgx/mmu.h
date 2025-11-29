@@ -40,8 +40,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef _MMU_H_
-#define _MMU_H_
+#ifndef __MMU_H__
+#define __MMU_H__
 
 #include "sgxinfokm.h"
 
@@ -498,4 +498,4 @@ IMG_VOID MMU_CheckFaultAddr(PVRSRV_SGXDEV_INFO *psDevInfo, IMG_UINT32 ui32PDDevP
 IMG_UINT32 MMU_GetPDumpContextID(IMG_HANDLE hDevMemContext);
 #endif /* #ifdef PDUMP */
 
-#endif /* #ifndef _MMU_H_ */
+#endif /* __MMU_H__ */

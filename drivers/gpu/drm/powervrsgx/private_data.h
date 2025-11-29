@@ -39,8 +39,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef __INCLUDED_PRIVATE_DATA_H_
-#define __INCLUDED_PRIVATE_DATA_H_
+#ifndef __PRIVATE_DATA_H__
+#define __PRIVATE_DATA_H__
 
 #if defined(SUPPORT_DRI_DRM) && defined(PVR_SECURE_DRM_AUTH_EXPORT)
 #include <linux/list.h>
@@ -91,5 +91,4 @@ typedef struct
 }
 PVRSRV_FILE_PRIVATE_DATA;
 
-#endif /* __INCLUDED_PRIVATE_DATA_H_ */
-
+#endif /* __PRIVATE_DATA_H__ */

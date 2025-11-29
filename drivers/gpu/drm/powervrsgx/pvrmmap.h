@@ -78,4 +78,3 @@ IMG_BOOL PVRUnMapKMem(IMG_HANDLE hModule, IMG_HANDLE hMappingInfo, IMG_HANDLE hM
 #endif
 
 #endif /* _PVRMMAP_H_ */
-

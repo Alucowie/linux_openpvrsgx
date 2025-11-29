@@ -41,7 +41,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#if !defined (__KERNELDISPLAY_H__)
+#ifndef __KERNELDISPLAY_H__
 #define __KERNELDISPLAY_H__
 
 typedef PVRSRV_ERROR (*PFN_OPEN_DC_DEVICE)(IMG_UINT32, IMG_HANDLE*, PVRSRV_SYNC_DATA*);
@@ -223,7 +223,7 @@ typedef IMG_BOOL (*PFN_DC_GET_PVRJTABLE)(PPVRSRV_DC_DISP2SRV_KMJTABLE);
 IMG_IMPORT IMG_BOOL PVRGetDisplayClassJTable(PVRSRV_DC_DISP2SRV_KMJTABLE *psJTable);
 
 
-#endif/* #if !defined (__KERNELDISPLAY_H__) */
+#endif /* __KERNELDISPLAY_H__ */
 
 /******************************************************************************
  End of file (kerneldisplay.h)

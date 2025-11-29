@@ -40,8 +40,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#if !defined(__SGXMMU_KM_H__)
-#define __SGXMMU_KM_H__
+#ifndef __SGXMMU_H__
+#define __SGXMMU_H__
 
 /* to be implemented */
 
@@ -92,7 +92,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define SGX_MMU_PTE_CACHECONSISTENT		(0x00000008U)
 #define SGX_MMU_PTE_EDMPROTECT			(0x00000010U)
 
-#endif	/* __SGXMMU_KM_H__ */
+#endif	/* __SGXMMU_H__ */
 
 /*****************************************************************************
  End of file (sgxmmu.h)

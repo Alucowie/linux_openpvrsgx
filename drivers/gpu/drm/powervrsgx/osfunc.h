@@ -675,4 +675,3 @@ static INLINE IMG_VOID OSGetCurrentProcessNameKM(IMG_CHAR *pszName, IMG_UINT32 u
 /******************************************************************************
  End of file (osfunc.h)
 ******************************************************************************/
-

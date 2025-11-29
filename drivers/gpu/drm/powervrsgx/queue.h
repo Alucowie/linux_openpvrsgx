@@ -40,8 +40,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#ifndef QUEUE_H
-#define QUEUE_H
+#ifndef __QUEUE_H__
+#define __QUEUE_H__
 
 /*!
  * Macro to Read Offset in given command queue
@@ -125,7 +125,7 @@ PVRSRV_ERROR PVRSRVRemoveCmdProcListKM(IMG_UINT32	ui32DevIndex,
 
 #endif /* !defined(USE_CODE) */
 
-#endif /* QUEUE_H */
+#endif /* __QUEUE_H__ */
 
 /******************************************************************************
  End of file (queue.h)

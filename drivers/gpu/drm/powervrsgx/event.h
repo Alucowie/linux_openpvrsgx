@@ -38,7 +38,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
-
+#ifndef __EVENT_H__
+#define __EVENT_H__
 
 PVRSRV_ERROR LinuxEventObjectListCreate(IMG_HANDLE *phEventObjectList);
 PVRSRV_ERROR LinuxEventObjectListDestroy(IMG_HANDLE hEventObjectList);
@@ -46,3 +47,5 @@ PVRSRV_ERROR LinuxEventObjectAdd(IMG_HANDLE hOSEventObjectList, IMG_HANDLE *phOS
 PVRSRV_ERROR LinuxEventObjectDelete(IMG_HANDLE hOSEventObjectList, IMG_HANDLE hOSEventObject);
 PVRSRV_ERROR LinuxEventObjectSignal(IMG_HANDLE hOSEventObjectList);
 PVRSRV_ERROR LinuxEventObjectWait(IMG_HANDLE hOSEventObject, IMG_UINT32 ui32MSTimeout);
+
+#endif /* __EVENT_H__ */
