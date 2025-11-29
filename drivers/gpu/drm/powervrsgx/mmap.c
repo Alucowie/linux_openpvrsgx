@@ -86,10 +86,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_drm.h"
 #endif
 
-#if !defined(PVR_SECURE_HANDLES) && !defined (SUPPORT_SID_INTERFACE)
-#error "The mmap code requires PVR_SECURE_HANDLES"
-#endif
-
 /* WARNING:
  * The mmap code has its own mutex, to prevent a possible deadlock,
  * when using gPVRSRVLock.

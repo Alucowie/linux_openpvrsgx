@@ -201,10 +201,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 	IMG_DEV_PHYADDR sPDDevPAddr;
 	IMG_UINT32 i;
 
-#if !defined(PVR_SECURE_HANDLES) && !defined (SUPPORT_SID_INTERFACE)
-	PVR_UNREFERENCED_PARAMETER(pbShared);
-#endif
-
 	if (hDevCookie == IMG_NULL)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "PVRSRVCreateDeviceMemContextKM: hDevCookie invalid"));
@@ -256,10 +252,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 				#else
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = 0;
 				#endif
-
-#if defined(PVR_SECURE_HANDLES) || defined (SUPPORT_SID_INTERFACE)
 				pbShared[ui32ClientHeapCount] = IMG_TRUE;
-#endif
 				ui32ClientHeapCount++;
 				break;
 			}
@@ -291,9 +284,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 				#else
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = 0;
 				#endif
-#if defined(PVR_SECURE_HANDLES) || defined (SUPPORT_SID_INTERFACE)
 				pbShared[ui32ClientHeapCount] = IMG_FALSE;
-#endif
 
 				ui32ClientHeapCount++;
 				break;
@@ -355,10 +346,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapInfoKM(IMG_HANDLE					hDevCookie
 	IMG_HANDLE hDevMemHeap;
 	IMG_UINT32 i;
 
-#if !defined(PVR_SECURE_HANDLES) && !defined (SUPPORT_SID_INTERFACE)
-	PVR_UNREFERENCED_PARAMETER(pbShared);
-#endif
-
 	if (hDevCookie == IMG_NULL)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "PVRSRVGetDeviceMemHeapInfoKM: hDevCookie invalid"));
@@ -393,9 +380,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapInfoKM(IMG_HANDLE					hDevCookie
 				psHeapInfo[ui32ClientHeapCount].ui32HeapByteSize = psDeviceMemoryHeap[i].ui32HeapSize;
 				psHeapInfo[ui32ClientHeapCount].ui32Attribs = psDeviceMemoryHeap[i].ui32Attribs;
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = psDeviceMemoryHeap[i].ui32XTileStride;
-#if defined(PVR_SECURE_HANDLES) || defined (SUPPORT_SID_INTERFACE)
 				pbShared[ui32ClientHeapCount] = IMG_TRUE;
-#endif
 				ui32ClientHeapCount++;
 				break;
 			}
@@ -423,10 +408,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapInfoKM(IMG_HANDLE					hDevCookie
 				psHeapInfo[ui32ClientHeapCount].ui32HeapByteSize = psDeviceMemoryHeap[i].ui32HeapSize;
 				psHeapInfo[ui32ClientHeapCount].ui32Attribs = psDeviceMemoryHeap[i].ui32Attribs;
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = psDeviceMemoryHeap[i].ui32XTileStride;
-#if defined(PVR_SECURE_HANDLES) || defined (SUPPORT_SID_INTERFACE)
 				pbShared[ui32ClientHeapCount] = IMG_FALSE;
-#endif
-
 				ui32ClientHeapCount++;
 				break;
 			}
