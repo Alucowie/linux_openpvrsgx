@@ -275,18 +275,8 @@ typedef struct _SGX_CCB_KICK_
 	IMG_UINT32	ui32NumTAStatusVals;
 	IMG_UINT32	ui32Num3DStatusVals;
 
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 	SGX_INTERNEL_STATUS_UPDATE	asTAStatusUpdate[SGX_MAX_TA_STATUS_VALS];
 	SGX_INTERNEL_STATUS_UPDATE	as3DStatusUpdate[SGX_MAX_3D_STATUS_VALS];
-#else
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID		ahTAStatusSyncInfo[SGX_MAX_TA_STATUS_VALS];
-	IMG_SID		ah3DStatusSyncInfo[SGX_MAX_3D_STATUS_VALS];
-#else
-	IMG_HANDLE	ahTAStatusSyncInfo[SGX_MAX_TA_STATUS_VALS];
-	IMG_HANDLE	ah3DStatusSyncInfo[SGX_MAX_3D_STATUS_VALS];
-#endif
-#endif
 
 	IMG_BOOL	bFirstKickOrResume;
 #if defined(NO_HARDWARE) || defined(PDUMP)

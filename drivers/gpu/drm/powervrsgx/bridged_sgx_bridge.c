@@ -433,7 +433,6 @@ SGXDoKickBW(IMG_UINT32 ui32BridgeID,
 	for (i = 0; i < psDoKickIN->sCCBKick.ui32NumTAStatusVals; i++)
 	{
 		psRetOUT->eError =
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 			PVRSRVLookupHandle(psPerProc->psHandleBase,
 #if defined (SUPPORT_SID_INTERFACE)
 							   &sCCBKickKM.asTAStatusUpdate[i].hKernelMemInfo,
@@ -447,16 +446,6 @@ SGXDoKickBW(IMG_UINT32 ui32BridgeID,
 		sCCBKickKM.asTAStatusUpdate[i].sCtlStatus = psDoKickIN->sCCBKick.asTAStatusUpdate[i].sCtlStatus;
 #endif
 
-#else
-			PVRSRVLookupHandle(psPerProc->psHandleBase,
-#if defined (SUPPORT_SID_INTERFACE)
-							   &sCCBKickKM.ahTAStatusSyncInfo[i],
-#else
-							   &psDoKickIN->sCCBKick.ahTAStatusSyncInfo[i],
-#endif
-							   psDoKickIN->sCCBKick.ahTAStatusSyncInfo[i],
-							   PVRSRV_HANDLE_TYPE_SYNC_INFO);
-#endif
 		if(psRetOUT->eError != PVRSRV_OK)
 		{
 			return 0;
@@ -471,7 +460,6 @@ SGXDoKickBW(IMG_UINT32 ui32BridgeID,
 	for(i = 0; i < psDoKickIN->sCCBKick.ui32Num3DStatusVals; i++)
 	{
 		psRetOUT->eError =
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 			PVRSRVLookupHandle(psPerProc->psHandleBase,
 #if defined (SUPPORT_SID_INTERFACE)
 							   &sCCBKickKM.as3DStatusUpdate[i].hKernelMemInfo,
@@ -480,19 +468,9 @@ SGXDoKickBW(IMG_UINT32 ui32BridgeID,
 #endif
 							   psDoKickIN->sCCBKick.as3DStatusUpdate[i].hKernelMemInfo,
 							   PVRSRV_HANDLE_TYPE_MEM_INFO);
-							   
+
 #if defined (SUPPORT_SID_INTERFACE)
 		sCCBKickKM.as3DStatusUpdate[i].sCtlStatus = psDoKickIN->sCCBKick.as3DStatusUpdate[i].sCtlStatus;
-#endif
-#else
-			PVRSRVLookupHandle(psPerProc->psHandleBase,
-#if defined (SUPPORT_SID_INTERFACE)
-							   &sCCBKickKM.ah3DStatusSyncInfo[i],
-#else
-							   &psDoKickIN->sCCBKick.ah3DStatusSyncInfo[i],
-#endif
-							   psDoKickIN->sCCBKick.ah3DStatusSyncInfo[i],
-							   PVRSRV_HANDLE_TYPE_SYNC_INFO);
 #endif
 
 		if(psRetOUT->eError != PVRSRV_OK)
@@ -3118,13 +3096,8 @@ DumpBufferArray(PVRSRV_PER_PROCESS_DATA   *psPerProc,
 
 		hUniqueTag = MAKEUNIQUETAG((PVRSRV_KERNEL_MEM_INFO *)psBuffer->hKernelMemInfo);
 
-	#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 		psCtrlMemInfoKM	= ((PVRSRV_KERNEL_MEM_INFO *)psBuffer->hCtrlKernelMemInfo);
 		ui32Offset =  psBuffer->sCtrlDevVAddr.uiAddr - psCtrlMemInfoKM->sDevVAddr.uiAddr;
-	#else
-		psCtrlMemInfoKM = ((PVRSRV_KERNEL_MEM_INFO *)psBuffer->hKernelMemInfo)->psKernelSyncInfo->psSyncDataMemInfoKM;
-		ui32Offset = offsetof(PVRSRV_SYNC_DATA, ui32ReadOpsComplete);
-	#endif
 
 		if (psBuffer->ui32Start <= psBuffer->ui32End)
 		{
@@ -3334,7 +3307,6 @@ SGXPDumpBufferArrayBW(IMG_UINT32 ui32BridgeID,
 		psKickTADumpBuffer[i].hKernelMemInfo = pvMemInfo;
 #endif
 
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 		eError = PVRSRVLookupHandle(psPerProc->psHandleBase,
 									&pvMemInfo,
 #if defined (SUPPORT_SID_INTERFACE)
@@ -3355,7 +3327,6 @@ SGXPDumpBufferArrayBW(IMG_UINT32 ui32BridgeID,
 		psKMPtr->sCtrlDevVAddr = psUMPtr->sCtrlDevVAddr;
 #else
 		psKickTADumpBuffer[i].hCtrlKernelMemInfo = pvMemInfo;
-#endif
 #endif
 
 #if defined (SUPPORT_SID_INTERFACE)

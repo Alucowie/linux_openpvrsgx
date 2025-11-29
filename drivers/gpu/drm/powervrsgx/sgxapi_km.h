@@ -454,12 +454,10 @@ typedef struct _SGX_KICKTA_DUMP_BUFFER_
 	IMG_UINT32			uiAllocIndex;
 	IMG_HANDLE			hKernelMemInfo;						/*< MemInfo handle for the circular buffer */
 	IMG_PVOID			pvLinAddr;
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 	IMG_HANDLE			hCtrlKernelMemInfo;					/*< MemInfo handle for the control structure of the
 																circular buffer */
 	IMG_DEV_VIRTADDR	sCtrlDevVAddr;						/*< Device virtual address of the memory in the 
 																control structure to be checked */
-#endif
 	IMG_PCHAR			pszName;							/*< Name of buffer */
 
 #if defined (__QNXNTO__)

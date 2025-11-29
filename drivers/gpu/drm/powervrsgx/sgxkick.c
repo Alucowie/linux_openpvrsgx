@@ -167,13 +167,7 @@ PVRSRV_ERROR SGXDoKickKM(IMG_HANDLE hDevHandle, SGX_CCB_KICK *psCCBKick)
 		/* Copy status vals over */
 		for (i = 0; i < psCCBKick->ui32NumTAStatusVals; i++)
 		{
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 			psTACmd->sCtlTAStatusInfo[i] = psCCBKick->asTAStatusUpdate[i].sCtlStatus;
-#else
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psCCBKick->ahTAStatusSyncInfo[i];
-			psTACmd->sCtlTAStatusInfo[i].sStatusDevAddr = psSyncInfo->sReadOpsCompleteDevVAddr;
-			psTACmd->sCtlTAStatusInfo[i].ui32StatusValue = psSyncInfo->psSyncData->ui32ReadOpsPending;
-#endif
 		}
 	}
 
@@ -183,13 +177,7 @@ PVRSRV_ERROR SGXDoKickKM(IMG_HANDLE hDevHandle, SGX_CCB_KICK *psCCBKick)
 		/* Copy status vals over */
 		for (i = 0; i < psCCBKick->ui32Num3DStatusVals; i++)
 		{
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 			psTACmd->sCtl3DStatusInfo[i] = psCCBKick->as3DStatusUpdate[i].sCtlStatus;
-#else
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psCCBKick->ah3DStatusSyncInfo[i];
-			psTACmd->sCtl3DStatusInfo[i].sStatusDevAddr = psSyncInfo->sReadOpsCompleteDevVAddr;
-			psTACmd->sCtl3DStatusInfo[i].ui32StatusValue = psSyncInfo->psSyncData->ui32ReadOpsPending;
-#endif
 		}
 	}
 
@@ -677,33 +665,6 @@ PVRSRV_ERROR SGXDoKickKM(IMG_HANDLE hDevHandle, SGX_CCB_KICK *psCCBKick)
 
 #endif/* SUPPORT_SGX_GENERALISED_SYNCOBJECTS */
 
-		for (i = 0; i < psCCBKick->ui32NumTAStatusVals; i++)
-		{
-#if !defined(SUPPORT_SGX_NEW_STATUS_VALS)
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psCCBKick->ahTAStatusSyncInfo[i];
-			PDUMPCOMMENT("Modify TA status value in TA cmd\r\n");
-			PDUMPMEM(&psSyncInfo->psSyncData->ui32LastOpDumpVal,
-				 psCCBMemInfo,
-				 psCCBKick->ui32CCBDumpWOff + (IMG_UINT32)offsetof(SGXMKIF_CMDTA_SHARED, sCtlTAStatusInfo[i].ui32StatusValue),
-				 sizeof(IMG_UINT32),
-				 0,
-				MAKEUNIQUETAG(psCCBMemInfo));
-#endif
-		}
-
-		for (i = 0; i < psCCBKick->ui32Num3DStatusVals; i++)
-		{
-#if !defined(SUPPORT_SGX_NEW_STATUS_VALS)
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psCCBKick->ah3DStatusSyncInfo[i];
-			PDUMPCOMMENT("Modify 3D status value in TA cmd\r\n");
-			PDUMPMEM(&psSyncInfo->psSyncData->ui32LastOpDumpVal,
-				 psCCBMemInfo,
-				 psCCBKick->ui32CCBDumpWOff + (IMG_UINT32)offsetof(SGXMKIF_CMDTA_SHARED, sCtl3DStatusInfo[i].ui32StatusValue),
-				 sizeof(IMG_UINT32),
-				 0,
-				MAKEUNIQUETAG(psCCBMemInfo));
-#endif
-		}
 	}
 #endif	/* defined(PDUMP) */
 
@@ -819,16 +780,11 @@ PVRSRV_ERROR SGXDoKickKM(IMG_HANDLE hDevHandle, SGX_CCB_KICK *psCCBKick)
 	/* Copy status vals over */
 	for (i = 0; i < psCCBKick->ui32NumTAStatusVals; i++)
 	{
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 		PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo = (PVRSRV_KERNEL_MEM_INFO*)psCCBKick->asTAStatusUpdate[i].hKernelMemInfo;
 		/* derive offset into meminfo and write the status value */
 		*(IMG_UINT32*)((IMG_UINTPTR_T)psKernelMemInfo->pvLinAddrKM
 						+ (psTACmd->sCtlTAStatusInfo[i].sStatusDevAddr.uiAddr
 						- psKernelMemInfo->sDevVAddr.uiAddr)) = psTACmd->sCtlTAStatusInfo[i].ui32StatusValue;
-#else
-		psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psCCBKick->ahTAStatusSyncInfo[i];
-		psSyncInfo->psSyncData->ui32ReadOpsComplete = psTACmd->sCtlTAStatusInfo[i].ui32StatusValue;
-#endif
 	}
 
 #if defined(SUPPORT_SGX_GENERALISED_SYNCOBJECTS)
@@ -876,16 +832,11 @@ PVRSRV_ERROR SGXDoKickKM(IMG_HANDLE hDevHandle, SGX_CCB_KICK *psCCBKick)
 		/* Copy status vals over */
 		for (i = 0; i < psCCBKick->ui32Num3DStatusVals; i++)
 		{
-#if defined(SUPPORT_SGX_NEW_STATUS_VALS)
 			PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo = (PVRSRV_KERNEL_MEM_INFO*)psCCBKick->as3DStatusUpdate[i].hKernelMemInfo;
 			/* derive offset into meminfo and write the status value */
 			*(IMG_UINT32*)((IMG_UINTPTR_T)psKernelMemInfo->pvLinAddrKM
 							+ (psTACmd->sCtl3DStatusInfo[i].sStatusDevAddr.uiAddr
 							- psKernelMemInfo->sDevVAddr.uiAddr)) = psTACmd->sCtl3DStatusInfo[i].ui32StatusValue;
-#else
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psCCBKick->ah3DStatusSyncInfo[i];
-			psSyncInfo->psSyncData->ui32ReadOpsComplete = psTACmd->sCtl3DStatusInfo[i].ui32StatusValue;
-#endif
 		}
 	}
 #endif
