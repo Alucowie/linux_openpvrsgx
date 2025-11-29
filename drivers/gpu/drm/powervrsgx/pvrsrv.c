@@ -48,7 +48,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pdump_km.h"
 #include "deviceid.h"
 #include "ra.h"
-#include "perfkm.h"
 
 #include "pvrversion.h"
 
@@ -414,7 +413,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVInit(PSYS_DATA psSysData)
 	PDUMPINIT();
 	g_ui32InitFlags |= INIT_DATA_ENABLE_PDUMPINIT;
 
-	PERFINIT();
 	return eError;
 
 Error:
@@ -447,8 +445,6 @@ IMG_VOID IMG_CALLCONV PVRSRVDeInit(PSYS_DATA psSysData)
 		PVR_DPF((PVR_DBG_ERROR,"PVRSRVDeInit: PVRSRVHandleDeInit failed - invalid param"));
 		return;
 	}
-
-	PERFDEINIT();
 
 	/* deinitialise pdump */
 	if( (g_ui32InitFlags & INIT_DATA_ENABLE_PDUMPINIT) > 0)
