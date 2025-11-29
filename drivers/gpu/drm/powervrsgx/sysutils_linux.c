@@ -50,9 +50,7 @@
 #define SGX_PARENT_CLOCK "core_ck"
 #endif
 
-#if defined(LDM_PLATFORM) && !defined(PVR_DRI_DRM_NOT_PCI)
 extern struct platform_device *gpsPVRLDMDev;
-#endif
 
 
 static PVRSRV_ERROR PowerLockWrap(SYS_SPECIFIC_DATA *psSysSpecData, IMG_BOOL bTryLock)
@@ -204,7 +202,6 @@ PVRSRV_ERROR EnableSGXClocks(SYS_DATA *psSysData)
         }
 
 
-#if defined(LDM_PLATFORM) && !defined(PVR_DRI_DRM_NOT_PCI)
 	{
 		
 //		int res = pm_runtime_get_sync(&gpsPVRLDMDev->dev);
@@ -214,7 +211,6 @@ PVRSRV_ERROR EnableSGXClocks(SYS_DATA *psSysData)
 //			return PVRSRV_ERROR_UNABLE_TO_ENABLE_CLOCK;
 //		}
 	}
-#endif
 //	SysEnableSGXInterrupts(psSysData);
 
 	
@@ -245,7 +241,6 @@ IMG_VOID DisableSGXClocks(SYS_DATA *psSysData)
 
 //	SysDisableSGXInterrupts(psSysData);
 
-#if defined(LDM_PLATFORM) && !defined(PVR_DRI_DRM_NOT_PCI)
 	{
 //		int res = pm_runtime_put_sync(&gpsPVRLDMDev->dev);
 //		if (res < 0)
@@ -253,7 +248,6 @@ IMG_VOID DisableSGXClocks(SYS_DATA *psSysData)
 //			PVR_DPF((PVR_DBG_ERROR, "DisableSGXClocks: pm_runtime_put_sync failed (%d)", -res));
 //		}
 	}
-#endif
 
 	atomic_set(&psSysSpecData->sSGXClocksEnabled, 0);
 
@@ -566,16 +560,12 @@ IMG_VOID DisableSystemClocks(SYS_DATA *psSysData)
 
 PVRSRV_ERROR SysPMRuntimeRegister(void)
 {
-#if defined(LDM_PLATFORM) && !defined(PVR_DRI_DRM_NOT_PCI)
 //	pm_runtime_enable(&gpsPVRLDMDev->dev);
-#endif
 	return PVRSRV_OK;
 }
 
 PVRSRV_ERROR SysPMRuntimeUnregister(void)
 {
-#if defined(LDM_PLATFORM) && !defined(PVR_DRI_DRM_NOT_PCI)
 //	pm_runtime_disable(&gpsPVRLDMDev->dev);
-#endif
 	return PVRSRV_OK;
 }

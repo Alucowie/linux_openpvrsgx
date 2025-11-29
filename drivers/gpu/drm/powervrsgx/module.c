@@ -55,21 +55,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * support is required, besides indicating the exact support
 	 * required (e.g. platform, or PCI device).
 	 */
-	#if defined(LDM_PLATFORM)
 		#define	PVR_LDM_PLATFORM_MODULE
 		#define PVR_LDM_DEVICE_CLASS
 		#define	PVR_LDM_MODULE
-	#else
-		#if defined(LDM_PCI)
-			#define PVR_LDM_DEVICE_CLASS
-			#define PVR_LDM_PCI_MODULE
-			#define	PVR_LDM_MODULE
-		#else
-			#if defined(SYS_SHARES_WITH_3PKM)
-				#define PVR_LDM_DEVICE_CLASS
-			#endif
-		#endif
-	#endif
 #define	PVR_MOD_STATIC	static
 #endif
 
