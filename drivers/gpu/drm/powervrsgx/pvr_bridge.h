@@ -95,13 +95,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define PVRSRV_BRIDGE_CHG_DEV_MEM_ATTRIBS		PVRSRV_IOWR(PVRSRV_BRIDGE_CORE_CMD_FIRST+28)
 #define PVRSRV_BRIDGE_MAP_DEV_MEMORY_2			PVRSRV_IOWR(PVRSRV_BRIDGE_CORE_CMD_FIRST+29)
 #define PVRSRV_BRIDGE_EXPORT_DEVICEMEM_2		PVRSRV_IOWR(PVRSRV_BRIDGE_CORE_CMD_FIRST+30)
-#if defined (SUPPORT_ION)
-#define PVRSRV_BRIDGE_MAP_ION_HANDLE			PVRSRV_IOWR(PVRSRV_BRIDGE_CORE_CMD_FIRST+31)
-#define PVRSRV_BRIDGE_UNMAP_ION_HANDLE			PVRSRV_IOWR(PVRSRV_BRIDGE_CORE_CMD_FIRST+32)
-#define PVRSRV_BRIDGE_CORE_CMD_LAST				(PVRSRV_BRIDGE_CORE_CMD_FIRST+32)
-#else
 #define PVRSRV_BRIDGE_CORE_CMD_LAST				(PVRSRV_BRIDGE_CORE_CMD_FIRST+30)
-#endif
 /* SIM */
 #define PVRSRV_BRIDGE_SIM_CMD_FIRST				(PVRSRV_BRIDGE_CORE_CMD_LAST+1)
 #define PVRSRV_BRIDGE_PROCESS_SIMISR_EVENT		PVRSRV_IOWR(PVRSRV_BRIDGE_SIM_CMD_FIRST+0)	/*!< RTSIM pseudo ISR */
@@ -576,37 +570,6 @@ typedef struct PVRSRV_BRIDGE_IN_EXPORTDEVICEMEM_TAG
 #endif
 
 }PVRSRV_BRIDGE_IN_EXPORTDEVICEMEM;
-
-/******************************************************************************
- *	'bridge in' map ion handle
- *****************************************************************************/
-typedef struct _PVRSRV_BRIDGE_IN_MAP_ION_HANDLE_
-{
-	IMG_UINT32			ui32BridgeFlags; /* Must be first member of structure */
-	IMG_HANDLE			handle;
-	IMG_UINT32			ui32Attribs;
-	IMG_SIZE_T			ui32Size;
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID				hDevCookie;
-	IMG_SID				hDevMemContext;
-#else
-	IMG_HANDLE			hDevCookie;
-	IMG_HANDLE			hDevMemContext;
-#endif
-} PVRSRV_BRIDGE_IN_MAP_ION_HANDLE;
-
-/******************************************************************************
- *	'bridge in' unmap ion handle
- *****************************************************************************/
-typedef struct PVRSRV_BRIDGE_IN_UNMAP_ION_HANDLE_TAG
-{
-	IMG_UINT32              ui32BridgeFlags; /* Must be first member of structure */
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID                 hKernelMemInfo;
-#else
-	PVRSRV_KERNEL_MEM_INFO	*psKernelMemInfo;
-#endif
-}PVRSRV_BRIDGE_IN_UNMAP_ION_HANDLE;
 
 /******************************************************************************
  *	'bridge in' get free device memory
@@ -1665,23 +1628,6 @@ typedef struct PVRSRV_BRIDGE_OUT_EXPORTDEVICEMEM_TAG
 #endif
 
 } PVRSRV_BRIDGE_OUT_EXPORTDEVICEMEM;
-
-
-/******************************************************************************
- *	'bridge out' map ion handle
- *****************************************************************************/
-typedef struct _PVRSRV_BRIDGE_OUT_MAP_ION_HANDLE_
-{
-	PVRSRV_ERROR            eError;
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID                 hKernelMemInfo;
-#else
-	PVRSRV_KERNEL_MEM_INFO	*psKernelMemInfo;
-#endif
-	PVRSRV_CLIENT_MEM_INFO  sClientMemInfo;
-	PVRSRV_CLIENT_SYNC_INFO sClientSyncInfo;
-
-} PVRSRV_BRIDGE_OUT_MAP_ION_HANDLE;
 
 
 /******************************************************************************

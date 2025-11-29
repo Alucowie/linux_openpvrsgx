@@ -130,7 +130,7 @@ typedef struct _DEVICE_MEMORY_INFO_
 	IMG_UINT32				ui32MappingHeapID;
 
 	/* heap for ion buffers  */
-	IMG_UINT32				ui32IonHeapID;
+	//IMG_UINT32				ui32IonHeapID;
 
 	/* device memory heap info about each heap in a device address space */
 	DEVICE_MEMORY_HEAP_INFO	*psDeviceMemoryHeap;

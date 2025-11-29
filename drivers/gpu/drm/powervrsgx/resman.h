@@ -72,7 +72,6 @@ enum {
 	RESMAN_TYPE_DEVICEMEM_MAPPING = 14,				/*!< Device Memory Mapping Resource */
 	RESMAN_TYPE_DEVICEMEM_WRAP = 15,				/*!< Device Memory Wrap Resource */
 	RESMAN_TYPE_DEVICEMEM_ALLOCATION = 16,				/*!< Device Memory Allocation Resource */
-	RESMAN_TYPE_DEVICEMEM_ION = 17,					/*!< Device Memory Ion Resource */
 	RESMAN_TYPE_EVENT_OBJECT = 18,					/*!< Event Object */
 	RESMAN_TYPE_SHARED_MEM_INFO = 19,				/*!< Shared system memory meminfo */
 	RESMAN_TYPE_MODIFY_SYNC_OPS = 20,				/*!< Syncobject synchronisation Resource*/

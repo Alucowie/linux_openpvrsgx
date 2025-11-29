@@ -48,11 +48,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_bridge_km.h"
 #include "osfunc.h"
 
-#if defined(SUPPORT_ION)
-#include "ion.h"
-#include "env_perproc.h"
-#endif
-
 /* local function prototypes */
 static PVRSRV_ERROR AllocDeviceMem(IMG_HANDLE		hDevCookie,
 								   IMG_HANDLE		hDevMemHeap,
@@ -789,15 +784,6 @@ static IMG_VOID freeExternal(PVRSRV_KERNEL_MEM_INFO *psMemInfo)
 			OSReleasePhysPageAddr(hOSWrapMem);
 		}
 	}
-#if defined(SUPPORT_ION)
-	else if (psMemInfo->memType == PVRSRV_MEMTYPE_ION)
-	{
-		if (hOSWrapMem)
-		{
-			IonUnimportBufferAndReleasePhysAddr(hOSWrapMem);
-		}
-	}
-#endif
 }
 
 /*!
@@ -865,7 +851,6 @@ PVRSRV_ERROR FreeMemCallBackCommon(PVRSRV_KERNEL_MEM_INFO *psMemInfo,
 		{
 			/* Fall through: Free only what we should for each memory type */
 			case PVRSRV_MEMTYPE_WRAPPED:
-			case PVRSRV_MEMTYPE_ION:
 				freeExternal(psMemInfo);
 				fallthrough;
 			case PVRSRV_MEMTYPE_DEVICE:
@@ -1135,241 +1120,6 @@ free_mainalloc:
 
 	return eError;
 }
-
-#if defined(SUPPORT_ION)
-static PVRSRV_ERROR IonUnmapCallback(IMG_PVOID  pvParam,
-									 IMG_UINT32 ui32Param,
-									 IMG_BOOL   bDummy)
-{
-	PVRSRV_KERNEL_MEM_INFO	*psMemInfo = (PVRSRV_KERNEL_MEM_INFO *)pvParam;
-	
-	PVR_UNREFERENCED_PARAMETER(bDummy);
-
-	return FreeMemCallBackCommon(psMemInfo, ui32Param, PVRSRV_FREE_CALLBACK_ORIGIN_ALLOCATOR);
-}
-
-/*!
-******************************************************************************
-
- @Function	PVRSRVMapIonHandleKM
-
- @Description
-
- Map an ION buffer into the specified device memory context
-
- @Input	   psPerProc : PerProcess data
- @Input    hDevCookie : Device node cookie
- @Input    hDevMemContext : Device memory context cookie
- @Input    hIon : Handle to ION buffer
- @Input    ui32Flags : Mapping flags
- @Input    ui32Size : Mapping size
- @Output   ppsKernelMemInfo: Output kernel meminfo if successful
-
- @Return   PVRSRV_ERROR  :
-
-******************************************************************************/
-IMG_EXPORT
-PVRSRV_ERROR PVRSRVMapIonHandleKM(PVRSRV_PER_PROCESS_DATA *psPerProc,
-								  IMG_HANDLE hDevCookie,
-								  IMG_HANDLE hDevMemContext,
-								  IMG_HANDLE hIon,
-								  IMG_UINT32 ui32Flags,
-								  IMG_UINT32 ui32Size,
-								  PVRSRV_KERNEL_MEM_INFO **ppsKernelMemInfo)
-{
-	PVRSRV_ENV_PER_PROCESS_DATA *psPerProcEnv = PVRSRVProcessPrivateData(psPerProc);
-	PVRSRV_DEVICE_NODE *psDeviceNode; 
-	PVRSRV_KERNEL_MEM_INFO *psNewKernelMemInfo;
-	DEVICE_MEMORY_INFO *psDevMemoryInfo;
-	DEVICE_MEMORY_HEAP_INFO *psDeviceMemoryHeap;
-	IMG_SYS_PHYADDR *pasSysPhysAddr;
-	PVRSRV_MEMBLK *psMemBlock;
-	PVRSRV_ERROR eError;
-	IMG_HANDLE hDevMemHeap = IMG_NULL;
-	IMG_HANDLE hPriv;
-	BM_HANDLE hBuffer;
-	IMG_UINT32 ui32HeapCount;
-	IMG_UINT32 ui32PageCount;
-	IMG_UINT32 i;
-	IMG_BOOL bAllocSync = (ui32Flags & PVRSRV_MEM_NO_SYNCOBJ)?IMG_FALSE:IMG_TRUE;
-
-	if ((hDevCookie == IMG_NULL) || (ui32Size == 0)
-		 || (hDevMemContext == IMG_NULL) || (ppsKernelMemInfo == IMG_NULL))
-	{
-		PVR_DPF((PVR_DBG_ERROR, "%s: Invalid params", __FUNCTION__));
-		return PVRSRV_ERROR_INVALID_PARAMS;
-	}
-
-	psDeviceNode = (PVRSRV_DEVICE_NODE *)hDevCookie;
-
-	if(OSAllocMem(PVRSRV_PAGEABLE_SELECT,
-					sizeof(PVRSRV_KERNEL_MEM_INFO),
-					(IMG_VOID **)&psNewKernelMemInfo, IMG_NULL,
-					"Kernel Memory Info") != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR,"%s: Failed to alloc memory for block", __FUNCTION__));
-		return PVRSRV_ERROR_OUT_OF_MEMORY;
-	}
-	OSMemSet(psNewKernelMemInfo, 0, sizeof(PVRSRV_KERNEL_MEM_INFO));
-
-	/* Choose the heap to map to */
-	ui32HeapCount = psDeviceNode->sDevMemoryInfo.ui32HeapCount;
-	psDevMemoryInfo = &psDeviceNode->sDevMemoryInfo;
-	psDeviceMemoryHeap = psDeviceNode->sDevMemoryInfo.psDeviceMemoryHeap;	
-	for(i=0; i<PVRSRV_MAX_CLIENT_HEAPS; i++)
-	{
-		if(HEAP_IDX(psDeviceMemoryHeap[i].ui32HeapID) == psDevMemoryInfo->ui32IonHeapID)
-		{
-			if(psDeviceMemoryHeap[i].DevMemHeapType == DEVICE_MEMORY_HEAP_PERCONTEXT)
-			{
-				if (psDeviceMemoryHeap[i].ui32HeapSize > 0)
-				{
-					hDevMemHeap = BM_CreateHeap(hDevMemContext, &psDeviceMemoryHeap[i]);
-				}
-				else
-				{
-					hDevMemHeap = IMG_NULL;
-				}
-			}
-			else
-			{
-				hDevMemHeap = psDevMemoryInfo->psDeviceMemoryHeap[i].hDevMemHeap;
-			}
-			break;
-		}
-	}
-	
-	if (hDevMemHeap == IMG_NULL)
-	{
-		PVR_DPF((PVR_DBG_ERROR, "%s: Failed to get ION heap", __FUNCTION__));
-		eError = PVRSRV_ERROR_FAILED_TO_RETRIEVE_HEAPINFO;
-		goto exitFailedHeap;
-	}
-
-	/* Import the ION buffer into our ion_client and DMA map it */
-	eError = IonImportBufferAndAquirePhysAddr(psPerProcEnv->psIONClient,
-											  hIon,
-											  &ui32PageCount,
-											  &pasSysPhysAddr,
-											  &psNewKernelMemInfo->pvLinAddrKM,
-											  &hPriv);
-	if (eError != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR, "%s: Failed to get ion buffer/buffer phys addr", __FUNCTION__));
-		goto exitFailedHeap;
-	}
-
-	/* Wrap the returned addresses into our memory context */
-	if (!BM_Wrap(hDevMemHeap,
-				 ui32Size,
-				 0,
-				 IMG_FALSE,
-				 pasSysPhysAddr,
-				 IMG_NULL,
-				 &ui32Flags,	/* This function clobbers our bits in ui32Flags */
-				 &hBuffer))
-	{
-		PVR_DPF((PVR_DBG_ERROR, "%s: Failed to wrap ion buffer", __FUNCTION__));
-		eError = PVRSRV_ERROR_OUT_OF_MEMORY;
-		goto exitFailedWrap;
-	}
-
-	/* Fill in "Implementation dependant" section of mem info */
-	psMemBlock = &psNewKernelMemInfo->sMemBlk;
-	psMemBlock->sDevVirtAddr = BM_HandleToDevVaddr(hBuffer);
-	psMemBlock->hOSMemHandle = BM_HandleToOSMemHandle(hBuffer);
-	psMemBlock->hBuffer = (IMG_HANDLE) hBuffer;
-	psMemBlock->hOSWrapMem = hPriv;			/* Saves creating a new element as we know hOSWrapMem will not be used */
-	psMemBlock->psIntSysPAddr = pasSysPhysAddr;
-
-	psNewKernelMemInfo->ui32Flags = ui32Flags;
-	psNewKernelMemInfo->sDevVAddr = psMemBlock->sDevVirtAddr;
-	psNewKernelMemInfo->uAllocSize = ui32Size;
-	psNewKernelMemInfo->memType = PVRSRV_MEMTYPE_ION;
-	PVRSRVKernelMemInfoIncRef(psNewKernelMemInfo);
-
-	/* Clear the Backup buffer pointer as we do not have one at this point. We only allocate this as we are going up/down */
-	psNewKernelMemInfo->pvSysBackupBuffer = IMG_NULL;
-
-	if (!bAllocSync)
-	{
-		psNewKernelMemInfo->psKernelSyncInfo = IMG_NULL;
-	}
-	else
-	{
-		eError = PVRSRVAllocSyncInfoKM(hDevCookie,
-									   hDevMemContext,
-									   &psNewKernelMemInfo->psKernelSyncInfo);
-		if(eError != PVRSRV_OK)
-		{
-			goto exitFailedSync;
-		}
-	}
-
-	/* register with the resman */
-	psNewKernelMemInfo->sMemBlk.hResItem = ResManRegisterRes(psPerProc->hResManContext,
-															 RESMAN_TYPE_DEVICEMEM_ION,
-															 psNewKernelMemInfo,
-															 0,
-															 &IonUnmapCallback);
-	if (psNewKernelMemInfo->sMemBlk.hResItem == IMG_NULL)
-	{
-		eError = PVRSRV_ERROR_OUT_OF_MEMORY;
-		goto exitFailedResman;
-	}
-
-	psNewKernelMemInfo->memType = PVRSRV_MEMTYPE_ION;
-
-	*ppsKernelMemInfo = psNewKernelMemInfo;
-	return PVRSRV_OK;
-
-exitFailedResman:
-	if (psNewKernelMemInfo->psKernelSyncInfo)
-	{
-		PVRSRVKernelSyncInfoDecRef(psNewKernelMemInfo->psKernelSyncInfo, psNewKernelMemInfo);
-	}
-exitFailedSync:
-	BM_Free(hBuffer, ui32Flags);
-exitFailedWrap:
-	IonUnimportBufferAndReleasePhysAddr(hPriv);
-	OSFreeMem(PVRSRV_PAGEABLE_SELECT,
-			  sizeof(IMG_SYS_PHYADDR) * ui32PageCount,
-			  pasSysPhysAddr,
-			  IMG_NULL);
-exitFailedHeap:
-	OSFreeMem(PVRSRV_PAGEABLE_SELECT,
-			  sizeof(PVRSRV_KERNEL_MEM_INFO),
-			  psNewKernelMemInfo,
-			  IMG_NULL);
-
-	return eError;
-}
-
-/*!
-******************************************************************************
-
- @Function	PVRSRVUnmapIonHandleKM
-
- @Description
-
- Frees an ion buffer mapped with PVRSRVMapIonHandleKM, including the mem_info structure
-
- @Input	   psMemInfo :
-
- @Return   PVRSRV_ERROR  :
-
-******************************************************************************/
-IMG_EXPORT
-PVRSRV_ERROR IMG_CALLCONV PVRSRVUnmapIonHandleKM(PVRSRV_KERNEL_MEM_INFO *psMemInfo)
-{
-	if (!psMemInfo)
-	{
-		return PVRSRV_ERROR_INVALID_PARAMS;
-	}
-
-	return ResManFreeResByPtr(psMemInfo->sMemBlk.hResItem, CLEANUP_WITH_POLL);
-}
-#endif	/* SUPPORT_ION */
 
 /*!
 ******************************************************************************

@@ -2101,23 +2101,6 @@ PVRSRV_ERROR SGXRegisterDevice (PVRSRV_DEVICE_NODE *psDeviceNode)
 	psDeviceMemoryHeap++;/* advance to the next heap */
 #endif
 
-#if defined(SUPPORT_ION)
-	/************* Ion Heap ***************/
-	psDeviceMemoryHeap->ui32HeapID = HEAP_ID( PVRSRV_DEVICE_TYPE_SGX, SGX_ION_HEAP_ID);
-	psDeviceMemoryHeap->sDevVAddrBase.uiAddr = SGX_ION_HEAP_BASE;
-	psDeviceMemoryHeap->ui32HeapSize = SGX_ION_HEAP_SIZE;
-	psDeviceMemoryHeap->ui32Attribs = PVRSRV_HAP_WRITECOMBINE
-														| PVRSRV_HAP_SINGLE_PROCESS;
-	psDeviceMemoryHeap->pszName = "Ion";
-	psDeviceMemoryHeap->pszBSName = "Ion BS";
-	psDeviceMemoryHeap->DevMemHeapType = DEVICE_MEMORY_HEAP_PERCONTEXT;
-	/* specify the ion heap ID for this device */
-	psDevMemoryInfo->ui32IonHeapID = SGX_ION_HEAP_ID;
-	/* set the default (4k). System can override these as required */
-	psDeviceMemoryHeap->ui32DataPageSize = SGX_MMU_PAGE_SIZE;
-	psDeviceMemoryHeap++;/* advance to the next heap */
-#endif
-
 	/************* TA data ***************/
 	psDeviceMemoryHeap->ui32HeapID = HEAP_ID( PVRSRV_DEVICE_TYPE_SGX, SGX_TADATA_HEAP_ID);
 	psDeviceMemoryHeap->sDevVAddrBase.uiAddr = SGX_TADATA_HEAP_BASE;

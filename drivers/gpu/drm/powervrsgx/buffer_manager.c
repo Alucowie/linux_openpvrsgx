@@ -2731,10 +2731,12 @@ BM_ImportMemory (IMG_VOID *pH,
 		IMG_UINT32 ui32Attribs = pBMHeap->ui32Attribs | PVRSRV_MEM_XPROC;
         IMG_BOOL bBadBackingStoreType;
 
+#if 0
         if(uFlags & PVRSRV_MEM_ION)
         {
             ui32Attribs |= PVRSRV_MEM_ION;
         }
+#endif
 
         bBadBackingStoreType = IMG_TRUE;
 

@@ -144,20 +144,6 @@ IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVFreeDeviceMemKM(IMG_HANDLE			hDevCookie,
 												PVRSRV_KERNEL_MEM_INFO	*psMemInfo);
 
-#if defined(SUPPORT_ION)
-IMG_IMPORT
-PVRSRV_ERROR PVRSRVMapIonHandleKM(PVRSRV_PER_PROCESS_DATA *psPerProc,
-								  IMG_HANDLE hDevCookie,
-								  IMG_HANDLE hDevMemContext,
-								  IMG_HANDLE hIon,
-								  IMG_UINT32 ui32Flags,
-								  IMG_UINT32 ui32Size,
-								  PVRSRV_KERNEL_MEM_INFO **ppsKernelMemInfo);
-
-IMG_IMPORT
-PVRSRV_ERROR IMG_CALLCONV PVRSRVUnmapIonHandleKM(PVRSRV_KERNEL_MEM_INFO *psMemInfo);
-#endif /* SUPPORT_ION */
-
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVDissociateDeviceMemKM(IMG_HANDLE			hDevCookie,
 												PVRSRV_KERNEL_MEM_INFO	*psMemInfo);

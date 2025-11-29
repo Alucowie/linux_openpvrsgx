@@ -72,10 +72,6 @@ typedef struct _ENV_DATA_TAG
 	struct workqueue_struct	*psWorkQueue;
 	struct work_struct	sMISRWork;
 	IMG_VOID		*pvMISRData;
-#if defined (SUPPORT_ION)
-	IMG_HANDLE		hIonHeaps;
-	IMG_HANDLE		hIonDev;
-#endif
 } ENV_DATA;
 
 #endif /* _ENV_DATA_ */

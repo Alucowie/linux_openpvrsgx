@@ -480,55 +480,6 @@ LinuxMemArea *NewAllocPagesLinuxMemArea(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32Are
 IMG_VOID FreeAllocPagesLinuxMemArea(LinuxMemArea *psLinuxMemArea);
 
 
-#if defined(CONFIG_ION_OMAP)
-
-/*!
- *******************************************************************************
- * @brief 
- *
- * @param ui32Bytes  
- * @param ui32AreaFlags  E.g Heap caching and mapping Flags
- *
- * @return 
- ******************************************************************************/
-LinuxMemArea *
-NewIONLinuxMemArea(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AreaFlags,
-                   IMG_PVOID pvPrivData, IMG_UINT32 ui32PrivDataLength);
-
-
-/*!
- *******************************************************************************
- * @brief 
- *
- * @param psLinuxMemArea  
- *
- * @return 
- ******************************************************************************/
-IMG_VOID FreeIONLinuxMemArea(LinuxMemArea *psLinuxMemArea);
-
-#else /* defined(CONFIG_ION_OMAP) */
-
-static inline LinuxMemArea *
-NewIONLinuxMemArea(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AreaFlags,
-                   IMG_PVOID pvPrivData, IMG_UINT32 ui32PrivDataLength)
-{
-    PVR_UNREFERENCED_PARAMETER(ui32Bytes);
-    PVR_UNREFERENCED_PARAMETER(ui32AreaFlags);
-    PVR_UNREFERENCED_PARAMETER(pvPrivData);
-    PVR_UNREFERENCED_PARAMETER(ui32PrivDataLength);
-    BUG();
-    return IMG_NULL;
-}
-
-static inline IMG_VOID FreeIONLinuxMemArea(LinuxMemArea *psLinuxMemArea)
-{
-    PVR_UNREFERENCED_PARAMETER(psLinuxMemArea);
-    BUG();
-}
-
-#endif /* defined(CONFIG_ION_OMAP) */
-
-
 /*!
  *******************************************************************************
  * @brief 

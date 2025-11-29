@@ -128,7 +128,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #define PVRSRV_MAP_NOUSERVIRTUAL            (1UL<<27)
 #define PVRSRV_MEM_XPROC  					(1U<<28)
-#define PVRSRV_MEM_ION						(1U<<29)
+//#define PVRSRV_MEM_ION						(1U<<29)
 #define PVRSRV_MEM_ALLOCATENONCACHEDMEM		(1UL<<30)
 
 /*
@@ -850,22 +850,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceMemory2(IMG_CONST PVRSRV_DEV_DATA	*psDe
 												 IMG_HANDLE					hDstDevMemHeap,
 #endif
 												 PVRSRV_CLIENT_MEM_INFO		**ppsDstMemInfo);
-#if defined(SUPPORT_ION)
-PVRSRV_ERROR PVRSRVMapIonHandle(const PVRSRV_DEV_DATA *psDevData,
-#if defined (SUPPORT_SID_INTERFACE)
-								 IMG_SID    hDevMemContext,
-#else
-								 IMG_HANDLE hDevMemContext,
-#endif
-								IMG_INT32 uiFD,
-								IMG_UINT32 uiSize,
-								IMG_UINT32 ui32Attribs,
-								PVRSRV_CLIENT_MEM_INFO **ppsMemInfo);
-
-PVRSRV_ERROR PVRSRVUnmapIonHandle(const PVRSRV_DEV_DATA *psDevData,
-								  PVRSRV_CLIENT_MEM_INFO *psMemInfo);
-#endif /* defined (SUPPORT_ION) */
-
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVAllocDeviceMemSparse(const PVRSRV_DEV_DATA *psDevData,

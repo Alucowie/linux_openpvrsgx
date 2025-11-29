@@ -76,9 +76,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <../arch/arm/mm/dma.h>
 
-#if defined (SUPPORT_ION)
-#include "ion.h"
-#endif
+#define PVRSRV_MODNAME "pvrsrvkm"
 
 #if defined (CONFIG_X86_PAE)
 #error Physical Address Extension not supported with the driver
@@ -162,6 +160,7 @@ OSAllocPages_Impl(IMG_UINT32 ui32AllocFlags,
     }
 #endif
 
+#if 0
     if(ui32AllocFlags & PVRSRV_MEM_ION)
     {
         /* We'll only see HAP_SINGLE_PROCESS with MEM_ION */
@@ -177,6 +176,7 @@ OSAllocPages_Impl(IMG_UINT32 ui32AllocFlags,
         PVRMMapRegisterArea(psLinuxMemArea);
         goto ExitSkipSwitch;
     }
+#endif
 
     switch(ui32AllocFlags & PVRSRV_HAP_MAPTYPE_MASK)
     {
@@ -242,7 +242,7 @@ OSAllocPages_Impl(IMG_UINT32 ui32AllocFlags,
 		psLinuxMemArea->hBMHandle = hBMHandle;
 	}
 
-ExitSkipSwitch:
+//ExitSkipSwitch:
     *ppvCpuVAddr = LinuxMemAreaToCpuVAddr(psLinuxMemArea);
     *phOSMemHandle = psLinuxMemArea;
     
@@ -4241,17 +4241,6 @@ PVRSRV_ERROR PVROSFuncInit(IMG_VOID)
         }
     }
 
-#if defined (SUPPORT_ION)
-	{
-		PVRSRV_ERROR eError;
-
-		eError = IonInit();
-		if (eError != PVRSRV_OK)
-		{
-			PVR_DPF((PVR_DBG_ERROR, "%s: IonInit failed", __FUNCTION__));
-		}
-	}
-#endif
     return PVRSRV_OK;
 }
 
@@ -4261,9 +4250,6 @@ PVRSRV_ERROR PVROSFuncInit(IMG_VOID)
  */
 IMG_VOID PVROSFuncDeInit(IMG_VOID)
 {
-#if defined (SUPPORT_ION)
-	IonDeinit();
-#endif
     if (psTimerWorkQueue != NULL)
     {
 	destroy_workqueue(psTimerWorkQueue);
