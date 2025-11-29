@@ -388,11 +388,10 @@ IMG_VOID PVRSRVDebugPrintf	(
 			/* Traces don't need a location */
 			if (bTrace == IMG_FALSE)
 			{
-#ifdef DEBUG_LOG_PATH_TRUNCATE
 				/* Buffer for rewriting filepath in log messages */
 				static IMG_CHAR szFileNameRewrite[PVR_MAX_FILEPATH_LEN];
 
-   				IMG_CHAR* pszTruncIter;
+				IMG_CHAR* pszTruncIter;
 				IMG_CHAR* pszTruncBackInter;
 
 				/* Truncate path (DEBUG_LOG_PATH_TRUNCATE shoud be set to EURASIA env var)*/
@@ -442,7 +441,6 @@ IMG_VOID PVRSRVDebugPrintf	(
 				pszFileName = szFileNameRewrite;
 				/* Remove first '/' if exist (it's always relative path */
 				if(*pszFileName == '/') pszFileName++;
-#endif
 
 #if !defined(__sh__)
 				pszLeafName = (IMG_CHAR *)strrchr (pszFileName, '\\');
