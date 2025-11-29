@@ -102,7 +102,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "kernelbuffer.h"
 #include "syscommon.h"
 #include "pvrmmap.h"
-#include "mutils.h"
 #include "mm.h"
 #include "mmap.h"
 #include "mutex.h"
@@ -958,8 +957,6 @@ static int __init PVRCore_Init(void)
 		error = -ENOMEM;
 		goto init_failed;
 	}
-
-	PVRLinuxMUtilsInit();
 
 	if(LinuxMMInit() != PVRSRV_OK)
 	{

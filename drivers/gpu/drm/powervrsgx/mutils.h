@@ -51,20 +51,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 #endif
 
-#if !(defined(__i386__) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26)))
-#if defined(SUPPORT_LINUX_X86_PAT)
-#undef SUPPORT_LINUX_X86_PAT
-#endif
-#endif
-
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0))
 #define ioremap_nocache ioremap
 #endif
 
-#if defined(SUPPORT_LINUX_X86_PAT)
-	pgprot_t pvr_pgprot_writecombine(pgprot_t prot);
-	#define	PGPROT_WC(pv)	pvr_pgprot_writecombine(pv)
-#else
 	#if defined(__arm__) || defined(__sh__)
 		#define	PGPROT_WC(pv)	pgprot_writecombine(pv)
 	#else
@@ -75,7 +65,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			#error  Unsupported architecture!
 		#endif
 	#endif
-#endif
 
 #define	PGPROT_UC(pv)	pgprot_noncached(pv)
 
@@ -89,9 +78,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	#endif
 #endif
 
-#if defined(SUPPORT_LINUX_X86_PAT)
-		#define IOREMAP_WC(pa, bytes) ioremap_wc(pa, bytes)
-#else
 	#if defined(__arm__)
 		#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27))
 			#define IOREMAP_WC(pa, bytes) ioremap_wc(pa, bytes)
@@ -109,11 +95,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	#else
 		#define IOREMAP_WC(pa, bytes)	ioremap_nocache(pa, bytes)
 	#endif
-#endif
 
 #define	IOREMAP_UC(pa, bytes)	ioremap_nocache(pa, bytes)
-
-IMG_VOID PVRLinuxMUtilsInit(IMG_VOID);
 
 #endif /* __IMG_LINUX_MUTILS_H__ */
 
