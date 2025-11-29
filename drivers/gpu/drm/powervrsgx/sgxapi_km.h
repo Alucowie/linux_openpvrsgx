@@ -88,11 +88,7 @@ extern "C" {
  * shaders need it to select which heap to write
  * their ISP controll stream to.
  */
-#if (defined(SUPPORT_PERCONTEXT_PB) || defined(SUPPORT_HYBRID_PB))
-#define SGX_3DPARAMETERS_HEAP_ID			SGX_PERCONTEXT_3DPARAMETERS_HEAP_ID	
-#else
-#define SGX_3DPARAMETERS_HEAP_ID			SGX_SHARED_3DPARAMETERS_HEAP_ID
-#endif
+#define SGX_3DPARAMETERS_HEAP_ID			SGX_PERCONTEXT_3DPARAMETERS_HEAP_ID
 /* Define for number of bytes between consecutive code base registers */
 #if defined(SGX543) || defined(SGX544) || defined(SGX554)
 #define SGX_USE_CODE_SEGMENT_RANGE_BITS		23
