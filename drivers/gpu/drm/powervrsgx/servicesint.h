@@ -423,11 +423,7 @@ typedef struct PVRSRV_DEVICECLASS_BUFFER_TAG
 */
 typedef struct PVRSRV_CLIENT_DEVICECLASS_INFO_TAG
 {
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID     hDeviceKM;
-#else
 	IMG_HANDLE hDeviceKM;
-#endif
 	IMG_HANDLE	hServices;
 } PVRSRV_CLIENT_DEVICECLASS_INFO;
 
@@ -527,11 +523,7 @@ PVRSRVUnrefSharedSysMem(const PVRSRV_CONNECTION *psConnection,
  ********************************************************************************/
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV
 PVRSRVMapMemInfoMem(const PVRSRV_CONNECTION *psConnection,
-#if defined (SUPPORT_SID_INTERFACE)
-                    IMG_SID hKernelMemInfo,
-#else
                     IMG_HANDLE hKernelMemInfo,
-#endif
                     PVRSRV_CLIENT_MEM_INFO **ppsClientMemInfo);
 
 #endif /* __SERVICESINT_H__ */

@@ -1108,11 +1108,7 @@ static PVRSRV_ERROR PVRSRVGetMiscInfoKM_Device_AnyVaCb(PVRSRV_DEVICE_NODE *psDev
 
 ******************************************************************************/
 IMG_EXPORT
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO_KM *psMiscInfo)
-#else
 PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
-#endif
 {
 	SYS_DATA *psSysData;
 
@@ -1298,16 +1294,10 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 		}
 		else
 		{
-#if defined (SUPPORT_SID_INTERFACE)
-			PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo = psMiscInfo->sCacheOpCtl.psKernelMemInfo;
-
-			if(!psMiscInfo->sCacheOpCtl.psKernelMemInfo)
-#else
 			PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo;
 			PVRSRV_PER_PROCESS_DATA *psPerProc;
 
 			if(!psMiscInfo->sCacheOpCtl.u.psKernelMemInfo)
-#endif
 			{
 				PVR_DPF((PVR_DBG_WARNING, "PVRSRVGetMiscInfoKM: "
 						 "Ignoring non-deferred cache op with no meminfo"));
@@ -1321,9 +1311,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 						 "to combine deferred cache ops with immediate ones"));
 			}
 
-#if defined (SUPPORT_SID_INTERFACE)
-			PVR_DBG_BREAK
-#else
 			psPerProc = PVRSRVFindPerProcessData();
 
 			if(PVRSRVLookupHandle(psPerProc->psHandleBase,
@@ -1335,7 +1322,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 						 "Can't find kernel meminfo"));
 				return PVRSRV_ERROR_INVALID_PARAMS;
 			}
-#endif
 
 			if(psMiscInfo->sCacheOpCtl.eCacheOpType == PVRSRV_MISC_INFO_CPUCACHEOP_FLUSH)
 			{
@@ -1362,16 +1348,11 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 
 	if((psMiscInfo->ui32StateRequest & PVRSRV_MISC_INFO_GET_REF_COUNT_PRESENT) != 0UL)
 	{
-#if !defined (SUPPORT_SID_INTERFACE)
 		PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo;
 		PVRSRV_PER_PROCESS_DATA *psPerProc;
-#endif
 
 		psMiscInfo->ui32StatePresent |= PVRSRV_MISC_INFO_GET_REF_COUNT_PRESENT;
 
-#if defined (SUPPORT_SID_INTERFACE)
-		PVR_DBG_BREAK
-#else
 		psPerProc = PVRSRVFindPerProcessData();
 
 		if(PVRSRVLookupHandle(psPerProc->psHandleBase,
@@ -1385,7 +1366,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 		}
 
 		psMiscInfo->sGetRefCountCtl.ui32RefCount = psKernelMemInfo->ui32RefCount;
-#endif
 	}
 
 	if ((psMiscInfo->ui32StateRequest & PVRSRV_MISC_INFO_GET_PAGE_SIZE_PRESENT) != 0UL)

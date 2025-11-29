@@ -744,18 +744,10 @@ typedef struct _PVRSRV_CLIENT_SYNC_INFO_
 	IMG_DEV_VIRTADDR		sReadOps2CompleteDevVAddr;
 
 	/* handle to client mapping data (OS specific) */
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID					hMappingInfo;
-
-	/* handle to kernel sync info */
-	IMG_SID					hKernelSyncInfo;
-#else
 	IMG_HANDLE					hMappingInfo;
 
 	/* handle to kernel sync info */
 	IMG_HANDLE					hKernelSyncInfo;
-#endif
-
 } PVRSRV_CLIENT_SYNC_INFO, *PPVRSRV_CLIENT_SYNC_INFO;
 
 /*!

@@ -264,28 +264,13 @@ IMG_CHAR* OSStringCopy(IMG_CHAR *pszDest, const IMG_CHAR *pszSrc);
 IMG_INT32 OSSNPrintf(IMG_CHAR *pStr, IMG_SIZE_T ui32Size, const IMG_CHAR *pszFormat, ...) IMG_FORMAT_PRINTF(3, 4);
 #define OSStringLength(pszString) strlen(pszString)
 
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR OSEventObjectCreateKM(const IMG_CHAR *pszName,
-								 PVRSRV_EVENTOBJECT_KM *psEventObject);
-PVRSRV_ERROR OSEventObjectDestroyKM(PVRSRV_EVENTOBJECT_KM *psEventObject);
-PVRSRV_ERROR OSEventObjectSignalKM(IMG_HANDLE hOSEventKM);
-PVRSRV_ERROR OSEventObjectWaitKM(IMG_HANDLE hOSEventKM);
-PVRSRV_ERROR OSEventObjectOpenKM(PVRSRV_EVENTOBJECT_KM *psEventObject,
-											IMG_HANDLE *phOSEvent);
-PVRSRV_ERROR OSEventObjectCloseKM(PVRSRV_EVENTOBJECT_KM *psEventObject,
-											IMG_HANDLE hOSEventKM);
-#else
 PVRSRV_ERROR OSEventObjectCreateKM(const IMG_CHAR *pszName,
 								 PVRSRV_EVENTOBJECT *psEventObject);
 PVRSRV_ERROR OSEventObjectDestroyKM(PVRSRV_EVENTOBJECT *psEventObject);
 PVRSRV_ERROR OSEventObjectSignalKM(IMG_HANDLE hOSEventKM);
 PVRSRV_ERROR OSEventObjectWaitKM(IMG_HANDLE hOSEventKM);
-PVRSRV_ERROR OSEventObjectOpenKM(PVRSRV_EVENTOBJECT *psEventObject,
-											IMG_HANDLE *phOSEvent);
-PVRSRV_ERROR OSEventObjectCloseKM(PVRSRV_EVENTOBJECT *psEventObject,
-											IMG_HANDLE hOSEventKM);
-#endif /* #if defined (SUPPORT_SID_INTERFACE) */
-
+PVRSRV_ERROR OSEventObjectOpenKM(PVRSRV_EVENTOBJECT *psEventObject, IMG_HANDLE *phOSEvent);
+PVRSRV_ERROR OSEventObjectCloseKM(PVRSRV_EVENTOBJECT *psEventObject, IMG_HANDLE hOSEventKM);
 
 PVRSRV_ERROR OSBaseAllocContigMemory(IMG_SIZE_T ui32Size, IMG_CPU_VIRTADDR *pLinAddr, IMG_CPU_PHYADDR *pPhysAddr);
 PVRSRV_ERROR OSBaseFreeContigMemory(IMG_SIZE_T ui32Size, IMG_CPU_VIRTADDR LinAddr, IMG_CPU_PHYADDR PhysAddr);

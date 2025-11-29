@@ -70,22 +70,14 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyCommandQueueKM(PVRSRV_QUEUE_INFO *psQueue
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapsKM(IMG_HANDLE hDevCookie,
-#if defined (SUPPORT_SID_INTERFACE)
-													PVRSRV_HEAP_INFO_KM *psHeapInfo);
-#else
 													PVRSRV_HEAP_INFO *psHeapInfo);
-#endif
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCookie,
 														 PVRSRV_PER_PROCESS_DATA	*psPerProc,
 														 IMG_HANDLE					*phDevMemContext,
 														 IMG_UINT32					*pui32ClientHeapCount,
-#if defined (SUPPORT_SID_INTERFACE)
-														 PVRSRV_HEAP_INFO_KM		*psHeapInfo,
-#else
 														 PVRSRV_HEAP_INFO			*psHeapInfo,
-#endif
 														 IMG_BOOL					*pbCreated,
 														 IMG_BOOL					*pbShared);
 
@@ -100,11 +92,7 @@ IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapInfoKM(IMG_HANDLE				hDevCookie,
 															IMG_HANDLE			hDevMemContext,
 															IMG_UINT32			*pui32ClientHeapCount,
-#if defined (SUPPORT_SID_INTERFACE)
-															PVRSRV_HEAP_INFO_KM	*psHeapInfo,
-#else
 															PVRSRV_HEAP_INFO	*psHeapInfo,
-#endif
 															IMG_BOOL 			*pbShared
 					);
 
@@ -314,11 +302,7 @@ IMG_IMPORT
 IMG_VOID IMG_CALLCONV PVRSRVReleaseSyncInfoKM(PVRSRV_KERNEL_SYNC_INFO	*psKernelSyncInfo);
 
 IMG_IMPORT
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO_KM *psMiscInfo);
-#else
 PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo);
-#endif
 
 /*!
  * *****************************************************************************

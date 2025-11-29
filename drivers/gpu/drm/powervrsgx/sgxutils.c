@@ -789,12 +789,7 @@ IMG_BOOL SGXIsDevicePowered(PVRSRV_DEVICE_NODE *psDeviceNode)
 
 ******************************************************************************/
 IMG_EXPORT
-PVRSRV_ERROR SGXGetInternalDevInfoKM(IMG_HANDLE hDevCookie,
-#if defined (SUPPORT_SID_INTERFACE)
-									SGX_INTERNAL_DEVINFO_KM *psSGXInternalDevInfo)
-#else
-									SGX_INTERNAL_DEVINFO *psSGXInternalDevInfo)
-#endif
+PVRSRV_ERROR SGXGetInternalDevInfoKM(IMG_HANDLE hDevCookie, SGX_INTERNAL_DEVINFO *psSGXInternalDevInfo)
 {
 	PVRSRV_SGXDEV_INFO *psDevInfo = (PVRSRV_SGXDEV_INFO *)((PVRSRV_DEVICE_NODE *)hDevCookie)->pvDevice;
 

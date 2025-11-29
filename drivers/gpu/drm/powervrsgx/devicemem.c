@@ -107,12 +107,7 @@ static IMG_UINT32 g_ui32SyncUID = 0;
 
 ******************************************************************************/
 IMG_EXPORT
-PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapsKM(IMG_HANDLE hDevCookie,
-#if defined (SUPPORT_SID_INTERFACE)
-													PVRSRV_HEAP_INFO_KM *psHeapInfo)
-#else
-													PVRSRV_HEAP_INFO *psHeapInfo)
-#endif
+PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapsKM(IMG_HANDLE hDevCookie, PVRSRV_HEAP_INFO *psHeapInfo)
 {
 	PVRSRV_DEVICE_NODE *psDeviceNode;
 	IMG_UINT32 ui32HeapCount;
@@ -180,11 +175,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 														 PVRSRV_PER_PROCESS_DATA	*psPerProc,
 														 IMG_HANDLE 				*phDevMemContext,
 														 IMG_UINT32 				*pui32ClientHeapCount,
-#if defined (SUPPORT_SID_INTERFACE)
-														 PVRSRV_HEAP_INFO_KM		*psHeapInfo,
-#else
 														 PVRSRV_HEAP_INFO			*psHeapInfo,
-#endif
 														 IMG_BOOL					*pbCreated,
 														 IMG_BOOL 					*pbShared)
 {
@@ -328,11 +319,7 @@ IMG_EXPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapInfoKM(IMG_HANDLE					hDevCookie,
 														 IMG_HANDLE 				hDevMemContext,
 														 IMG_UINT32 				*pui32ClientHeapCount,
-#if defined (SUPPORT_SID_INTERFACE)
-														 PVRSRV_HEAP_INFO_KM		*psHeapInfo,
-#else
 														 PVRSRV_HEAP_INFO			*psHeapInfo,
-#endif
 														 IMG_BOOL 					*pbShared)
 {
 	PVRSRV_DEVICE_NODE *psDeviceNode;
@@ -819,11 +806,7 @@ PVRSRV_ERROR FreeMemCallBackCommon(PVRSRV_KERNEL_MEM_INFO *psMemInfo,
 	{
 		if((psMemInfo->ui32Flags & PVRSRV_MEM_EXPORTED) != 0)
 		{
-#if defined (SUPPORT_SID_INTERFACE)
-			IMG_SID hMemInfo = 0;
-#else
 			IMG_HANDLE hMemInfo = IMG_NULL;
-#endif
 
 			/* find the handle */
 			eError = PVRSRVFindHandle(KERNEL_HANDLE_BASE,

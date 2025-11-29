@@ -185,11 +185,7 @@ PVRSRV_ERROR PVRMMapRemoveRegisteredArea(LinuxMemArea *psLinuxMemArea);
  * @Return PVRSRV_ERROR
  ******************************************************************************/
 PVRSRV_ERROR PVRMMapOSMemHandleToMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
-#if defined (SUPPORT_SID_INTERFACE)
-                                          IMG_SID     hMHandle,
-#else
                                           IMG_HANDLE hMHandle,
-#endif
                                           IMG_UINT32 *pui32MMapOffset,
                                           IMG_UINT32 *pui32ByteOffset,
                                           IMG_UINT32 *pui32RealByteSize,
@@ -212,11 +208,7 @@ PVRSRV_ERROR PVRMMapOSMemHandleToMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
  ******************************************************************************/
 PVRSRV_ERROR
 PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
-#if defined (SUPPORT_SID_INTERFACE)
-				IMG_SID   hMHandle,
-#else
 				IMG_HANDLE hMHandle,
-#endif
 				IMG_BOOL *pbMUnmap,
 				IMG_UINT32 *pui32RealByteSize,
                                 IMG_UINT32 *pui32UserVAddr);

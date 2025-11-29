@@ -421,7 +421,6 @@ typedef struct _PVRSRV_SGX_PDUMP_CONTEXT_
 } PVRSRV_SGX_PDUMP_CONTEXT;
 
 
-#if !defined (SUPPORT_SID_INTERFACE)
 typedef struct _SGX_KICKTA_DUMP_ROFF_
 {
 	IMG_HANDLE			hKernelMemInfo;						/*< Buffer handle */
@@ -430,13 +429,8 @@ typedef struct _SGX_KICKTA_DUMP_ROFF_
 	IMG_UINT32			ui32Value;							/*< Actual value to dump */
 	IMG_PCHAR			pszName;							/*< Name of buffer */
 } SGX_KICKTA_DUMP_ROFF, *PSGX_KICKTA_DUMP_ROFF;
-#endif
 
-#if defined (SUPPORT_SID_INTERFACE)
-typedef struct _SGX_KICKTA_DUMP_BUFFER_KM_
-#else
 typedef struct _SGX_KICKTA_DUMP_BUFFER_
-#endif
 {
 	IMG_UINT32			ui32SpaceUsed;
 	IMG_UINT32			ui32Start;							/*< Byte offset of start to dump */
@@ -451,13 +445,8 @@ typedef struct _SGX_KICKTA_DUMP_BUFFER_
 	IMG_DEV_VIRTADDR	sCtrlDevVAddr;						/*< Device virtual address of the memory in the 
 																control structure to be checked */
 	IMG_PCHAR			pszName;							/*< Name of buffer */
-#if defined (SUPPORT_SID_INTERFACE)
-} SGX_KICKTA_DUMP_BUFFER_KM, *PSGX_KICKTA_DUMP_BUFFER_KM;
-#else
 } SGX_KICKTA_DUMP_BUFFER, *PSGX_KICKTA_DUMP_BUFFER;
-#endif
 
-#if !defined (SUPPORT_SID_INTERFACE)
 #ifdef PDUMP
 /*
 	PDUMP version of above kick structure
@@ -477,7 +466,6 @@ typedef struct _SGX_KICKTA_PDUMP_
 	IMG_UINT32						ui32ROffArraySize;
 } SGX_KICKTA_PDUMP, *PSGX_KICKTA_PDUMP;
 #endif	/* PDUMP */
-#endif /* #if !defined (SUPPORT_SID_INTERFACE) */
 
 #if defined(SGX_FEATURE_2D_HARDWARE)
 /* Maximum size of ctrl stream for 2d blit command (in 32 bit words) */

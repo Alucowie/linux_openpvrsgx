@@ -189,11 +189,7 @@ static IMG_UINT32 DeinitDevInfo(PVRSRV_SGXDEV_INFO *psDevInfo)
 ******************************************************************************/
 static PVRSRV_ERROR InitDevInfo(PVRSRV_PER_PROCESS_DATA *psPerProc,
 								PVRSRV_DEVICE_NODE *psDeviceNode,
-#if defined (SUPPORT_SID_INTERFACE)
-								SGX_BRIDGE_INIT_INFO_KM *psInitInfo)
-#else
 								SGX_BRIDGE_INIT_INFO *psInitInfo)
-#endif
 {
 	PVRSRV_SGXDEV_INFO *psDevInfo = (PVRSRV_SGXDEV_INFO *)psDeviceNode->pvDevice;
 	PVRSRV_ERROR		eError;
@@ -850,11 +846,7 @@ static PVRSRV_ERROR DevInitSGXPart1 (IMG_VOID *pvDeviceNode)
 
 ******************************************************************************/
 IMG_EXPORT
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR SGXGetInfoForSrvinitKM(IMG_HANDLE hDevHandle, PVRSRV_HEAP_INFO_KM *pasHeapInfo, IMG_DEV_PHYADDR *psPDDevPAddr)
-#else
 PVRSRV_ERROR SGXGetInfoForSrvinitKM(IMG_HANDLE hDevHandle, SGX_BRIDGE_INFO_FOR_SRVINIT *psInitInfo)
-#endif
 {
 	PVRSRV_DEVICE_NODE	*psDeviceNode;
 	PVRSRV_SGXDEV_INFO	*psDevInfo;
@@ -865,15 +857,9 @@ PVRSRV_ERROR SGXGetInfoForSrvinitKM(IMG_HANDLE hDevHandle, SGX_BRIDGE_INFO_FOR_S
 	psDeviceNode = (PVRSRV_DEVICE_NODE *)hDevHandle;
 	psDevInfo = (PVRSRV_SGXDEV_INFO *)psDeviceNode->pvDevice;
 
-#if defined (SUPPORT_SID_INTERFACE)
-	*psPDDevPAddr = psDevInfo->sKernelPDDevPAddr;
-
-	eError = PVRSRVGetDeviceMemHeapsKM(hDevHandle, pasHeapInfo);
-#else
 	psInitInfo->sPDDevPAddr = psDevInfo->sKernelPDDevPAddr;
 
 	eError = PVRSRVGetDeviceMemHeapsKM(hDevHandle, &psInitInfo->asHeapInfo[0]);
-#endif
 	if (eError != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR,"SGXGetInfoForSrvinit: PVRSRVGetDeviceMemHeapsKM failed (%d)", eError));
@@ -900,11 +886,7 @@ PVRSRV_ERROR SGXGetInfoForSrvinitKM(IMG_HANDLE hDevHandle, SGX_BRIDGE_INFO_FOR_S
 IMG_EXPORT
 PVRSRV_ERROR DevInitSGXPart2KM (PVRSRV_PER_PROCESS_DATA *psPerProc,
                                 IMG_HANDLE hDevHandle,
-#if defined (SUPPORT_SID_INTERFACE)
-                                SGX_BRIDGE_INIT_INFO_KM *psInitInfo)
-#else
                                 SGX_BRIDGE_INIT_INFO *psInitInfo)
-#endif
 {
 	PVRSRV_DEVICE_NODE		*psDeviceNode;
 	PVRSRV_SGXDEV_INFO		*psDevInfo;

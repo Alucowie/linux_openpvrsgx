@@ -180,11 +180,7 @@ MMapOffsetToHandle(IMG_UINT32 pfn)
 #endif
 
 static inline IMG_UINT32
-#if defined (SUPPORT_SID_INTERFACE)
-HandleToMMapOffset(IMG_SID hHandle)
-#else
 HandleToMMapOffset(IMG_HANDLE hHandle)
-#endif
 {
 	IMG_UINT32 ulHandle = (IMG_UINT32)hHandle;
 
@@ -361,11 +357,7 @@ DetermineUsersSizeAndByteOffset(LinuxMemArea *psLinuxMemArea,
  ******************************************************************************/
 PVRSRV_ERROR
 PVRMMapOSMemHandleToMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
-#if defined (SUPPORT_SID_INTERFACE)
-                             IMG_SID     hMHandle,
-#else
                              IMG_HANDLE hMHandle,
-#endif
                              IMG_UINT32 *pui32MMapOffset,
                              IMG_UINT32 *pui32ByteOffset,
                              IMG_UINT32 *pui32RealByteSize,
@@ -383,11 +375,7 @@ PVRMMapOSMemHandleToMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
     eError = PVRSRVLookupOSMemHandle(psPerProc->psHandleBase, &hOSMemHandle, hMHandle);
     if (eError != PVRSRV_OK)
     {
-#if defined (SUPPORT_SID_INTERFACE)
-        PVR_DPF((PVR_DBG_ERROR, "%s: Lookup of handle %x failed", __FUNCTION__, hMHandle));
-#else
         PVR_DPF((PVR_DBG_ERROR, "%s: Lookup of handle %p failed", __FUNCTION__, hMHandle));
-#endif
 
         goto exit_unlock;
     }
@@ -507,11 +495,7 @@ exit_unlock:
  ******************************************************************************/
 PVRSRV_ERROR
 PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
-#if defined (SUPPORT_SID_INTERFACE)
-				IMG_SID   hMHandle,
-#else
 				IMG_HANDLE hMHandle,
-#endif
 				IMG_BOOL *pbMUnmap,
 				IMG_UINT32 *pui32RealByteSize,
                                 IMG_UINT32 *pui32UserVAddr)
@@ -529,11 +513,7 @@ PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
     eError = PVRSRVLookupOSMemHandle(psPerProc->psHandleBase, &hOSMemHandle, hMHandle);
     if (eError != PVRSRV_OK)
     {
-#if defined (SUPPORT_SID_INTERFACE)
-	PVR_DPF((PVR_DBG_ERROR, "%s: Lookup of handle %x failed", __FUNCTION__, hMHandle));
-#else
 	PVR_DPF((PVR_DBG_ERROR, "%s: Lookup of handle %p failed", __FUNCTION__, hMHandle));
-#endif
 
 	goto exit_unlock;
     }
@@ -565,11 +545,7 @@ PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
     }
 
     /* MMap data not found */
-#if defined (SUPPORT_SID_INTERFACE)
-    PVR_DPF((PVR_DBG_ERROR, "%s: Mapping data not found for handle %x (memory area %p)", __FUNCTION__, hMHandle, psLinuxMemArea));
-#else
     PVR_DPF((PVR_DBG_ERROR, "%s: Mapping data not found for handle %p (memory area %p)", __FUNCTION__, hMHandle, psLinuxMemArea));
-#endif
 
     eError =  PVRSRV_ERROR_MAPPING_NOT_FOUND;
 

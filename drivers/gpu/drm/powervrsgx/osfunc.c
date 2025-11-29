@@ -2509,11 +2509,7 @@ PVRSRV_ERROR OSDisableTimer (IMG_HANDLE hTimer)
  @Return   PVRSRV_ERROR  : 
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR OSEventObjectCreateKM(const IMG_CHAR *pszName, PVRSRV_EVENTOBJECT_KM *psEventObject)
-#else
 PVRSRV_ERROR OSEventObjectCreateKM(const IMG_CHAR *pszName, PVRSRV_EVENTOBJECT *psEventObject)
-#endif
 {
 
     PVRSRV_ERROR eError = PVRSRV_OK;
@@ -2529,11 +2525,7 @@ PVRSRV_ERROR OSEventObjectCreateKM(const IMG_CHAR *pszName, PVRSRV_EVENTOBJECT *
         {
             /* autogenerate a name */	
             static IMG_UINT16 ui16NameIndex = 0;			
-#if defined (SUPPORT_SID_INTERFACE)
-            snprintf(psEventObject->szName, EVENTOBJNAME_MAXLENGTH, "PVRSRV_EVENTOBJECT_KM_%d", ui16NameIndex++);
-#else
             snprintf(psEventObject->szName, EVENTOBJNAME_MAXLENGTH, "PVRSRV_EVENTOBJECT_%d", ui16NameIndex++);
-#endif
         }
         
         if(LinuxEventObjectListCreate(&psEventObject->hOSEventKM) != PVRSRV_OK)
@@ -2567,11 +2559,7 @@ PVRSRV_ERROR OSEventObjectCreateKM(const IMG_CHAR *pszName, PVRSRV_EVENTOBJECT *
  @Return   PVRSRV_ERROR  : 
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR OSEventObjectDestroyKM(PVRSRV_EVENTOBJECT_KM *psEventObject)
-#else
 PVRSRV_ERROR OSEventObjectDestroyKM(PVRSRV_EVENTOBJECT *psEventObject)
-#endif
 {
     PVRSRV_ERROR eError = PVRSRV_OK;
 
@@ -2642,11 +2630,7 @@ PVRSRV_ERROR OSEventObjectWaitKM(IMG_HANDLE hOSEventKM)
  @Return   PVRSRV_ERROR  : 
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR OSEventObjectOpenKM(PVRSRV_EVENTOBJECT_KM *psEventObject,
-#else
 PVRSRV_ERROR OSEventObjectOpenKM(PVRSRV_EVENTOBJECT *psEventObject,
-#endif
                                             IMG_HANDLE *phOSEvent)
 {
     PVRSRV_ERROR eError = PVRSRV_OK;
@@ -2685,11 +2669,7 @@ PVRSRV_ERROR OSEventObjectOpenKM(PVRSRV_EVENTOBJECT *psEventObject,
  @Return   PVRSRV_ERROR  : 
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR OSEventObjectCloseKM(PVRSRV_EVENTOBJECT_KM *psEventObject,
-#else
 PVRSRV_ERROR OSEventObjectCloseKM(PVRSRV_EVENTOBJECT *psEventObject,
-#endif
                                             IMG_HANDLE hOSEventKM)
 {
     PVRSRV_ERROR eError = PVRSRV_OK;

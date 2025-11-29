@@ -73,14 +73,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define	INDEX_IS_VALID(psBase, i) ((i) < (psBase)->ui32TotalHandCount)
 
 /* Valid handles are never NULL, but handle array indices are based from 0 */
-#if defined (SUPPORT_SID_INTERFACE)
-#define	INDEX_TO_HANDLE(i) ((IMG_SID)((i) + 1))
-#define	HANDLE_TO_INDEX(h) ((IMG_UINT32)(h) - 1)
-#else
 #define	INDEX_TO_HANDLE(i) ((IMG_HANDLE)((IMG_UINTPTR_T)(i) + 1))
 #define	HANDLE_TO_INDEX(h) ((IMG_UINT32)(IMG_UINTPTR_T)(h) - 1)
-
-#endif
 
 #define	INDEX_TO_BLOCK_INDEX(i)		DIVIDE_BY_BLOCK_SIZE(i)
 #define BLOCK_INDEX_TO_INDEX(i)		MULTIPLY_BY_BLOCK_SIZE(i)
@@ -145,11 +139,7 @@ struct sHandleList
 {
 	IMG_UINT32 ui32Prev;
 	IMG_UINT32 ui32Next;
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID hParent;
-#else
 	IMG_HANDLE hParent;
-#endif
 };
 
 enum ePVRSRVInternalHandleFlag
@@ -316,11 +306,7 @@ typedef IMG_UINTPTR_T HAND_KEY[HAND_KEY_LEN];
 
 ******************************************************************************/
 static INLINE
-#if defined (SUPPORT_SID_INTERFACE)
-IMG_VOID HandleListInit(IMG_UINT32 ui32Index, struct sHandleList *psList, IMG_SID hParent)
-#else
 IMG_VOID HandleListInit(IMG_UINT32 ui32Index, struct sHandleList *psList, IMG_HANDLE hParent)
-#endif
 {
 	psList->ui32Next = ui32Index;
 	psList->ui32Prev = ui32Index;
@@ -454,11 +440,7 @@ IMG_BOOL NoParent(struct sHandle *psHandle)
 
 ******************************************************************************/
 static INLINE
-#if defined (SUPPORT_SID_INTERFACE)
-IMG_SID ParentHandle(struct sHandle *psHandle)
-#else
 IMG_HANDLE ParentHandle(struct sHandle *psHandle)
-#endif
 {
 	return psHandle->sSiblings.hParent;
 }
@@ -670,11 +652,7 @@ PVRSRV_ERROR IterateOverChildren(PVRSRV_HANDLE_BASE *psBase, struct sHandle *psP
 
 ******************************************************************************/
 static INLINE
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR GetHandleStructure(PVRSRV_HANDLE_BASE *psBase, struct sHandle **ppsHandle, IMG_SID hHandle, PVRSRV_HANDLE_TYPE eType)
-#else
 PVRSRV_ERROR GetHandleStructure(PVRSRV_HANDLE_BASE *psBase, struct sHandle **ppsHandle, IMG_HANDLE hHandle, PVRSRV_HANDLE_TYPE eType)
-#endif
 {
 	IMG_UINT32 ui32Index = HANDLE_TO_INDEX(hHandle);
 	struct sHandle *psHandle;
@@ -683,9 +661,6 @@ PVRSRV_ERROR GetHandleStructure(PVRSRV_HANDLE_BASE *psBase, struct sHandle **pps
 	if (!INDEX_IS_VALID(psBase, ui32Index))
 	{
 		PVR_DPF((PVR_DBG_ERROR, "GetHandleStructure: Handle index out of range (%u >= %u)", ui32Index, psBase->ui32TotalHandCount));
-#if defined (SUPPORT_SID_INTERFACE)
-		PVR_DBG_BREAK
-#endif
 		return PVRSRV_ERROR_HANDLE_INDEX_OUT_OF_RANGE;
 	}
 
@@ -693,9 +668,6 @@ PVRSRV_ERROR GetHandleStructure(PVRSRV_HANDLE_BASE *psBase, struct sHandle **pps
 	if (psHandle->eType == PVRSRV_HANDLE_TYPE_NONE)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "GetHandleStructure: Handle not allocated (index: %u)", ui32Index));
-#if defined (SUPPORT_SID_INTERFACE)
-		PVR_DBG_BREAK
-#endif
 		return PVRSRV_ERROR_HANDLE_NOT_ALLOCATED;
 	}
 
@@ -706,9 +678,6 @@ PVRSRV_ERROR GetHandleStructure(PVRSRV_HANDLE_BASE *psBase, struct sHandle **pps
 	if (eType != PVRSRV_HANDLE_TYPE_NONE && eType != psHandle->eType)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "GetHandleStructure: Handle type mismatch (%d != %d)", eType, psHandle->eType));
-#if defined (SUPPORT_SID_INTERFACE)
-		PVR_DBG_BREAK
-#endif
 		return PVRSRV_ERROR_HANDLE_TYPE_MISMATCH;
 	}
 
@@ -733,11 +702,7 @@ PVRSRV_ERROR GetHandleStructure(PVRSRV_HANDLE_BASE *psBase, struct sHandle **pps
 
 ******************************************************************************/
 static INLINE
-#if defined (SUPPORT_SID_INTERFACE)
-IMG_SID ParentIfPrivate(struct sHandle *psHandle)
-#else
 IMG_HANDLE ParentIfPrivate(struct sHandle *psHandle)
-#endif
 {
 	return TEST_ALLOC_FLAG(psHandle, PVRSRV_HANDLE_ALLOC_FLAG_PRIVATE) ?
 			ParentHandle(psHandle) : IMG_NULL;
@@ -757,11 +722,7 @@ IMG_HANDLE ParentIfPrivate(struct sHandle *psHandle)
 
 ******************************************************************************/
 static INLINE
-#if defined (SUPPORT_SID_INTERFACE)
-IMG_VOID InitKey(HAND_KEY aKey, PVRSRV_HANDLE_BASE *psBase, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, IMG_SID hParent)
-#else
 IMG_VOID InitKey(HAND_KEY aKey, PVRSRV_HANDLE_BASE *psBase, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, IMG_HANDLE hParent)
-#endif
 {
 	PVR_UNREFERENCED_PARAMETER(psBase);
 
@@ -1068,14 +1029,8 @@ static PVRSRV_ERROR FreeHandle(PVRSRV_HANDLE_BASE *psBase, struct sHandle *psHan
 
 	if (!TEST_ALLOC_FLAG(psHandle, PVRSRV_HANDLE_ALLOC_FLAG_MULTI) && !BATCHED_HANDLE_PARTIALLY_FREE(psHandle))
 	{
-#if defined (SUPPORT_SID_INTERFACE)
-		IMG_SID hHandle;
-		hHandle = (IMG_SID) HASH_Remove_Extended(psBase->psHashTab, aKey);
-#else
 		IMG_HANDLE hHandle;
 		hHandle = (IMG_HANDLE) HASH_Remove_Extended(psBase->psHashTab, aKey);
-
-#endif
 
 		PVR_ASSERT(hHandle != IMG_NULL);
 		PVR_ASSERT(hHandle == INDEX_TO_HANDLE(ui32Index));
@@ -1277,11 +1232,7 @@ static PVRSRV_ERROR FreeHandleBase(PVRSRV_HANDLE_BASE *psBase)
 
 ******************************************************************************/
 static INLINE
-#if defined (SUPPORT_SID_INTERFACE)
-IMG_SID FindHandle(PVRSRV_HANDLE_BASE *psBase, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, IMG_SID hParent)
-#else
 IMG_HANDLE FindHandle(PVRSRV_HANDLE_BASE *psBase, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, IMG_HANDLE hParent)
-#endif
 {
 	HAND_KEY aKey;
 
@@ -1289,11 +1240,7 @@ IMG_HANDLE FindHandle(PVRSRV_HANDLE_BASE *psBase, IMG_VOID *pvData, PVRSRV_HANDL
 
 	InitKey(aKey, psBase, pvData, eType, hParent);
 
-#if defined (SUPPORT_SID_INTERFACE)
-	return (IMG_SID) HASH_Retrieve_Extended(psBase->psHashTab, aKey);
-#else
 	return (IMG_HANDLE) HASH_Retrieve_Extended(psBase->psHashTab, aKey);
-#endif
 }
 
 /*!
@@ -1395,19 +1342,11 @@ static PVRSRV_ERROR EnsureFreeHandles(PVRSRV_HANDLE_BASE *psBase, IMG_UINT32 ui3
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-static PVRSRV_ERROR AllocHandle(PVRSRV_HANDLE_BASE *psBase, IMG_SID *phHandle, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, PVRSRV_HANDLE_ALLOC_FLAG eFlag, IMG_SID hParent)
-#else
 static PVRSRV_ERROR AllocHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, PVRSRV_HANDLE_ALLOC_FLAG eFlag, IMG_HANDLE hParent)
-#endif
 {
 	IMG_UINT32 ui32NewIndex = DEFAULT_MAX_INDEX_PLUS_ONE;
 	struct sHandle *psNewHandle = IMG_NULL;
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID hHandle;
-#else
 	IMG_HANDLE hHandle;
-#endif
 	HAND_KEY aKey;
 	PVRSRV_ERROR eError;
 
@@ -1596,24 +1535,12 @@ static PVRSRV_ERROR AllocHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVAllocHandle(PVRSRV_HANDLE_BASE *psBase, IMG_SID *phHandle, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, PVRSRV_HANDLE_ALLOC_FLAG eFlag)
-#else
 PVRSRV_ERROR PVRSRVAllocHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, PVRSRV_HANDLE_ALLOC_FLAG eFlag)
-#endif
 {
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID hHandle;
-#else
 	IMG_HANDLE hHandle;
-#endif
 	PVRSRV_ERROR eError;
 
-#if defined (SUPPORT_SID_INTERFACE)
-	*phHandle = 0;
-#else
 	*phHandle = IMG_NULL;
-#endif
 
 	if (HANDLES_BATCHED(psBase))
 	{
@@ -1631,11 +1558,7 @@ PVRSRV_ERROR PVRSRVAllocHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle,
 	{
 		/* See if there is already a handle for this data pointer */
 		hHandle = FindHandle(psBase, pvData, eType, IMG_NULL);
-#if defined (SUPPORT_SID_INTERFACE)
-		if (hHandle != 0)
-#else
 		if (hHandle != IMG_NULL)
-#endif
 		{
 			struct sHandle *psHandle;
 
@@ -1657,10 +1580,7 @@ PVRSRV_ERROR PVRSRVAllocHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle,
 				eError = PVRSRV_OK;
 				goto exit_ok;
 			}
-			
-#if defined (SUPPORT_SID_INTERFACE)
-			PVR_DBG_BREAK
-#endif
+
 			return PVRSRV_ERROR_HANDLE_NOT_SHAREABLE;
 		}
 	}
@@ -1693,26 +1613,15 @@ exit_ok:
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVAllocSubHandle(PVRSRV_HANDLE_BASE *psBase, IMG_SID *phHandle, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, PVRSRV_HANDLE_ALLOC_FLAG eFlag, IMG_SID hParent)
-#else
 PVRSRV_ERROR PVRSRVAllocSubHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType, PVRSRV_HANDLE_ALLOC_FLAG eFlag, IMG_HANDLE hParent)
-#endif
 {
 	struct sHandle *psPHand;
 	struct sHandle *psCHand;
 	PVRSRV_ERROR eError;
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID hParentKey;
-	IMG_SID hHandle;
-
-	*phHandle = 0;
-#else
 	IMG_HANDLE hParentKey;
 	IMG_HANDLE hHandle;
 
 	*phHandle = IMG_NULL;
-#endif
 
 	if (HANDLES_BATCHED(psBase))
 	{
@@ -1740,11 +1649,7 @@ PVRSRV_ERROR PVRSRVAllocSubHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHand
 	{
 		/* See if there is already a handle for this data pointer */
 		hHandle = FindHandle(psBase, pvData, eType, hParentKey);
-#if defined (SUPPORT_SID_INTERFACE)
-		if (hHandle != 0)
-#else
 		if (hHandle != IMG_NULL)
-#endif
 		{
 			struct sHandle *psCHandle;
 			PVRSRV_ERROR eErr;
@@ -1769,9 +1674,6 @@ PVRSRV_ERROR PVRSRVAllocSubHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHand
 				*phHandle = hHandle;
 				goto exit_ok;
 			}
-#if defined (SUPPORT_SID_INTERFACE)
-			PVR_DBG_BREAK
-#endif
 			return PVRSRV_ERROR_HANDLE_NOT_SHAREABLE;
 		}
 	}
@@ -1820,26 +1722,14 @@ exit_ok:
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVFindHandle(PVRSRV_HANDLE_BASE *psBase, IMG_SID *phHandle, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType)
-#else
 PVRSRV_ERROR PVRSRVFindHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle, IMG_VOID *pvData, PVRSRV_HANDLE_TYPE eType)
-#endif
 {
-#if defined (SUPPORT_SID_INTERFACE)
-	IMG_SID hHandle;
-#else
 	IMG_HANDLE hHandle;
-#endif
 
 	PVR_ASSERT(eType != PVRSRV_HANDLE_TYPE_NONE);
 
 	/* See if there is a handle for this data pointer */
-#if defined (SUPPORT_SID_INTERFACE)
-	hHandle = (IMG_SID) FindHandle(psBase, pvData, eType, IMG_NULL);
-#else
 	hHandle = (IMG_HANDLE) FindHandle(psBase, pvData, eType, IMG_NULL);
-#endif
 	if (hHandle == IMG_NULL)
 	{
 		return PVRSRV_ERROR_HANDLE_NOT_FOUND;
@@ -1867,11 +1757,7 @@ PVRSRV_ERROR PVRSRVFindHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle, 
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVLookupHandleAnyType(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, PVRSRV_HANDLE_TYPE *peType, IMG_SID hHandle)
-#else
 PVRSRV_ERROR PVRSRVLookupHandleAnyType(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, PVRSRV_HANDLE_TYPE *peType, IMG_HANDLE hHandle)
-#endif
 {
 	struct sHandle *psHandle;
 	PVRSRV_ERROR eError;
@@ -1880,9 +1766,6 @@ PVRSRV_ERROR PVRSRVLookupHandleAnyType(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *pp
 	if (eError != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "PVRSRVLookupHandleAnyType: Error looking up handle (%d)", eError));
-#if defined (SUPPORT_SID_INTERFACE)
-		PVR_DBG_BREAK
-#endif
 		return eError;
 	}
 
@@ -1908,27 +1791,17 @@ PVRSRV_ERROR PVRSRVLookupHandleAnyType(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *pp
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVLookupHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, IMG_SID hHandle, PVRSRV_HANDLE_TYPE eType)
-#else
 PVRSRV_ERROR PVRSRVLookupHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, IMG_HANDLE hHandle, PVRSRV_HANDLE_TYPE eType)
-#endif
 {
 	struct sHandle *psHandle;
 	PVRSRV_ERROR eError;
 
 	PVR_ASSERT(eType != PVRSRV_HANDLE_TYPE_NONE);
-#if defined (SUPPORT_SID_INTERFACE)
-	PVR_ASSERT(hHandle != 0);
-#endif
 
 	eError = GetHandleStructure(psBase, &psHandle, hHandle, eType);
 	if (eError != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "PVRSRVLookupHandle: Error looking up handle (%d)", eError));
-#if defined (SUPPORT_SID_INTERFACE)
-		PVR_DBG_BREAK
-#endif
 		return eError;
 	}
 
@@ -1954,20 +1827,13 @@ PVRSRV_ERROR PVRSRVLookupHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, 
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVLookupSubHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, IMG_SID hHandle, PVRSRV_HANDLE_TYPE eType, IMG_SID hAncestor)
-#else
 PVRSRV_ERROR PVRSRVLookupSubHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, IMG_HANDLE hHandle, PVRSRV_HANDLE_TYPE eType, IMG_HANDLE hAncestor)
-#endif
 {
 	struct sHandle *psPHand;
 	struct sHandle *psCHand;
 	PVRSRV_ERROR eError;
 
 	PVR_ASSERT(eType != PVRSRV_HANDLE_TYPE_NONE);
-#if defined (SUPPORT_SID_INTERFACE)
-	PVR_ASSERT(hHandle != 0);
-#endif
 
 	eError = GetHandleStructure(psBase, &psCHand, hHandle, eType);
 	if (eError != PVRSRV_OK)
@@ -2010,11 +1876,7 @@ PVRSRV_ERROR PVRSRVLookupSubHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvDat
 		not regarded as an error.
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVGetParentHandle(PVRSRV_HANDLE_BASE *psBase, IMG_SID *phParent, IMG_SID hHandle, PVRSRV_HANDLE_TYPE eType)
-#else
 PVRSRV_ERROR PVRSRVGetParentHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *phParent, IMG_HANDLE hHandle, PVRSRV_HANDLE_TYPE eType)
-#endif
 {
 	struct sHandle *psHandle;
 	PVRSRV_ERROR eError;
@@ -2050,11 +1912,7 @@ PVRSRV_ERROR PVRSRVGetParentHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *phPare
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVLookupAndReleaseHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, IMG_SID hHandle, PVRSRV_HANDLE_TYPE eType)
-#else
 PVRSRV_ERROR PVRSRVLookupAndReleaseHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID *ppvData, IMG_HANDLE hHandle, PVRSRV_HANDLE_TYPE eType)
-#endif
 {
 	struct sHandle *psHandle;
 	PVRSRV_ERROR eError;
@@ -2065,9 +1923,6 @@ PVRSRV_ERROR PVRSRVLookupAndReleaseHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID 
 	if (eError != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "PVRSRVLookupAndReleaseHandle: Error looking up handle (%d)", eError));
-#if defined (SUPPORT_SID_INTERFACE)
-		PVR_DBG_BREAK
-#endif
 		return eError;
 	}
 
@@ -2091,11 +1946,7 @@ PVRSRV_ERROR PVRSRVLookupAndReleaseHandle(PVRSRV_HANDLE_BASE *psBase, IMG_PVOID 
  @Return	Error code or PVRSRV_OK
 
 ******************************************************************************/
-#if defined (SUPPORT_SID_INTERFACE)
-PVRSRV_ERROR PVRSRVReleaseHandle(PVRSRV_HANDLE_BASE *psBase, IMG_SID hHandle, PVRSRV_HANDLE_TYPE eType)
-#else
 PVRSRV_ERROR PVRSRVReleaseHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE hHandle, PVRSRV_HANDLE_TYPE eType)
-#endif
 {
 	struct sHandle *psHandle;
 	PVRSRV_ERROR eError;

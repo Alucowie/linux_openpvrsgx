@@ -716,11 +716,7 @@ static int PVRSRVOpen(struct inode unref__ * pInode, struct file *pFile)
 	if(eError != PVRSRV_OK)
 		goto err_unlock;
 
-#if defined (SUPPORT_SID_INTERFACE)
-	psPrivateData->hKernelMemInfo = 0;
-#else
 	psPrivateData->hKernelMemInfo = NULL;
-#endif
 #if defined(SUPPORT_DRI_DRM) && defined(PVR_SECURE_DRM_AUTH_EXPORT)
 	psPrivateData->psDRMFile = pFile;
 

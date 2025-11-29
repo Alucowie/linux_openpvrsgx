@@ -103,11 +103,6 @@ typedef void**          IMG_HVOID,	* IMG_PHVOID;
 
 #define IMG_NULL        0 
 
-/* services/stream ID */
-typedef IMG_UINT32      IMG_SID;
-
-typedef IMG_UINT32      IMG_EVENTSID;
-
 /*
  * Address types.
  * All types used to refer to a block of memory are wrapped in structures
