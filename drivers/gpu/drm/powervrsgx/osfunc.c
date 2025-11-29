@@ -2356,28 +2356,14 @@ typedef struct TIMER_CALLBACK_DATA_TAG
     struct timer_list		sTimer;
     IMG_UINT32			ui32Delay;
     IMG_BOOL			bActive;
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
     struct work_struct		sWork;
-#endif
 }TIMER_CALLBACK_DATA;
 
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES)
 static struct workqueue_struct	*psTimerWorkQueue;
-#endif
 
 static TIMER_CALLBACK_DATA sTimers[OS_MAX_TIMERS];
 
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
 DEFINE_MUTEX(sTimerStructLock);
-#else
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39))
-/* The lock is used to control access to sTimers */
-/* PRQA S 0671,0685 1 */ /* C99 macro not understood by QAC */
-static spinlock_t sTimerStructLock = SPIN_LOCK_UNLOCKED;
-#else
-static DEFINE_SPINLOCK(sTimerStructLock);
-#endif
-#endif
 
 static void OSTimerCallbackBody(TIMER_CALLBACK_DATA *psTimerCBData)
 {
@@ -2409,33 +2395,23 @@ static void OSTimerCallbackBody(TIMER_CALLBACK_DATA *psTimerCBData)
 static IMG_VOID OSTimerCallbackWrapper(struct timer_list *t)
 {
     TIMER_CALLBACK_DATA	*psTimerCBData = from_timer(psTimerCBData, t, sTimer);
-    
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
+
     int res;
 
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES)
     res = queue_work(psTimerWorkQueue, &psTimerCBData->sWork);
-#else
-    res = schedule_work(&psTimerCBData->sWork);
-#endif
     if (res == 0)
     {
-        PVR_DPF((PVR_DBG_WARNING, "OSTimerCallbackWrapper: work already queued"));		
+        PVR_DPF((PVR_DBG_WARNING, "OSTimerCallbackWrapper: work already queued"));
     }
-#else
-    OSTimerCallbackBody(psTimerCBData);
-#endif
 }
 
 
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
 static void OSTimerWorkQueueCallBack(struct work_struct *psWork)
 {
     TIMER_CALLBACK_DATA *psTimerCBData = container_of(psWork, TIMER_CALLBACK_DATA, sWork);
 
     OSTimerCallbackBody(psTimerCBData);
 }
-#endif
 
 /*!
 ******************************************************************************
@@ -2459,9 +2435,6 @@ IMG_HANDLE OSAddTimer(PFN_TIMER_FUNC pfnTimerFunc, IMG_VOID *pvData, IMG_UINT32 
 {
     TIMER_CALLBACK_DATA	*psTimerCBData;
     IMG_UINT32		ui32i;
-#if !(defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE))
-    unsigned long		ulLockFlags;
-#endif
 
     /* check callback */
     if(!pfnTimerFunc)
@@ -2471,11 +2444,7 @@ IMG_HANDLE OSAddTimer(PFN_TIMER_FUNC pfnTimerFunc, IMG_VOID *pvData, IMG_UINT32 
     }
     
     /* Allocate timer callback data structure */
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
     mutex_lock(&sTimerStructLock);
-#else
-    spin_lock_irqsave(&sTimerStructLock, ulLockFlags);
-#endif
     for (ui32i = 0; ui32i < OS_MAX_TIMERS; ui32i++)
     {
         psTimerCBData = &sTimers[ui32i];
@@ -2485,11 +2454,7 @@ IMG_HANDLE OSAddTimer(PFN_TIMER_FUNC pfnTimerFunc, IMG_VOID *pvData, IMG_UINT32 
             break;
         }
     }
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
     mutex_unlock(&sTimerStructLock);
-#else
-    spin_unlock_irqrestore(&sTimerStructLock, ulLockFlags);
-#endif
     if (ui32i >= OS_MAX_TIMERS)
     {
         PVR_DPF((PVR_DBG_ERROR, "OSAddTimer: all timers are in use"));		
@@ -2611,17 +2576,14 @@ PVRSRV_ERROR OSDisableTimer (IMG_HANDLE hTimer)
     psTimerCBData->bActive = IMG_FALSE;
     smp_mb();
 
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES)
     flush_workqueue(psTimerWorkQueue);
-#endif
 #if defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
     flush_scheduled_work();
 #endif
 
     /* remove timer */
-    del_timer_sync(&psTimerCBData->sTimer);	
-    
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES)
+    del_timer_sync(&psTimerCBData->sTimer);
+
     /*
      * This second flush is to catch the case where the timer ran
      * before we managed to delete it, in which case, it will have
@@ -2630,7 +2592,6 @@ PVRSRV_ERROR OSDisableTimer (IMG_HANDLE hTimer)
      * timer being rearmed.
      */
     flush_workqueue(psTimerWorkQueue);
-#endif
 #if defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
     flush_scheduled_work();
 #endif
@@ -4482,19 +4443,16 @@ IMG_VOID OSGetCurrentProcessNameKM(IMG_CHAR *pszName, IMG_UINT32 ui32Size)
 /* One time osfunc initialisation */
 PVRSRV_ERROR PVROSFuncInit(IMG_VOID)
 {
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES)
     {
         psTimerWorkQueue = create_workqueue("pvr_timer");
         if (psTimerWorkQueue == NULL)
         {
-	    PVR_DPF((PVR_DBG_ERROR, "%s: couldn't create timer workqueue", __FUNCTION__));		
+	    PVR_DPF((PVR_DBG_ERROR, "%s: couldn't create timer workqueue", __FUNCTION__));
 	    return PVRSRV_ERROR_UNABLE_TO_CREATE_THREAD;
 
         }
     }
-#endif
 
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE)
     {
 	IMG_UINT32 ui32i;
 
@@ -4505,7 +4463,6 @@ PVRSRV_ERROR PVROSFuncInit(IMG_VOID)
 	    INIT_WORK(&psTimerCBData->sWork, OSTimerWorkQueueCallBack);
         }
     }
-#endif
 
 #if defined (SUPPORT_ION)
 	{
@@ -4530,10 +4487,8 @@ IMG_VOID PVROSFuncDeInit(IMG_VOID)
 #if defined (SUPPORT_ION)
 	IonDeinit();
 #endif
-#if defined(PVR_LINUX_TIMERS_USING_WORKQUEUES)
     if (psTimerWorkQueue != NULL)
     {
 	destroy_workqueue(psTimerWorkQueue);
     }
-#endif
 }
