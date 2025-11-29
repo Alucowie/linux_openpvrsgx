@@ -48,10 +48,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "ra.h"
 #include "perproc.h"
 
-#if defined(__cplusplus)
-extern "C"{
-#endif
-
 /* forward reference */
 typedef struct _BM_HEAP_ BM_HEAP;
 
@@ -612,11 +608,6 @@ IMG_VOID _BM_XProcIndexRelease(IMG_UINT32 ui32Index);
 	_BM_XProcIndexAcquire( x)
 #define BM_XProcIndexRelease(x) \
 	_BM_XProcIndexRelease( x)
-#endif
-
-
-#if defined(__cplusplus)
-}
 #endif
 
 #endif

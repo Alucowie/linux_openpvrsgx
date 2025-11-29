@@ -44,10 +44,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #if !defined (__KERNELBUFFER_H__)
 #define __KERNELBUFFER_H__
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 /*
 	Function table and pointers for SRVKM->BUFFER
 */
@@ -89,9 +85,5 @@ typedef IMG_BOOL (*PFN_BC_GET_PVRJTABLE) (PPVRSRV_BC_BUFFER2SRV_KMJTABLE);
 
 /* Prototype for platforms that access the JTable via linkage */
 IMG_IMPORT IMG_BOOL PVRGetBufferClassJTable(PVRSRV_BC_BUFFER2SRV_KMJTABLE *psJTable);
-
-#if defined (__cplusplus)
-}
-#endif
 
 #endif/* #if !defined (__KERNELBUFFER_H__) */

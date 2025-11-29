@@ -43,11 +43,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef QUEUE_H
 #define QUEUE_H
 
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 /*!
  * Macro to Read Offset in given command queue
  */
@@ -129,11 +124,6 @@ PVRSRV_ERROR PVRSRVRemoveCmdProcListKM(IMG_UINT32	ui32DevIndex,
 									   IMG_UINT32	ui32CmdCount);
 
 #endif /* !defined(USE_CODE) */
-
-
-#if defined (__cplusplus)
-}
-#endif
 
 #endif /* QUEUE_H */
 

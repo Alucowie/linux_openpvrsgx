@@ -179,10 +179,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * Purge handles for a handle base that has purging enabled.
  */
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 #include "img_types.h"
 #include "hash.h"
 #include "resman.h"
@@ -285,10 +281,6 @@ PVRSRV_ERROR PVRSRVHandleDeInit(IMG_VOID);
 
 #define PVRSRVAllocSubHandleNR(psBase, phHandle, pvData, eType, eFlag, hParent) \
 	(IMG_VOID)PVRSRVAllocSubHandle(psBase, phHandle, pvData, eType, eFlag, hParent)
-
-#if defined (__cplusplus)
-}
-#endif
 
 #endif /* __HANDLE_H__ */
 

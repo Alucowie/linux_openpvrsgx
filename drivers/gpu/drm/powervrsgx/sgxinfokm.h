@@ -49,10 +49,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "sgxscript.h"
 #include "sgxinfo.h"
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 /****************************************************************************/
 /* kernel only defines: 													*/
 /****************************************************************************/
@@ -578,10 +574,6 @@ static INLINE IMG_VOID NoHardwareGenerateEvent(PVRSRV_SGXDEV_INFO		*psDevInfo,
 	ui32RegVal |= (ui32StatusValue & ui32StatusMask);
 
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, ui32StatusRegister, ui32RegVal);
-}
-#endif
-
-#if defined(__cplusplus)
 }
 #endif
 

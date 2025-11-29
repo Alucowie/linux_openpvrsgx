@@ -50,10 +50,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_bridge.h"
 #include "perproc.h"
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 IMG_IMPORT
 #if defined (SUPPORT_SID_INTERFACE)
 PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSFER_SGX_KICK_KM *psKick);
@@ -266,10 +262,6 @@ SGXGetInternalDevInfoKM(IMG_HANDLE hDevCookie,
 						SGX_INTERNAL_DEVINFO_KM *psSGXInternalDevInfo);
 #else
 						SGX_INTERNAL_DEVINFO *psSGXInternalDevInfo);
-#endif
-
-#if defined (__cplusplus)
-}
 #endif
 
 #endif /* __SGX_BRIDGE_KM_H__ */

@@ -42,13 +42,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __PVR_DEBUG_H__
 #define __PVR_DEBUG_H__
 
-
 #include "img_types.h"
-
-
-#if defined (__cplusplus)
-extern "C" {
-#endif
 
 #define PVR_MAX_DEBUG_MESSAGE_LEN	(512)
 
@@ -182,11 +176,6 @@ IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVTrace(const IMG_CHAR* pszFormat, ... )
 	#define PVR_TRACE(X)
 
 #endif /* defined(PVRSRV_NEED_PVR_TRACE) */
-
-
-#if defined (__cplusplus)
-}
-#endif
 
 #endif	/* __PVR_DEBUG_H__ */
 

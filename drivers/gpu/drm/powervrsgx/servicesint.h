@@ -43,10 +43,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #if !defined (__SERVICESINT_H__)
 #define __SERVICESINT_H__
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 #include "services.h"
 #include "sysinfo.h"
 
@@ -539,10 +535,6 @@ PVRSRVMapMemInfoMem(const PVRSRV_CONNECTION *psConnection,
 #endif
                     PVRSRV_CLIENT_MEM_INFO **ppsClientMemInfo);
 
-
-#if defined (__cplusplus)
-}
-#endif
 #endif /* __SERVICESINT_H__ */
 
 /*****************************************************************************

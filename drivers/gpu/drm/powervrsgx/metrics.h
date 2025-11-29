@@ -43,11 +43,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define _METRICS_
 
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
-
 typedef struct 
 {
 	IMG_UINT32 ui32Start;
@@ -112,11 +107,58 @@ extern IMG_VOID   PVRSRVOutputMetricTotals(IMG_VOID);
 
 #endif /* defined(__sh__) */
 
+<<<<<<< HEAD
 #if defined(__cplusplus)
 }
 #endif
 
 
+||||||| parent of 046516d00deb (remove __cplusplus blocks)
+
+
+#else /* defined(DEBUG) || defined(TIMING) */
+
+
+
+#define PVRSRV_TIME_START(X)
+#define PVRSRV_TIME_SUSPEND(X)
+#define PVRSRV_TIME_RESUME(X)
+#define PVRSRV_TIME_STOP(X)
+#define PVRSRV_TIME_RESET(X)
+
+#define PVRSRVSetupMetricTimers(X)
+#define PVRSRVOutputMetricTotals()
+
+
+
+#endif /* defined(DEBUG) || defined(TIMING) */
+
+#if defined(__cplusplus)
+}
+#endif
+
+
+=======
+
+
+#else /* defined(DEBUG) || defined(TIMING) */
+
+
+
+#define PVRSRV_TIME_START(X)
+#define PVRSRV_TIME_SUSPEND(X)
+#define PVRSRV_TIME_RESUME(X)
+#define PVRSRV_TIME_STOP(X)
+#define PVRSRV_TIME_RESET(X)
+
+#define PVRSRVSetupMetricTimers(X)
+#define PVRSRVOutputMetricTotals()
+
+
+
+#endif /* defined(DEBUG) || defined(TIMING) */
+
+>>>>>>> 046516d00deb (remove __cplusplus blocks)
 #endif /* _METRICS_ */
 
 /**************************************************************************

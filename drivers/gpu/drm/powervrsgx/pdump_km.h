@@ -48,10 +48,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #include "pdump_osfunc.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 /*
  *	Pull in pdump flags from services include
  */
@@ -115,10 +111,6 @@ extern IMG_UINT32 g_ui32EveryLineCounter;
 #define PDUMPIDL(args...)
 #define PDUMPSUSPEND(args...)
 #define PDUMPRESUME(args...)
-
-#if defined (__cplusplus)
-}
-#endif
 
 #endif /* _PDUMP_KM_H_ */
 

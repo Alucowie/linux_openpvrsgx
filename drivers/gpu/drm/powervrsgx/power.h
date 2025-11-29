@@ -42,11 +42,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef POWER_H
 #define POWER_H
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-
 /*!
  *****************************************************************************
  *	Power management
@@ -130,9 +125,6 @@ IMG_VOID PVRSRVDevicePostClockSpeedChange(IMG_UINT32	ui32DeviceIndex,
 										  IMG_BOOL		bIdleDevice,
 										  IMG_VOID		*pvInfo);
 
-#if defined (__cplusplus)
-}
-#endif
 #endif /* POWER_H */
 
 /******************************************************************************

@@ -42,10 +42,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __SGXSCRIPT_H__
 #define __SGXSCRIPT_H__
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 #define	SGX_MAX_INIT_COMMANDS	64
 #define	SGX_MAX_DEINIT_COMMANDS	16
 
@@ -87,10 +83,6 @@ typedef struct _SGX_INIT_SCRIPTS_
 	SGX_INIT_COMMAND asInitCommandsPart2[SGX_MAX_INIT_COMMANDS];
 	SGX_INIT_COMMAND asDeinitCommands[SGX_MAX_DEINIT_COMMANDS];
 } SGX_INIT_SCRIPTS;
-
-#if defined(__cplusplus)
-}
-#endif
 
 #endif /* __SGXSCRIPT_H__ */
 

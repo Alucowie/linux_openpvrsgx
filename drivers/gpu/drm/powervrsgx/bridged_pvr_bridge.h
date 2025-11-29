@@ -45,10 +45,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "pvr_bridge.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 #if defined(__linux__)
 #define PVRSRV_GET_BRIDGE_ID(X)	_IOC_NR(X)
 #else
@@ -208,10 +204,6 @@ PVRSRV_ERROR CommonBridgeInit(IMG_VOID);
 
 IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 					  PVRSRV_BRIDGE_PACKAGE   * psBridgePackageKM);
-
-#if defined (__cplusplus)
-}
-#endif
 
 #endif /* __BRIDGED_PVR_BRIDGE_H__ */
 

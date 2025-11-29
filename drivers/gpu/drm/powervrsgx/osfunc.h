@@ -42,10 +42,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __OSFUNC_H__
 #define __OSFUNC_H__
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 #include <linux/hardirq.h>
 #include <linux/string.h>
 #if defined(__arm__)
@@ -672,10 +668,6 @@ static INLINE IMG_VOID OSGetCurrentProcessNameKM(IMG_CHAR *pszName, IMG_UINT32 u
 	PVR_UNREFERENCED_PARAMETER(ui32Size);
 }
 
-#endif
-
-#if defined (__cplusplus)
-}
 #endif
 
 #endif /* __OSFUNC_H__ */

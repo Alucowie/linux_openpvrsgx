@@ -43,10 +43,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __SERVICES_H__
 #define __SERVICES_H__
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 #include "img_defs.h"
 #include "servicesext.h"
 #include "pdumpdefs.h"
@@ -1744,9 +1740,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCacheInvalidate(const PVRSRV_CONNECTION *psConne
 ******************************************************************************/
 #define TIME_NOT_PASSED_UINT32(a,b,c)		(((a) - (b)) < (c))
 
-#if defined (__cplusplus)
-}
-#endif
 #endif /* __SERVICES_H__ */
 
 /******************************************************************************

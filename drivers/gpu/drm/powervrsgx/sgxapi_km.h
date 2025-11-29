@@ -43,10 +43,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __SGXAPI_KM_H__
 #define __SGXAPI_KM_H__
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 #include "sgxdefs.h"
 
 #include <asm/unistd.h>
@@ -498,10 +494,6 @@ typedef struct _SGX_KICKTA_PDUMP_
 #endif
 #define SGX_MAX_TRANSFER_STATUS_VALS	2
 #define SGX_MAX_TRANSFER_SYNC_OPS	5
-
-#if defined (__cplusplus)
-}
-#endif
 
 #endif /* __SGXAPI_KM_H__ */
 

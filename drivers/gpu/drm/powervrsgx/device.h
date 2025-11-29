@@ -43,10 +43,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __DEVICE_H__
 #define __DEVICE_H__
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-	
 #include "ra.h"  		/* RA_ARENA */
 #include "resman.h"		/* PRESMAN_ITEM */
 
@@ -398,10 +394,6 @@ IMG_BOOL IMG_CALLCONV PVRSRVDeviceLISR(PVRSRV_DEVICE_NODE *psDeviceNode);
 IMG_BOOL IMG_CALLCONV PVRSRVSystemLISR(IMG_VOID *pvSysData);
 IMG_VOID IMG_CALLCONV PVRSRVMISR(IMG_VOID *pvSysData);
 
-#if defined(__cplusplus)
-}
-#endif
-	
 #endif /* __DEVICE_H__ */
 
 /******************************************************************************

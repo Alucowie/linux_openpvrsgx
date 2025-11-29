@@ -74,12 +74,6 @@
 #endif
 #endif
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
- 
- 
 IMG_VOID DisableSystemClocks(SYS_DATA *psSysData);
 PVRSRV_ERROR EnableSystemClocks(SYS_DATA *psSysData);
 
@@ -149,10 +143,4 @@ IMG_VOID UnwrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
 PVRSRV_ERROR SysPMRuntimeRegister(void);
 PVRSRV_ERROR SysPMRuntimeUnregister(void);
 
-#if defined(__cplusplus)
-}
-#endif
-
 #endif	
-
-

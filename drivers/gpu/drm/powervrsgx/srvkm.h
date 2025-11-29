@@ -42,11 +42,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef SRVKM_H
 #define SRVKM_H
 
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 	/**	Use PVR_DPF() unless message is necessary in release build
 	 */
 	#ifdef PVR_DISABLE_LOGGING
@@ -69,10 +64,6 @@ extern "C" {
 
 	IMG_VOID PVRSRVScheduleDeviceCallbacks(IMG_VOID);
 
-
-#if defined (__cplusplus)
-}
-#endif
 
 /******************
 HIGHER LEVEL MACROS
