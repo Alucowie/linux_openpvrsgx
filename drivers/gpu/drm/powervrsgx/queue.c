@@ -70,8 +70,6 @@ typedef struct _DEVICE_COMMAND_DATA_
 } DEVICE_COMMAND_DATA;
 
 
-#if defined(__linux__) && defined(__KERNEL__)
-
 #include "proc.h"
 
 /*****************************************************************************
@@ -175,7 +173,6 @@ void* ProcSeqOff2ElementQueue(struct seq_file * sfile, loff_t off)
 
 	return psQueue;
 }
-#endif /* __linux__ && __KERNEL__ */
 
 /*!
  * Macro to return space in given command queue

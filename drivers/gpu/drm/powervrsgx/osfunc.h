@@ -51,12 +51,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 extern "C" {
 #endif
 
-#if defined(__linux__) && defined(__KERNEL__)
 #include <linux/hardirq.h>
 #include <linux/string.h>
 #if defined(__arm__)
 #include <asm/memory.h>
-#endif
 #endif
 
 
@@ -111,8 +109,6 @@ PVRSRV_ERROR OSUnReservePhys(IMG_VOID *pvCpuVAddr, IMG_SIZE_T ui32Bytes, IMG_UIN
  *  INVALIDATE	Invalidate w/o flush
  */
 
-#if defined(__linux__) && defined(__KERNEL__)
-
 IMG_VOID OSFlushCPUCacheKM(IMG_VOID);
 
 IMG_VOID OSCleanCPUCacheKM(IMG_VOID);
@@ -129,65 +125,6 @@ IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 									 IMG_UINT32 ui32ByteOffset,
 									 IMG_VOID *pvRangeAddrStart,
 									 IMG_UINT32 ui32Length);
-
-#else /* defined(__linux__) && defined(__KERNEL__) */
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(OSFlushCPUCacheKM)
-#endif
-static INLINE IMG_VOID OSFlushCPUCacheKM(IMG_VOID) {}
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(OSCleanCPUCacheKM)
-#endif
-static INLINE IMG_VOID OSCleanCPUCacheKM(IMG_VOID) {}
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(OSFlushCPUCacheRangeKM)
-#endif
-static INLINE IMG_BOOL OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
-											  IMG_UINT32 ui32ByteOffset,
-											  IMG_VOID *pvRangeAddrStart,
-											  IMG_UINT32 ui32Length)
-{
-	PVR_UNREFERENCED_PARAMETER(hOSMemHandle);
-	PVR_UNREFERENCED_PARAMETER(ui32ByteOffset);
-	PVR_UNREFERENCED_PARAMETER(pvRangeAddrStart);
-	PVR_UNREFERENCED_PARAMETER(ui32Length);
-	return IMG_FALSE;
-}
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(OSCleanCPUCacheRangeKM)
-#endif
-static INLINE IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
-											  IMG_UINT32 ui32ByteOffset,
-											  IMG_VOID *pvRangeAddrStart,
-											  IMG_UINT32 ui32Length)
-{
-	PVR_UNREFERENCED_PARAMETER(hOSMemHandle);
-	PVR_UNREFERENCED_PARAMETER(ui32ByteOffset);
-	PVR_UNREFERENCED_PARAMETER(pvRangeAddrStart);
-	PVR_UNREFERENCED_PARAMETER(ui32Length);
-	return IMG_FALSE;
-}
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(OSInvalidateCPUCacheRangeKM)
-#endif
-static INLINE IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
-												   IMG_UINT32 ui32ByteOffset,
-												   IMG_VOID *pvRangeAddrStart,
-												   IMG_UINT32 ui32Length)
-{
-	PVR_UNREFERENCED_PARAMETER(hOSMemHandle);
-	PVR_UNREFERENCED_PARAMETER(ui32ByteOffset);
-	PVR_UNREFERENCED_PARAMETER(pvRangeAddrStart);
-	PVR_UNREFERENCED_PARAMETER(ui32Length);
-	return IMG_FALSE;
-}
-
-#endif /* defined(__linux__) && defined(__KERNEL__) */
 
 #if defined(__linux__) || defined(__QNXNTO__)
 PVRSRV_ERROR OSRegisterDiscontigMem(IMG_SYS_PHYADDR *pBasePAddr,
@@ -680,8 +617,6 @@ static INLINE PVRSRV_ERROR OSReleasePhysPageAddr(IMG_HANDLE hOSWrapMem)
 	return PVRSRV_OK;	
 }
 #endif
-									
-#if defined(__linux__) && defined(__KERNEL__)
 
 #define	OS_SUPPORTS_IN_LISR
 
@@ -700,20 +635,6 @@ static inline IMG_VOID OSMemoryBarrier(IMG_VOID)
 {
 	mb();
 }
-
-#else /* defined(__linux__) && defined(__KERNEL__) */
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(OSWriteMemoryBarrier)
-#endif
-static INLINE IMG_VOID OSWriteMemoryBarrier(IMG_VOID) { }
-
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(OSMemoryBarrier)
-#endif
-static INLINE IMG_VOID OSMemoryBarrier(IMG_VOID) { }
-
-#endif /* defined(__linux__) && defined(__KERNEL__) */
 
 /* Atomic functions */
 PVRSRV_ERROR OSAtomicAlloc(IMG_PVOID *ppvRefCount);

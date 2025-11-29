@@ -91,10 +91,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "buffer_manager.h"
 #include "osfunc.h"
 
-#if defined(__linux__) && defined(__KERNEL__)
 #include <linux/kernel.h>
 #include "proc.h"
-#endif
 
 #ifdef USE_BM_FREESPACE_CHECK
 #include <stdio.h>

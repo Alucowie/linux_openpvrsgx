@@ -77,12 +77,6 @@ typedef signed long		IMG_INT32,	*IMG_PINT32;
 typedef unsigned long long		IMG_UINT64,	*IMG_PUINT64;
 typedef long long			IMG_INT64,	*IMG_PINT64;
 
-#if !(defined(LINUX) && defined (__KERNEL__))
-/* Linux kernel mode does not use floating point */
-typedef float			IMG_FLOAT,	*IMG_PFLOAT;
-typedef double			IMG_DOUBLE, *IMG_PDOUBLE;
-#endif
-
 typedef	enum tag_img_bool
 {
 	IMG_FALSE		= 0,
