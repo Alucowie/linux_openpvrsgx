@@ -44,10 +44,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <linux/interrupt.h>
 #include <linux/pci.h>
-
-#if defined(PVR_LINUX_MISR_USING_WORKQUEUE) || defined(PVR_LINUX_MISR_USING_PRIVATE_WORKQUEUE)
 #include <linux/workqueue.h>
-#endif
 
 /* 
  *	Env data specific to linux - convenient place to put this
@@ -72,15 +69,9 @@ typedef struct _ENV_DATA_TAG
 	IMG_BOOL		bMISRInstalled;
 	IMG_UINT32		ui32IRQ;
 	IMG_VOID		*pvISRCookie;
-#if defined(PVR_LINUX_MISR_USING_PRIVATE_WORKQUEUE)
 	struct workqueue_struct	*psWorkQueue;
-#endif
-#if defined(PVR_LINUX_MISR_USING_WORKQUEUE) || defined(PVR_LINUX_MISR_USING_PRIVATE_WORKQUEUE)
 	struct work_struct	sMISRWork;
 	IMG_VOID		*pvMISRData;
-#else
-	struct tasklet_struct	sMISRTasklet;
-#endif
 #if defined (SUPPORT_ION)
 	IMG_HANDLE		hIonHeaps;
 	IMG_HANDLE		hIonDev;
