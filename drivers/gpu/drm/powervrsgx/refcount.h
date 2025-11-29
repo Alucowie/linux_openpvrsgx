@@ -88,9 +88,6 @@ void PVRSRVBMXProcIncRef2(const IMG_CHAR *pszFile, IMG_INT iLine,
 void PVRSRVBMXProcDecRef2(const IMG_CHAR *pszFile, IMG_INT iLine,
 						  IMG_UINT32 ui32Index);
 
-#if defined(__linux__)
-
-/* mmap refcounting is Linux specific */
 #include "mmap.h"
 
 #define PVRSRVOffsetStructIncRef(x...) \
@@ -110,8 +107,6 @@ void PVRSRVOffsetStructIncMapped2(const IMG_CHAR *pszFile, IMG_INT iLine,
 								  PKV_OFFSET_STRUCT psOffsetStruct);
 void PVRSRVOffsetStructDecMapped2(const IMG_CHAR *pszFile, IMG_INT iLine,
 								  PKV_OFFSET_STRUCT psOffsetStruct);
-
-#endif /* defined(__linux__) */
 
 #else /* defined(PVRSRV_REFCOUNT_DEBUG) */
 
@@ -171,9 +166,6 @@ static INLINE void PVRSRVBMXProcDecRef(IMG_UINT32 ui32Index)
 	gXProcWorkaroundShareData[ui32Index].ui32RefCount--;
 }
 
-#if defined(__linux__)
-
-/* mmap refcounting is Linux specific */
 #include "mmap.h"
 
 static INLINE void PVRSRVOffsetStructIncRef(PKV_OFFSET_STRUCT psOffsetStruct)
@@ -195,8 +187,6 @@ static INLINE void PVRSRVOffsetStructDecMapped(PKV_OFFSET_STRUCT psOffsetStruct)
 {
 	psOffsetStruct->ui32Mapped--;
 }
-
-#endif /* defined(__linux__) */
 
 #endif /* defined(PVRSRV_REFCOUNT_DEBUG) */
 

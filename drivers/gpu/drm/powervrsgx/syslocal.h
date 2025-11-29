@@ -27,8 +27,6 @@
 #ifndef __SYSLOCAL_H__
 #define __SYSLOCAL_H__
 
-#if defined(__linux__)
-
 #include <linux/version.h>
 #include <linux/clk.h>
 #include <linux/mutex.h>
@@ -66,12 +64,9 @@
 #if !defined(PVR_NO_OMAP_TIMER)
 //#define PVR_OMAP_TIMER_BASE_IN_SYS_SPEC_DATA
 #endif
-#endif 
 
-#if defined(__linux__)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35)) && defined(SGX_OCP_REGS_ENABLED)
 /*#define SGX_OCP_NO_INT_BYPASS*/
-#endif
 #endif
 
 IMG_VOID DisableSystemClocks(SYS_DATA *psSysData);

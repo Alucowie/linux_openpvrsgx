@@ -126,13 +126,7 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 	}
 	gsSGXDeviceMap.sRegsCpuPBase = sCpuPAddr;
 	gsSGXDeviceMap.sRegsSysPBase = SysCpuPAddrToSysPAddr(gsSGXDeviceMap.sRegsCpuPBase);
-#if defined(__linux__)
-	
 	gsSGXDeviceMap.pvRegsCpuVBase = gsSGXRegsCPUVAddr;
-#else
-	
-	gsSGXDeviceMap.pvRegsCpuVBase = IMG_NULL;
-#endif
 
 	OSMemSet(gsSGXRegsCPUVAddr, 0, gsSGXDeviceMap.ui32RegsSize);
 
@@ -468,8 +462,6 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 	}
 	SYS_SPECIFIC_DATA_SET(&gsSysSpecificData, SYS_SPECIFIC_DATA_ENABLE_LISR);
 
-#if defined(__linux__)
-	
 	gpsSysData->pszVersionString = SysCreateVersionString();
 	if (!gpsSysData->pszVersionString)
 	{
@@ -479,7 +471,6 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 	{
 		PVR_TRACE(("SysFinalise: Version string: %s", gpsSysData->pszVersionString));
 	}
-#endif
 
 	DisableSGXClocks(gpsSysData);
 

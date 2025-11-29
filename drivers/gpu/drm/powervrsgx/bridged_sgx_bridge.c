@@ -3187,11 +3187,6 @@ SGXPDumpBufferArrayBW(IMG_UINT32 ui32BridgeID,
 	SGX_KICKTA_DUMP_BUFFER *psUMPtr;
 	SGX_KICKTA_DUMP_BUFFER_KM *psKickTADumpBufferKM, *psKMPtr;
 #else
-#if defined(__QNXNTO__)
-    const IMG_UINT32 NAME_BUFFER_SIZE = 30;
-    IMG_PCHAR pszNameBuffer, pszName;
-    IMG_UINT32 ui32NameBufferArraySize, ui32NameLength;
-#endif
 	SGX_KICKTA_DUMP_BUFFER *psKickTADumpBuffer;
 #endif
 	IMG_UINT32 ui32BufferArrayLength =
@@ -3230,45 +3225,6 @@ SGXPDumpBufferArrayBW(IMG_UINT32 ui32BridgeID,
 		/*not nulling pointer, out of scope*/
 		return -EFAULT;
 	}
-
-#if defined (__QNXNTO__)
-    ui32NameBufferArraySize = ui32BufferArrayLength * NAME_BUFFER_SIZE;
-    if (OSAllocMem(PVRSRV_OS_PAGEABLE_HEAP, ui32NameBufferArraySize,
-            (IMG_PVOID *)&pszNameBuffer, 0,
-            "Kick Tile Accelerator Dump Buffer names") != PVRSRV_OK)
-    {
-        OSFreeMem(PVRSRV_OS_PAGEABLE_HEAP, ui32BufferArraySize, psKickTADumpBuffer, 0);
-        return -ENOMEM;
-    }
-
-    pszName = pszNameBuffer;
-
-    for (i=0; i<ui32BufferArrayLength; i++)
-    {
-        if (psKickTADumpBuffer[i].pszName)
-        {
-            ui32NameLength = psKickTADumpBuffer[i].ui32NameLength;
-            if (ui32NameLength >= NAME_BUFFER_SIZE)
-            {
-                ui32NameLength = NAME_BUFFER_SIZE - 1;
-            }
-
-            if (ui32NameLength && 
-                (CopyFromUserWrapper(psPerProc, ui32BridgeID, pszName, 
-                    psKickTADumpBuffer[i].pszName, ui32NameLength + 1) == PVRSRV_OK))
-            {
-                pszName[NAME_BUFFER_SIZE - 1] = 0;
-                psKickTADumpBuffer[i].pszName = pszName;
-                pszName += NAME_BUFFER_SIZE;
-            }
-            else 
-            {
-                PVR_DPF((PVR_DBG_WARNING, "Failed to read PDUMP buffer name"));
-                psKickTADumpBuffer[i].pszName = 0;
-            }
-        }
-    }
-#endif
 #endif
 
 	for(i = 0; i < ui32BufferArrayLength; i++)
@@ -3352,9 +3308,6 @@ SGXPDumpBufferArrayBW(IMG_UINT32 ui32BridgeID,
 	OSFreeMem(PVRSRV_OS_PAGEABLE_HEAP, ui32BufferArraySize, psKickTADumpBufferKM, 0);
 #else
 	OSFreeMem(PVRSRV_OS_PAGEABLE_HEAP, ui32BufferArraySize, psKickTADumpBuffer, 0);
-#if defined (__QNXNTO__)
-	OSFreeMem(PVRSRV_OS_PAGEABLE_HEAP, ui32NameBufferArraySize, pszNameBuffer, 0);
-#endif
 #endif
 	/*not nulling pointer, out of scope*/
 
@@ -3657,7 +3610,6 @@ SGXPDumpHWPerfCBBW(IMG_UINT32						ui32BridgeID,
 				   PVRSRV_BRIDGE_RETURN 			*psRetOUT,
 				   PVRSRV_PER_PROCESS_DATA 			*psPerProc)
 {
-#if defined(__linux__)
 	PVRSRV_SGXDEV_INFO	*psDevInfo;
 	PVRSRV_DEVICE_NODE *psDeviceNode;
 	IMG_HANDLE hDevMemContextInt = 0;
@@ -3699,13 +3651,6 @@ SGXPDumpHWPerfCBBW(IMG_UINT32						ui32BridgeID,
 					psPDumpHWPerfCBIN->ui32PDumpFlags);
 
 	return 0;
-#else
-	PVR_UNREFERENCED_PARAMETER(ui32BridgeID);
-	PVR_UNREFERENCED_PARAMETER(psPDumpHWPerfCBIN);
-	PVR_UNREFERENCED_PARAMETER(psRetOUT);
-	PVR_UNREFERENCED_PARAMETER(psPerProc);
-	return 0;
-#endif
 }
 
 

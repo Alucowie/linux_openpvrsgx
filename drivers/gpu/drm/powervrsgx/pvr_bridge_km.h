@@ -49,10 +49,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /******************************************************************************
  * Function prototypes
  *****************************************************************************/
-#if defined(__linux__)
 PVRSRV_ERROR LinuxBridgeInit(IMG_VOID);
 IMG_VOID LinuxBridgeDeInit(IMG_VOID);
-#endif
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVEnumerateDevicesKM(IMG_UINT32 *pui32NumDevices,

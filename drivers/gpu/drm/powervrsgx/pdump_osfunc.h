@@ -55,28 +55,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * supported (e.g. Linux).
  */
 #define MAX_PDUMP_STRING_LENGTH (256)
-#if  defined(__QNXNTO__)
-#define PDUMP_GET_SCRIPT_STRING()	\
-	IMG_CHAR pszScript[MAX_PDUMP_STRING_LENGTH];		\
-	IMG_UINT32	ui32MaxLen = MAX_PDUMP_STRING_LENGTH-1;	\
-	IMG_HANDLE	hScript = (IMG_HANDLE)pszScript;
-
-#define PDUMP_GET_MSG_STRING()		\
-	IMG_CHAR pszMsg[MAX_PDUMP_STRING_LENGTH];			\
-	IMG_UINT32	ui32MaxLen = MAX_PDUMP_STRING_LENGTH-1;
-
-#define PDUMP_GET_FILE_STRING()		\
-	IMG_CHAR	pszFileName[MAX_PDUMP_STRING_LENGTH];	\
-	IMG_UINT32	ui32MaxLen = MAX_PDUMP_STRING_LENGTH-1;
-
-#define PDUMP_GET_SCRIPT_AND_FILE_STRING()		\
-	IMG_CHAR 	pszScript[MAX_PDUMP_STRING_LENGTH];		\
-	IMG_CHAR	pszFileName[MAX_PDUMP_STRING_LENGTH];	\
-	IMG_UINT32	ui32MaxLenScript = MAX_PDUMP_STRING_LENGTH-1;	\
-	IMG_UINT32	ui32MaxLenFileName = MAX_PDUMP_STRING_LENGTH-1;	\
-	IMG_HANDLE	hScript = (IMG_HANDLE)pszScript;
-
-#else /* WIN32 or QNX */
 
 
 	/*
@@ -143,9 +121,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @return	error (always PVRSRV_OK on some OSes)
 	 */
 	PVRSRV_ERROR PDumpOSGetFilenameString(IMG_CHAR **ppszFile, IMG_UINT32 *pui32MaxLen);
-
-#endif /* WIN32 or QNX */
-
 
 /*
  * Define macro for processing variable args list in OS-independent

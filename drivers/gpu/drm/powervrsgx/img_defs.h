@@ -96,18 +96,11 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
 #define _TCHAR_DEFINED
 #endif /* #ifndef _TCHAR_DEFINED */
 
-
-			#if defined(__linux__) || defined(__QNXNTO__) || defined(__METAG)
-
-				#define IMG_CALLCONV
-				#define IMG_INTERNAL	__attribute__((visibility("hidden")))
-				#define IMG_EXPORT		__attribute__((visibility("default")))
-				#define IMG_IMPORT
-				#define IMG_RESTRICT	__restrict__
-
-			#else
-					#error("define an OS")
-			#endif
+#define IMG_CALLCONV
+#define IMG_INTERNAL	__attribute__((visibility("hidden")))
+#define IMG_EXPORT		__attribute__((visibility("default")))
+#define IMG_IMPORT
+#define IMG_RESTRICT	__restrict__
 
 // Use default definition if not overridden
 #ifndef IMG_ABORT

@@ -65,9 +65,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "env_data.h"
 
-#if defined (__linux__) || defined(__QNXNTO__)
 #include "mmap.h"
-#endif
 
 
 #include "srvkm.h"
@@ -640,11 +638,7 @@ PVRSRVAllocDeviceMemBW(IMG_UINT32 ui32BridgeID,
 	psAllocDeviceMemOUT->sClientMemInfo.pvLinAddrKM =
 			psMemInfo->pvLinAddrKM;
 
-#if defined (__linux__)
 	psAllocDeviceMemOUT->sClientMemInfo.pvLinAddr = 0;
-#else
-	psAllocDeviceMemOUT->sClientMemInfo.pvLinAddr = psMemInfo->pvLinAddrKM;
-#endif
 	psAllocDeviceMemOUT->sClientMemInfo.sDevVAddr = psMemInfo->sDevVAddr;
 	psAllocDeviceMemOUT->sClientMemInfo.ui32Flags = psMemInfo->ui32Flags;
 	psAllocDeviceMemOUT->sClientMemInfo.uAllocSize = psMemInfo->uAllocSize;
@@ -1736,7 +1730,6 @@ PVRMMapOSMemHandleToMMapDataBW(IMG_UINT32 ui32BridgeID,
 {
 	PVRSRV_BRIDGE_ASSERT_CMD(ui32BridgeID, PVRSRV_BRIDGE_MHANDLE_TO_MMAP_DATA);
 
-#if defined (__linux__) || defined (__QNXNTO__)
 	psMMapDataOUT->eError =
 		PVRMMapOSMemHandleToMMapData(psPerProc,
 										psMMapDataIN->hMHandle,
@@ -1744,12 +1737,6 @@ PVRMMapOSMemHandleToMMapDataBW(IMG_UINT32 ui32BridgeID,
 										&psMMapDataOUT->ui32ByteOffset,
 										&psMMapDataOUT->ui32RealByteSize,
 										&psMMapDataOUT->ui32UserVAddr);
-#else
-	PVR_UNREFERENCED_PARAMETER(psPerProc);
-	PVR_UNREFERENCED_PARAMETER(psMMapDataIN);
-
-	psMMapDataOUT->eError = PVRSRV_ERROR_NOT_SUPPORTED;
-#endif
 	return 0;
 }
 
@@ -1762,20 +1749,12 @@ PVRMMapReleaseMMapDataBW(IMG_UINT32 ui32BridgeID,
 {
 	PVRSRV_BRIDGE_ASSERT_CMD(ui32BridgeID, PVRSRV_BRIDGE_RELEASE_MMAP_DATA);
 
-#if defined (__linux__) || defined (__QNXNTO__)
 	psMMapDataOUT->eError =
 		PVRMMapReleaseMMapData(psPerProc,
 										psMMapDataIN->hMHandle,
 										&psMMapDataOUT->bMUnmap,
 										&psMMapDataOUT->ui32RealByteSize,
 										&psMMapDataOUT->ui32UserVAddr);
-#else
-
-	PVR_UNREFERENCED_PARAMETER(psPerProc);
-	PVR_UNREFERENCED_PARAMETER(psMMapDataIN);
-
-	psMMapDataOUT->eError = PVRSRV_ERROR_NOT_SUPPORTED;
-#endif
 	return 0;
 }
 
@@ -3919,9 +3898,7 @@ PVRSRVInitSrvConnectBW(IMG_UINT32 ui32BridgeID,
 		return 0;
 	}
 
-#if defined (__linux__) || defined (__QNXNTO__)
 	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RUNNING, IMG_TRUE);
-#endif
 	psPerProc->bInitProcess = IMG_TRUE;
 
 	psRetOUT->eError = PVRSRV_OK;
@@ -5061,7 +5038,6 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 		}
 	}
 
-#if defined(__linux__)
 	{
 		/* This should be moved into the linux specific code */
 		SYS_DATA *psSysData;
@@ -5100,10 +5076,6 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 			}
 		}
 	}
-#else
-	psBridgeIn  = psBridgePackageKM->pvParamIn;
-	psBridgeOut = psBridgePackageKM->pvParamOut;
-#endif
 
 	if(ui32BridgeID >= (BRIDGE_DISPATCH_TABLE_ENTRY_COUNT))
 	{
@@ -5122,8 +5094,6 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 		goto return_fault;
 	}
 
-#if defined(__linux__)
-	/* This should be moved into the linux specific code */
 	if(CopyToUserWrapper(psPerProc,
 						 ui32BridgeID,
 						 psBridgePackageKM->pvParamOut,
@@ -5133,7 +5103,6 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 	{
 		goto return_fault;
 	}
-#endif
 
 	err = 0;
 return_fault:

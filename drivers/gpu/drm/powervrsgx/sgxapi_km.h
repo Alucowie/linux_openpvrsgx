@@ -455,10 +455,6 @@ typedef struct _SGX_KICKTA_DUMP_BUFFER_
 	IMG_DEV_VIRTADDR	sCtrlDevVAddr;						/*< Device virtual address of the memory in the 
 																control structure to be checked */
 	IMG_PCHAR			pszName;							/*< Name of buffer */
-
-#if defined (__QNXNTO__)
-	IMG_UINT32          ui32NameLength;                     /*< Number of characters in buffer name */
-#endif
 #if defined (SUPPORT_SID_INTERFACE)
 } SGX_KICKTA_DUMP_BUFFER_KM, *PSGX_KICKTA_DUMP_BUFFER_KM;
 #else
