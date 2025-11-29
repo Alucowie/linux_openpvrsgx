@@ -64,12 +64,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 #endif
 
-/* VGX: */
-#if defined(SUPPORT_VGX)
-#include "vgx_bridge.h"
-#endif
-
-/* SGX: */
 #include "sgx_bridge.h"
 
 #include "bridged_pvr_bridge.h"

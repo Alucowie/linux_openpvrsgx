@@ -268,7 +268,7 @@ extern "C" {
 #define PVRSRV_BRIDGE_FREE_SYNC_INFO            PVRSRV_IOWR(PVRSRV_BRIDGE_SYNC_OPS_CMD_FIRST+9)
 #define PVRSRV_BRIDGE_SYNC_OPS_CMD_LAST			(PVRSRV_BRIDGE_SYNC_OPS_CMD_FIRST+9)
 
-/* For sgx_bridge.h (msvdx_bridge.h should probably use these defines too) */
+/* For sgx_bridge.h */
 #define PVRSRV_BRIDGE_LAST_NON_DEVICE_CMD		(PVRSRV_BRIDGE_SYNC_OPS_CMD_LAST+1)
 
 

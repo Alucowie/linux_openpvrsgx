@@ -109,18 +109,12 @@ extern IMG_UINT32 g_ui32EveryLineCounter;
 #define PDUMPCOMMENTWITHFLAGS(args...)
 #define PDUMPMALLOCPAGESPHYS(args...)
 #define PDUMPENDINITPHASE(args...)
-#define PDUMPMSVDXREG(args...)
-#define PDUMPMSVDXREGWRITE(args...)
-#define PDUMPMSVDXREGREAD(args...)
-#define PDUMPMSVDXPOLEQ(args...)
-#define PDUMPMSVDXPOL(args...)
 #define PDUMPBITMAPKM(args...)
 #define PDUMPDRIVERINFO(args...)
 #define PDUMPIDLWITHFLAGS(args...)
 #define PDUMPIDL(args...)
 #define PDUMPSUSPEND(args...)
 #define PDUMPRESUME(args...)
-#define PDUMPMSVDXWRITEREF(args...)
 
 #if defined (__cplusplus)
 }

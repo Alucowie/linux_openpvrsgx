@@ -222,25 +222,11 @@ extern "C" {
 typedef enum _PVRSRV_DEVICE_TYPE_
 {
 	PVRSRV_DEVICE_TYPE_UNKNOWN			= 0 ,
-	PVRSRV_DEVICE_TYPE_MBX1				= 1 ,
-	PVRSRV_DEVICE_TYPE_MBX1_LITE		= 2 ,
-
-	PVRSRV_DEVICE_TYPE_M24VA			= 3,
-	PVRSRV_DEVICE_TYPE_MVDA2			= 4,
-	PVRSRV_DEVICE_TYPE_MVED1			= 5,
-	PVRSRV_DEVICE_TYPE_MSVDX			= 6,
 
 	PVRSRV_DEVICE_TYPE_SGX				= 7,
 
-	PVRSRV_DEVICE_TYPE_VGX				= 8,
-
 	/* 3rd party devices take ext type */
 	PVRSRV_DEVICE_TYPE_EXT				= 9,
-
-    PVRSRV_DEVICE_TYPE_LAST             = 9,
-
-	PVRSRV_DEVICE_TYPE_FORCE_I32		= 0x7fffffff
-
 } PVRSRV_DEVICE_TYPE;
 
 #define HEAP_ID( _dev_ , _dev_heap_idx_ )	(  ((_dev_)<<24) | ((_dev_heap_idx_)&((1<<24)-1))  )

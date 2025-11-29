@@ -160,7 +160,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			#define SGX_GENERAL_HEAP_SIZE				(0xC2000000-0x00001000)
 		#endif
 	#else
-		#include <sgx_msvdx_defs.h>
 		/* Create heaps with memory tiling enabled.
 	 	 * SGX HW limit is 10 heaps.
 	 	 */

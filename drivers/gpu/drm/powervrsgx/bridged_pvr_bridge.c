@@ -52,12 +52,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "ra.h"
 #include "pvr_bridge.h"
 #include "sgx_bridge.h"
-#if defined(SUPPORT_VGX)
-#include "vgx_bridge.h"
-#endif
-#if defined(SUPPORT_MSVDX)
-#include "msvdx_bridge.h"
-#endif
 #include "perproc.h"
 #include "device.h"
 #include "buffer_manager.h"
@@ -68,12 +62,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "bridged_pvr_bridge.h"
 #include "bridged_sgx_bridge.h"
-#if defined(SUPPORT_VGX)
-#include "bridged_vgx_bridge.h"
-#endif
-#if defined(SUPPORT_MSVDX)
-#include "bridged_msvdx_bridge.h"
-#endif
 
 #include "env_data.h"
 
@@ -4180,7 +4168,7 @@ static PVRSRV_ERROR DoQuerySyncOpsSatisfied(PVRSRV_KERNEL_SYNC_INFO *psKernelSyn
 		(ui32ReadOps2Pending - ui32ReadOps2PendingSnapShot >=
 		ui32ReadOps2Pending - psKernelSyncInfo->psSyncData->ui32ReadOps2Complete))
 	{
-#if defined(PDUMP) && !defined(SUPPORT_VGX)
+#if defined(PDUMP)
 		/* pdump the sync pol: reads */
 		PDumpComment("Poll for read ops complete to reach value (pdump: %u, actual snapshot: %u)",
 					 psKernelSyncInfo->psSyncData->ui32LastReadOpDumpVal,
@@ -4679,7 +4667,7 @@ PVRSRVSyncOpsFlushToDeltaBW(IMG_UINT32                                         u
 
 	if (ui32DeltaRead <= psSyncOpsFlushToDeltaIN->ui32Delta && ui32DeltaWrite <= psSyncOpsFlushToDeltaIN->ui32Delta)
 	{
-#if defined(PDUMP) && !defined(SUPPORT_VGX)
+#if defined(PDUMP)
 		/* pdump the sync pol: reads */
 		PDumpComment("Poll for read ops complete to delta (%u)",
 					 psSyncOpsFlushToDeltaIN->ui32Delta);
@@ -4995,12 +4983,6 @@ CommonBridgeInit(IMG_VOID)
 	SetDispatchTableEntry(PVRSRV_BRIDGE_FREE_SYNC_INFO, PVRSRVFreeSyncInfoBW);
 
 	SetSGXDispatchTableEntry();
-#if defined (SUPPORT_VGX)
-	SetVGXDispatchTableEntry();
-#endif
-#if defined (SUPPORT_MSVDX)
-	SetMSVDXDispatchTableEntry();
-#endif
 
 	/* A safety net to help ensure there won't be any un-initialised dispatch
 	 * table entries... */

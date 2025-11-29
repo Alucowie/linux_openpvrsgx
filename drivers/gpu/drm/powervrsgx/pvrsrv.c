@@ -278,7 +278,7 @@ static IMG_VOID PVRSRVEnumerateDevicesKM_ForEachVaCb(PVRSRV_DEVICE_NODE *psDevic
  @Description
  This function will enumerate all the devices supported by the
  PowerVR services within the target system.
- The function returns a list of the device ID strcutres stored either in
+ The function returns a list of the device ID structres stored either in
  the services or constructed in the user mode glue component in certain
  environments. The number of devices in the list is also returned.
 

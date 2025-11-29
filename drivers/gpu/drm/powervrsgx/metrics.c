@@ -42,12 +42,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "services_headers.h"
 #include "metrics.h"
 
-/* VGX: */
-#if defined(SUPPORT_VGX)
-#include "vgxapi_km.h"
-#endif
-
-/* SGX: */
 #include "sgxapi_km.h"
 
 static volatile IMG_UINT32 *pui32TimerRegister = 0;

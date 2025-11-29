@@ -54,39 +54,36 @@ extern "C" {
 enum {
 	/* SGX: */
 	RESMAN_TYPE_SHARED_PB_DESC = 1,					/*!< Parameter buffer kernel stubs */
-	RESMAN_TYPE_SHARED_PB_DESC_CREATE_LOCK,				/*!< Shared parameter buffer creation lock */
-	RESMAN_TYPE_HW_RENDER_CONTEXT,					/*!< Hardware Render Context Resource */
-	RESMAN_TYPE_HW_TRANSFER_CONTEXT,				/*!< Hardware transfer Context Resource */
-	RESMAN_TYPE_HW_2D_CONTEXT,						/*!< Hardware 2D Context Resource */
-	RESMAN_TYPE_TRANSFER_CONTEXT,					/*!< Transfer Queue context */
-
-	/* VGX: */
-	RESMAN_TYPE_DMA_CLIENT_FIFO_DATA,				/*!< VGX DMA Client FIFO data */
+	RESMAN_TYPE_SHARED_PB_DESC_CREATE_LOCK = 2,			/*!< Shared parameter buffer creation lock */
+	RESMAN_TYPE_HW_RENDER_CONTEXT = 3,				/*!< Hardware Render Context Resource */
+	RESMAN_TYPE_HW_TRANSFER_CONTEXT = 4,				/*!< Hardware transfer Context Resource */
+	RESMAN_TYPE_HW_2D_CONTEXT = 5,					/*!< Hardware 2D Context Resource */
+	RESMAN_TYPE_TRANSFER_CONTEXT = 6,				/*!< Transfer Queue context */
 
 	/* DISPLAY CLASS: */
-	RESMAN_TYPE_DISPLAYCLASS_SWAPCHAIN_REF,			/*!< Display Class Swapchain Reference Resource */
-	RESMAN_TYPE_DISPLAYCLASS_DEVICE,				/*!< Display Class Device Resource */
+	RESMAN_TYPE_DISPLAYCLASS_SWAPCHAIN_REF = 8,			/*!< Display Class Swapchain Reference Resource */
+	RESMAN_TYPE_DISPLAYCLASS_DEVICE = 9,				/*!< Display Class Device Resource */
 
 	/* BUFFER CLASS: */
-	RESMAN_TYPE_BUFFERCLASS_DEVICE,					/*!< Buffer Class Device Resource */
-	
+	RESMAN_TYPE_BUFFERCLASS_DEVICE = 10,				/*!< Buffer Class Device Resource */
+
 	/* OS specific User mode Mappings: */
-	RESMAN_TYPE_OS_USERMODE_MAPPING,				/*!< OS specific User mode mappings */
-	
+	RESMAN_TYPE_OS_USERMODE_MAPPING = 11,				/*!< OS specific User mode mappings */
+
 	/* COMMON: */
-	RESMAN_TYPE_DEVICEMEM_CONTEXT,					/*!< Device Memory Context Resource */
-	RESMAN_TYPE_DEVICECLASSMEM_MAPPING,				/*!< Device Memory Mapping Resource */
-	RESMAN_TYPE_DEVICEMEM_MAPPING,					/*!< Device Memory Mapping Resource */
-	RESMAN_TYPE_DEVICEMEM_WRAP,						/*!< Device Memory Wrap Resource */
-	RESMAN_TYPE_DEVICEMEM_ALLOCATION,				/*!< Device Memory Allocation Resource */
-	RESMAN_TYPE_DEVICEMEM_ION,						/*!< Device Memory Ion Resource */
-	RESMAN_TYPE_EVENT_OBJECT,						/*!< Event Object */
-    RESMAN_TYPE_SHARED_MEM_INFO,                    /*!< Shared system memory meminfo */
-    RESMAN_TYPE_MODIFY_SYNC_OPS,					/*!< Syncobject synchronisation Resource*/
-    RESMAN_TYPE_SYNC_INFO,					        /*!< Syncobject Resource*/
-	
+	RESMAN_TYPE_DEVICEMEM_CONTEXT = 12,				/*!< Device Memory Context Resource */
+	RESMAN_TYPE_DEVICECLASSMEM_MAPPING = 13,			/*!< Device Memory Mapping Resource */
+	RESMAN_TYPE_DEVICEMEM_MAPPING = 14,				/*!< Device Memory Mapping Resource */
+	RESMAN_TYPE_DEVICEMEM_WRAP = 15,				/*!< Device Memory Wrap Resource */
+	RESMAN_TYPE_DEVICEMEM_ALLOCATION = 16,				/*!< Device Memory Allocation Resource */
+	RESMAN_TYPE_DEVICEMEM_ION = 17,					/*!< Device Memory Ion Resource */
+	RESMAN_TYPE_EVENT_OBJECT = 18,					/*!< Event Object */
+	RESMAN_TYPE_SHARED_MEM_INFO = 19,				/*!< Shared system memory meminfo */
+	RESMAN_TYPE_MODIFY_SYNC_OPS = 20,				/*!< Syncobject synchronisation Resource*/
+	RESMAN_TYPE_SYNC_INFO = 21,				        /*!< Syncobject Resource*/
+
 	/* KERNEL: */
-	RESMAN_TYPE_KERNEL_DEVICEMEM_ALLOCATION			/*!< Device Memory Allocation Resource */
+	RESMAN_TYPE_KERNEL_DEVICEMEM_ALLOCATION = 22			/*!< Device Memory Allocation Resource */
 };
 
 #define RESMAN_CRITERIA_ALL				0x00000000	/*!< match by criteria all */
