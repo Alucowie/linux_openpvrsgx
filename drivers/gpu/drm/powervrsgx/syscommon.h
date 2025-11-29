@@ -198,9 +198,6 @@ extern SYS_DATA* gpsSysData;
  @Return   ppsSysData updated
 
 ******************************************************************************/
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysAcquireData)
-#endif
 static INLINE IMG_VOID SysAcquireData(SYS_DATA **ppsSysData)
 {
 	/* Copy pointer back system information pointer */
@@ -228,9 +225,6 @@ static INLINE IMG_VOID SysAcquireData(SYS_DATA **ppsSysData)
  @Return   psSysData - pointer to copy reference into
 
 ******************************************************************************/
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysAcquireDataNoCheck)
-#endif
 static INLINE SYS_DATA * SysAcquireDataNoCheck(IMG_VOID)
 {
 	/* return pointer back system information pointer */
@@ -250,9 +244,6 @@ static INLINE SYS_DATA * SysAcquireDataNoCheck(IMG_VOID)
  @Return   PVRSRV_ERROR  :
 
 ******************************************************************************/
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysInitialiseCommon)
-#endif
 static INLINE PVRSRV_ERROR SysInitialiseCommon(SYS_DATA *psSysData)
 {
 	PVRSRV_ERROR	eError;
@@ -275,9 +266,6 @@ static INLINE PVRSRV_ERROR SysInitialiseCommon(SYS_DATA *psSysData)
  @Return   PVRSRV_ERROR  :
 
 ******************************************************************************/
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysDeinitialiseCommon)
-#endif
 static INLINE IMG_VOID SysDeinitialiseCommon(SYS_DATA *psSysData)
 {
 	/* De-initialise Services */
@@ -296,9 +284,6 @@ static INLINE IMG_VOID SysDeinitialiseCommon(SYS_DATA *psSysData)
 #define	SysReadHWReg(p, o) OSReadHWReg(p, o)
 #define SysWriteHWReg(p, o, v) OSWriteHWReg(p, o, v)
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysHighResTimerCreate)
-#endif
 static INLINE IMG_HANDLE SysHighResTimerCreate(IMG_VOID)
 {
 	SYS_DATA *psSysData;
@@ -307,9 +292,6 @@ static INLINE IMG_HANDLE SysHighResTimerCreate(IMG_VOID)
 	return psSysData->pfnHighResTimerCreate();
 }
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysHighResTimerGetus)
-#endif
 static INLINE IMG_UINT32 SysHighResTimerGetus(IMG_HANDLE hTimer)
 {
 	SYS_DATA *psSysData;
@@ -318,9 +300,6 @@ static INLINE IMG_UINT32 SysHighResTimerGetus(IMG_HANDLE hTimer)
 	return psSysData->pfnHighResTimerGetus(hTimer);
 }
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(SysHighResTimerDestroy)
-#endif
 static INLINE IMG_VOID SysHighResTimerDestroy(IMG_HANDLE hTimer)
 {
 	SYS_DATA *psSysData;

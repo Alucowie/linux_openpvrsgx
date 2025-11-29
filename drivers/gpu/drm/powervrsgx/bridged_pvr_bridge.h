@@ -84,9 +84,6 @@ CopyToUserWrapper(PVRSRV_PER_PROCESS_DATA *pProcData,
 #define ASSIGN_AND_EXIT_ON_ERROR(error, src)		\
 	ASSIGN_AND_RETURN_ON_ERROR(error, src, 0)
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(NewHandleBatch)
-#endif
 static INLINE PVRSRV_ERROR
 NewHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc,
 					IMG_UINT32 ui32BatchSize)
@@ -108,9 +105,6 @@ NewHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc,
 #define NEW_HANDLE_BATCH_OR_ERROR(error, psPerProc, ui32BatchSize)	\
 	ASSIGN_AND_EXIT_ON_ERROR(error, NewHandleBatch(psPerProc, ui32BatchSize))
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(CommitHandleBatch)
-#endif
 static INLINE PVRSRV_ERROR
 CommitHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc)
 {
@@ -125,9 +119,6 @@ CommitHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc)
 #define COMMIT_HANDLE_BATCH_OR_ERROR(error, psPerProc) 			\
 	ASSIGN_AND_EXIT_ON_ERROR(error, CommitHandleBatch(psPerProc))
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(ReleaseHandleBatch)
-#endif
 static INLINE IMG_VOID
 ReleaseHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc)
 {

@@ -1397,9 +1397,6 @@ typedef	struct  _PVRSRV_SEMAPHORE_OPAQUE_STRUCT_ *PVRSRV_SEMAPHORE_HANDLE;
 
 #if !defined(USE_CODE)
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(PVRSRVCreateSemaphore)
-#endif
 static INLINE PVRSRV_ERROR PVRSRVCreateSemaphore(PVRSRV_SEMAPHORE_HANDLE *phSemaphore, IMG_INT iInitialCount)
 {
 	PVR_UNREFERENCED_PARAMETER(iInitialCount);
@@ -1407,18 +1404,12 @@ static INLINE PVRSRV_ERROR PVRSRVCreateSemaphore(PVRSRV_SEMAPHORE_HANDLE *phSema
 	return PVRSRV_OK;
 }
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(PVRSRVDestroySemaphore)
-#endif
 static INLINE PVRSRV_ERROR PVRSRVDestroySemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphore)
 {
 	PVR_UNREFERENCED_PARAMETER(hSemaphore);
 	return PVRSRV_OK;
 }
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(PVRSRVWaitSemaphore)
-#endif
 static INLINE PVRSRV_ERROR PVRSRVWaitSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphore, IMG_UINT64 ui64TimeoutMicroSeconds)
 {
 	PVR_UNREFERENCED_PARAMETER(hSemaphore);
@@ -1426,9 +1417,6 @@ static INLINE PVRSRV_ERROR PVRSRVWaitSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphor
 	return PVRSRV_ERROR_INVALID_PARAMS;
 }
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(PVRSRVPostSemaphore)
-#endif
 static INLINE IMG_VOID PVRSRVPostSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphore, IMG_INT iPostCount)
 {
 	PVR_UNREFERENCED_PARAMETER(hSemaphore);

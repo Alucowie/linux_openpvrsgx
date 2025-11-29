@@ -205,9 +205,6 @@ void* ProcSeqOff2ElementQueue(struct seq_file * sfile, loff_t off)
 
  @Return : Next op value
 *****************************************************************************/
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(PVRSRVGetWriteOpsPending)
-#endif
 static INLINE
 IMG_UINT32 PVRSRVGetWriteOpsPending(PVRSRV_KERNEL_SYNC_INFO *psSyncInfo, IMG_BOOL bIsReadOp)
 {
@@ -240,9 +237,6 @@ IMG_UINT32 PVRSRVGetWriteOpsPending(PVRSRV_KERNEL_SYNC_INFO *psSyncInfo, IMG_BOO
 
  @Return : Next op value
 *****************************************************************************/
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(PVRSRVGetReadOpsPending)
-#endif
 static INLINE
 IMG_UINT32 PVRSRVGetReadOpsPending(PVRSRV_KERNEL_SYNC_INFO *psSyncInfo, IMG_BOOL bIsReadOp)
 {

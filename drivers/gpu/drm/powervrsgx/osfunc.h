@@ -128,9 +128,6 @@ PVRSRV_ERROR OSUnRegisterDiscontigMem(IMG_VOID *pvCpuVAddr,
 									IMG_HANDLE hOSMemHandle);
 
 
-#ifdef INLINE_IS_PRAGMA
-#pragma inline(OSReserveDiscontigPhys)
-#endif
 static INLINE PVRSRV_ERROR OSReserveDiscontigPhys(IMG_SYS_PHYADDR *pBasePAddr, IMG_SIZE_T ui32Bytes, IMG_UINT32 ui32Flags, IMG_VOID **ppvCpuVAddr, IMG_HANDLE *phOSMemHandle)
 {
 	*ppvCpuVAddr = IMG_NULL;
