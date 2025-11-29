@@ -102,9 +102,7 @@ static const IMG_CHAR *SGXUKernelStatusString(IMG_UINT32 code)
 	}	\
 }
 
-#if defined (SYS_USING_INTERRUPTS)
 IMG_BOOL SGX_ISRHandler(IMG_VOID *pvData);
-#endif
 
 
 static
@@ -989,14 +987,11 @@ PVRSRV_ERROR DevInitSGXPart2KM (PVRSRV_PER_PROCESS_DATA *psPerProc,
 	}
 #endif/* #ifdef SGX_FEATURE_HOST_PORT */
 
-#if defined (SYS_USING_INTERRUPTS)
 
 	/* Set up ISR callback information. */
 	psDeviceNode->pvISRData = psDeviceNode;
 	/* ISR handler address was set up earlier */
 	PVR_ASSERT(psDeviceNode->pfnDeviceISR == SGX_ISRHandler);
-
-#endif /* SYS_USING_INTERRUPTS */
 
 	/* Prevent the microkernel being woken up before there is something to do. */
 	psDevInfo->psSGXHostCtl->ui32PowerStatus |= PVRSRV_USSE_EDM_POWMAN_NO_WORK;
@@ -1568,7 +1563,6 @@ IMG_VOID SGXDumpDebugInfo (PVRSRV_SGXDEV_INFO	*psDevInfo,
 }
 
 
-#if defined(SYS_USING_INTERRUPTS) || defined(SUPPORT_HW_RECOVERY)
 /*!
 *******************************************************************************
 
@@ -1665,7 +1659,6 @@ IMG_VOID HWRecoveryResetSGX (PVRSRV_DEVICE_NODE *psDeviceNode,
 	/* Flush any old commands from the queues. */
 	PVRSRVProcessQueues(IMG_TRUE);
 }
-#endif /* #if defined(SYS_USING_INTERRUPTS) || defined(SUPPORT_HW_RECOVERY) */
 
 
 #if defined(SUPPORT_HW_RECOVERY)
@@ -1810,8 +1803,6 @@ SGX_NoUKernel_LockUp:
 
 
 
-#if defined(SYS_USING_INTERRUPTS)
-
 /*
 	SGX ISR Handler
 */
@@ -1917,7 +1908,6 @@ static IMG_VOID SGX_MISRHandler (IMG_VOID *pvData)
 
 	SGXTestActivePowerEvent(psDeviceNode, ISR_ID);
 }
-#endif /* #if defined (SYS_USING_INTERRUPTS) */
 
 #if defined(SUPPORT_MEMORY_TILING)
 
@@ -2048,13 +2038,11 @@ PVRSRV_ERROR SGXRegisterDevice (PVRSRV_DEVICE_NODE *psDeviceNode)
 	psDeviceNode->pfnMMUMapPagesSparse = &MMU_MapPagesSparse;
 	psDeviceNode->pfnMMUMapShadowSparse = &MMU_MapShadowSparse;
 
-#if defined (SYS_USING_INTERRUPTS)
 	/*
 		SGX ISR handler
 	*/
 	psDeviceNode->pfnDeviceISR = SGX_ISRHandler;
 	psDeviceNode->pfnDeviceMISR = SGX_MISRHandler;
-#endif
 
 #if defined(SUPPORT_MEMORY_TILING)
 	psDeviceNode->pfnAllocMemTilingRange = SGX_AllocMemTilingRange;
