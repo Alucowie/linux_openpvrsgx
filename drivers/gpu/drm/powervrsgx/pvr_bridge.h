@@ -1736,7 +1736,6 @@ typedef struct PVRSRV_BRIDGE_OUT_GETFREEDEVICEMEM_TAG
 } PVRSRV_BRIDGE_OUT_GETFREEDEVICEMEM;
 
 
-//#ifdef LINUX
 /******************************************************************************
  *	'bridge out' get full map data
  *****************************************************************************/
@@ -1776,7 +1775,6 @@ typedef struct PVRSRV_BRIDGE_OUT_RELEASE_MMAP_DATA_TAG
     /* Size of mapping */
     IMG_UINT32			ui32RealByteSize;
 } PVRSRV_BRIDGE_OUT_RELEASE_MMAP_DATA;
-//#endif
 
 
 /******************************************************************************

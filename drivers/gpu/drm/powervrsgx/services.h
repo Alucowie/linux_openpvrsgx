@@ -854,7 +854,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVUnmapPhysToUserSpace(IMG_CONST PVRSRV_DEV_DATA *
 										IMG_PVOID pvUserAddr,
 										IMG_PVOID pvProcess);
 
-#if defined(LINUX)
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVExportDeviceMem2(IMG_CONST PVRSRV_DEV_DATA	*psDevData,
 												 PVRSRV_CLIENT_MEM_INFO		*psMemInfo,
@@ -869,8 +868,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceMemory2(IMG_CONST PVRSRV_DEV_DATA	*psDe
 												 IMG_HANDLE					hDstDevMemHeap,
 #endif
 												 PVRSRV_CLIENT_MEM_INFO		**ppsDstMemInfo);
-#endif /* defined(LINUX) */
-
 #if defined(SUPPORT_ION)
 PVRSRV_ERROR PVRSRVMapIonHandle(const PVRSRV_DEV_DATA *psDevData,
 #if defined (SUPPORT_SID_INTERFACE)
