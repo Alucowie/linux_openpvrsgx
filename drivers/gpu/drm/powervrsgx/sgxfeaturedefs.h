@@ -107,10 +107,6 @@ must be defined when SGX_FEATURE_MP is defined
 #define SGX_FEATURE_MP_CORE_COUNT_3D	(1)
 #endif /* SGX_FEATURE_MP */
 
-#if defined(SUPPORT_SGX_LOW_LATENCY_SCHEDULING) && !defined(SUPPORT_SGX_PRIORITY_SCHEDULING)
-#define SUPPORT_SGX_PRIORITY_SCHEDULING
-#endif
-
 #include "img_types.h"
 
 /******************************************************************************
