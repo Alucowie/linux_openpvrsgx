@@ -231,9 +231,7 @@ static PVRSRV_ERROR InitDevInfo(PVRSRV_PER_PROCESS_DATA *psPerProc,
 #if defined(SGX_SUPPORT_HWPROFILING)
 	psDevInfo->psKernelHWProfilingMemInfo = (PVRSRV_KERNEL_MEM_INFO *)psInitInfo->hKernelHWProfilingMemInfo;
 #endif
-#if defined(SUPPORT_SGX_HWPERF)
 	psDevInfo->psKernelHWPerfCBMemInfo = (PVRSRV_KERNEL_MEM_INFO *)psInitInfo->hKernelHWPerfCBMemInfo;
-#endif
 	psDevInfo->psKernelTASigBufferMemInfo = psInitInfo->hKernelTASigBufferMemInfo;
 	psDevInfo->psKernel3DSigBufferMemInfo = psInitInfo->hKernel3DSigBufferMemInfo;
 #if defined(FIX_HW_BRN_29702)
@@ -3232,7 +3230,6 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 		}
 #endif /* SUPPORT_SGX_EDM_MEMORY_DEBUG */
 
-#if defined(SUPPORT_SGX_HWPERF)
 		case SGX_MISC_INFO_REQUEST_SET_HWPERF_STATUS:
 		{
 			PVRSRV_SGX_MISCINFO_SET_HWPERF_STATUS	*psSetHWPerfStatus = &psMiscInfo->uData.sSetHWPerfStatus;
@@ -3308,7 +3305,6 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 											 IMG_FALSE);
 			return eError;
 		}
-#endif /* SUPPORT_SGX_HWPERF */
 
 		case SGX_MISC_INFO_DUMP_DEBUG_INFO:
 		{

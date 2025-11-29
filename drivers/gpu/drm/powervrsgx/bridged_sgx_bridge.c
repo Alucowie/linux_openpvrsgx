@@ -1338,7 +1338,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 	}
 #endif
 
-#if defined(SUPPORT_SGX_HWPERF)
 	eError = PVRSRVLookupHandle(psPerProc->psHandleBase,
 						   &hDummy,
 						   psSGXDevInitPart2IN->sInitInfo.hKernelHWPerfCBMemInfo,
@@ -1348,7 +1347,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 		PVR_DPF((PVR_DBG_ERROR, "SGXDevInitPart2BW: Failed to look up HWPerf meminfo (possibly due to SUPPORT_SGX_HWPERF option mismatch)"));
 		bLookupFailed = IMG_TRUE;
 	}
-#endif
 
 	eError = PVRSRVLookupHandle(psPerProc->psHandleBase,
 								&hDummy,
@@ -1646,7 +1644,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 	}
 #endif
 
-#if defined(SUPPORT_SGX_HWPERF)
 	eError = PVRSRVLookupAndReleaseHandle(psPerProc->psHandleBase,
 #if defined (SUPPORT_SID_INTERFACE)
 						   &asInitInfoKM.hKernelHWPerfCBMemInfo,
@@ -1659,7 +1656,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 	{
 		bReleaseFailed = IMG_TRUE;
 	}
-#endif
 
 	eError = PVRSRVLookupAndReleaseHandle(psPerProc->psHandleBase,
 #if defined (SUPPORT_SID_INTERFACE)
@@ -1991,7 +1987,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 #endif
 #endif
 
-#if defined(SUPPORT_SGX_HWPERF)
 #if defined (SUPPORT_SID_INTERFACE)
 	eError = PVRSRVDissociateDeviceMemKM(hDevCookieInt, asInitInfoKM.hKernelHWPerfCBMemInfo);
 #else
@@ -2001,7 +1996,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 	{
 		bDissociateFailed = IMG_TRUE;
 	}
-#endif
 
 #if defined (SUPPORT_SID_INTERFACE)
 	eError = PVRSRVDissociateDeviceMemKM(hDevCookieInt, asInitInfoKM.hKernelTASigBufferMemInfo);
@@ -3697,7 +3691,6 @@ SGXPDumpHWPerfCBBW(IMG_UINT32						ui32BridgeID,
 				   PVRSRV_BRIDGE_RETURN 			*psRetOUT,
 				   PVRSRV_PER_PROCESS_DATA 			*psPerProc)
 {
-#if defined(SUPPORT_SGX_HWPERF)
 #if defined(__linux__)
 	PVRSRV_SGXDEV_INFO	*psDevInfo;
 	PVRSRV_DEVICE_NODE *psDeviceNode;
@@ -3747,13 +3740,6 @@ SGXPDumpHWPerfCBBW(IMG_UINT32						ui32BridgeID,
 	PVR_UNREFERENCED_PARAMETER(psPerProc);
 	return 0;
 #endif
-#else
-	PVR_UNREFERENCED_PARAMETER(ui32BridgeID);
-	PVR_UNREFERENCED_PARAMETER(psPDumpHWPerfCBIN);
-	PVR_UNREFERENCED_PARAMETER(psRetOUT);
-	PVR_UNREFERENCED_PARAMETER(psPerProc);
-	return -EFAULT;
-#endif /* defined(SUPPORT_SGX_HWPERF) */
 }
 
 

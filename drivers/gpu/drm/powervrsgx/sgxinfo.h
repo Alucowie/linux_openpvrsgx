@@ -120,12 +120,10 @@ typedef struct _SGX_BRIDGE_INIT_INFO_
 	IMG_HANDLE	hKernelHWProfilingMemInfo;
 #endif
 #endif
-#if defined(SUPPORT_SGX_HWPERF)
 #if defined (SUPPORT_SID_INTERFACE)
 	IMG_SID		hKernelHWPerfCBMemInfo;
 #else
 	IMG_HANDLE	hKernelHWPerfCBMemInfo;
-#endif
 #endif
 #if defined (SUPPORT_SID_INTERFACE)
 	IMG_SID		hKernelTASigBufferMemInfo;

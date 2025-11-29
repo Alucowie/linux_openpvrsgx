@@ -372,9 +372,7 @@ typedef struct _SGX_BRIDGE_INIT_INFO_KM_
 #if defined(SGX_SUPPORT_HWPROFILING)
 	IMG_HANDLE	hKernelHWProfilingMemInfo;
 #endif
-#if defined(SUPPORT_SGX_HWPERF)
 	IMG_HANDLE	hKernelHWPerfCBMemInfo;
-#endif
 	IMG_HANDLE	hKernelTASigBufferMemInfo;
 	IMG_HANDLE	hKernel3DSigBufferMemInfo;
 
