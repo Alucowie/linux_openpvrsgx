@@ -47,8 +47,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "img_defs.h"
 
-#if defined(SUPPORT_SGX)
-
 #include "services.h"
 #include "pvr_debug.h"
 #include "pvr_bridge.h"
@@ -3856,5 +3854,3 @@ IMG_VOID SetSGXDispatchTableEntry(IMG_VOID)
 #endif
 }
 /* PRQA L:END_SET_SGX */ /* end of setup overrides */
-
-#endif /* SUPPORT_SGX */

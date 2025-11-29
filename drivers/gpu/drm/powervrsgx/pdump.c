@@ -39,23 +39,18 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#if defined (SUPPORT_SGX) || defined (SUPPORT_VGX)
 #if defined (PDUMP)
 
 #include <asm/atomic.h>
 #include <stdarg.h>
-#if defined (SUPPORT_SGX)
 #include "sgxdefs.h" /* Is this still needed? */
-#endif
 #include "services_headers.h"
 
 #include "pvrversion.h"
 #include "pvr_debug.h"
 
 #include "dbgdrvif.h"
-#if defined (SUPPORT_SGX)
 #include "sgxmmu.h"/* Is this still needed? */
-#endif
 #include "mm.h"
 #include "pdump_km.h"
 #include "pdump_int.h"
@@ -798,7 +793,6 @@ IMG_VOID PDumpResumeKM(IMG_VOID)
 }
 
 #endif /* #if defined (PDUMP) */
-#endif /* #if defined (SUPPORT_SGX) */
 /*****************************************************************************
  End of file (PDUMP.C)
 *****************************************************************************/

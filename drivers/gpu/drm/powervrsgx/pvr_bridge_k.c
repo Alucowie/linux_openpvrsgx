@@ -70,9 +70,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 /* SGX: */
-#if defined(SUPPORT_SGX)
 #include "sgx_bridge.h"
-#endif
 
 #include "bridged_pvr_bridge.h"
 

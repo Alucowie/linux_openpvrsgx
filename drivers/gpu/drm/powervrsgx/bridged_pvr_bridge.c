@@ -51,9 +51,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_debug.h"
 #include "ra.h"
 #include "pvr_bridge.h"
-#if defined(SUPPORT_SGX)
 #include "sgx_bridge.h"
-#endif
 #if defined(SUPPORT_VGX)
 #include "vgx_bridge.h"
 #endif
@@ -69,9 +67,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "syscommon.h"
 
 #include "bridged_pvr_bridge.h"
-#if defined(SUPPORT_SGX)
 #include "bridged_sgx_bridge.h"
-#endif
 #if defined(SUPPORT_VGX)
 #include "bridged_vgx_bridge.h"
 #endif
@@ -5031,9 +5027,7 @@ CommonBridgeInit(IMG_VOID)
 	SetDispatchTableEntry(PVRSRV_BRIDGE_ALLOC_SYNC_INFO, PVRSRVAllocSyncInfoBW);
 	SetDispatchTableEntry(PVRSRV_BRIDGE_FREE_SYNC_INFO, PVRSRVFreeSyncInfoBW);
 
-#if defined (SUPPORT_SGX)
 	SetSGXDispatchTableEntry();
-#endif
 #if defined (SUPPORT_VGX)
 	SetVGXDispatchTableEntry();
 #endif
