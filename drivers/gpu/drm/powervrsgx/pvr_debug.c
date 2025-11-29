@@ -40,14 +40,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#include <linux/version.h>
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #include <asm/io.h>
 #include <asm/uaccess.h>
 #include <linux/kernel.h>
@@ -105,13 +97,7 @@ static IMG_CHAR gszBufferIRQ[PVR_MAX_MSG_LEN + 1];
 static PVRSRV_LINUX_MUTEX gsDebugMutexNonIRQ;
 #endif
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39))
-/* The lock is used to control access to gszBufferIRQ */
-/* PRQA S 0671,0685 1 */ /* ignore warnings about C99 style initialisation */
-static spinlock_t gsDebugLockIRQ = SPIN_LOCK_UNLOCKED;
-#else
 static DEFINE_SPINLOCK(gsDebugLockIRQ);
-#endif
 
 #if !defined(PVR_DEBUG_ALWAYS_USE_SPINLOCK)
 #if !defined (USE_SPIN_LOCK) /* to keep QAC happy */ 

@@ -42,14 +42,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#include <linux/version.h>
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/fs.h>
@@ -85,16 +77,6 @@ static void *pvr_proc_seq_next (struct seq_file *m, void *v, loff_t *pos);
 static int pvr_proc_seq_show (struct seq_file *m, void *v);
 static ssize_t pvr_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *ppos);
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0))
-static struct file_operations pvr_proc_operations =
-{
-	.open		= pvr_proc_open,
-	.read		= seq_read,
-	.write		= pvr_proc_write,
-	.llseek		= seq_lseek,
-	.release	= seq_release,
-};
-#else
 static struct proc_ops pvr_proc_operations =
 {
 	.proc_open	= pvr_proc_open,
@@ -103,19 +85,8 @@ static struct proc_ops pvr_proc_operations =
 	.proc_lseek	= seq_lseek,
 	.proc_release	= seq_release,
 };
-#endif
 
 static ssize_t pvr_proc_read(struct file *file, char __user *buffer, size_t count, loff_t *ppos);
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0))
-static struct file_operations pvr_read_proc_operations =
-{
-	.open		= pvr_proc_open,
-	.read		= pvr_proc_read,
-	.write		= pvr_proc_write,
-	.llseek		= seq_lseek,
-	.release	= seq_release,
-};
-#else
 static struct proc_ops pvr_read_proc_operations =
 {
 	.proc_open	= pvr_proc_open,
@@ -124,7 +95,6 @@ static struct proc_ops pvr_read_proc_operations =
 	.proc_lseek	= seq_lseek,
 	.proc_release	= seq_release,
 };
-#endif
 
 static struct seq_operations pvr_proc_seq_operations =
 {
@@ -150,13 +120,7 @@ static void ProcSeqShowVersion(struct seq_file *sfile,void* el);
 static void ProcSeqShowSysNodes(struct seq_file *sfile,void* el);
 static void* ProcSeqOff2ElementSysNodes(struct seq_file * sfile, loff_t off);
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0)
-#define PDE_DATA(x)    PDE(x)->data;
-#elif (LINUX_VERSION_CODE < KERNEL_VERSION(5,16,0))
-// defined in proc_fs.h
-#else
 #define PDE_DATA pde_data	// renamed to lower case
-#endif
 
 /*!
 ******************************************************************************
@@ -290,7 +254,7 @@ static IMG_INT pvr_proc_open(struct inode *inode,struct file *file)
 	IMG_INT ret = seq_open(file, &pvr_proc_seq_operations);
 	struct seq_file *seq = (struct seq_file*)file->private_data;
 
-	PVR_PROC_SEQ_HANDLERS *data = (PVR_PROC_SEQ_HANDLERS *) PDE_DATA(inode);
+	PVR_PROC_SEQ_HANDLERS *data = (PVR_PROC_SEQ_HANDLERS *) pde_data(inode);
 	seq->private = data;
 
 	return ret;
@@ -312,7 +276,7 @@ static ssize_t pvr_proc_write(struct file *file, const char __user *buffer,
 {
 	struct inode *inode = file->f_path.dentry->d_inode;
 
-	PVR_PROC_SEQ_HANDLERS *data = (PVR_PROC_SEQ_HANDLERS *) PDE_DATA(inode);
+	PVR_PROC_SEQ_HANDLERS *data = (PVR_PROC_SEQ_HANDLERS *) pde_data(inode);
 	PVR_UNREFERENCED_PARAMETER(ppos);
 	if (!data->write_proc)
 		return -EIO;
@@ -779,7 +743,7 @@ IMG_VOID RemovePerProcessProcEntrySeq(struct proc_dir_entry* proc_entry)
 static ssize_t pvr_proc_read(struct file *file, char __user *buffer,size_t count, loff_t *ppos)
 {
 	struct inode *inode = file->f_path.dentry->d_inode;
-	PVR_PROC_SEQ_HANDLERS *data = (PVR_PROC_SEQ_HANDLERS *) PDE_DATA(inode);
+	PVR_PROC_SEQ_HANDLERS *data = (PVR_PROC_SEQ_HANDLERS *) pde_data(inode);
 	PVR_UNREFERENCED_PARAMETER(ppos);
 	if (!data->read_proc)
 		return -EIO;

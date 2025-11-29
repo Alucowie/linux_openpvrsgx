@@ -350,15 +350,7 @@ static INLINE IMG_VOID CheckPT(MMU_PT_INFO *psPTInfoList)
 */
 #if defined(PVRSRV_MMU_MAKE_READWRITE_ON_DEMAND)
 
-#include <linux/version.h>
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#else
 #include <generated/autoconf.h>
-#endif
 
 #include <linux/mm.h>
 #include <linux/sched.h>

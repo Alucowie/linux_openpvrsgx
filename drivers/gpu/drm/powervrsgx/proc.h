@@ -47,10 +47,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/proc_fs.h>	// read_proc_t etc
 #include <linux/seq_file.h> // seq_file
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,0))
 typedef int (read_proc_t)(char *page, char **start, off_t off,int count, int *eof, void *data);
 typedef int (write_proc_t)(struct file *file, const char __user *buffer,unsigned long count, void *data);
-#endif
 
 #define END_OF_FILE (off_t) -1
 

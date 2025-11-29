@@ -39,14 +39,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
-#include <linux/version.h>
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
-#ifndef AUTOCONF_INCLUDED
-#include <linux/config.h>
-#endif
-#endif
-
 #if !defined(PVR_LINUX_MEM_AREA_POOL_MAX_PAGES)
 #define PVR_LINUX_MEM_AREA_POOL_MAX_PAGES 0
 #endif
@@ -58,17 +50,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/mm.h>
 #include <linux/vmalloc.h>
 #include <asm/io.h>
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0))
-#include <linux/wrapper.h>
-#endif
 #include <linux/slab.h>
 #include <linux/highmem.h>
 #include <linux/sched.h>
 
 #if defined(PVR_LINUX_MEM_AREA_POOL_ALLOW_SHRINK)
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,1,0))
 #include <linux/shrinker.h>
-#endif
 #endif
 
 #include "img_defs.h"
@@ -219,11 +206,6 @@ static LinuxKMemCache *g_PsLinuxPagePoolCache;
 
 static LIST_HEAD(g_sPagePoolList);
 static int g_iPagePoolMaxEntries;
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-static IMG_VOID ReservePages(IMG_VOID *pvAddress, IMG_UINT32 ui32Length);
-static IMG_VOID UnreservePages(IMG_VOID *pvAddress, IMG_UINT32 ui32Length);
-#endif
 
 static LinuxMemArea *LinuxMemAreaStructAlloc(IMG_VOID);
 static IMG_VOID LinuxMemAreaStructFree(LinuxMemArea *psLinuxMemArea);
@@ -589,14 +571,6 @@ AllocPageFromLinux(void)
             return NULL;
 
         }
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-    	/* Reserve those pages to allow them to be re-mapped to user space */
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0))		
-    	SetPageReserved(psPage);
-#else
-        mem_map_reserve(psPage);
-#endif
-#endif
 	return psPage;
 }
 
@@ -604,13 +578,6 @@ AllocPageFromLinux(void)
 static IMG_VOID
 FreePageToLinux(struct page *psPage)
 {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))		
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0))		
-        ClearPageReserved(psPage);
-#else
-        mem_map_reserve(psPage);
-#endif		
-#endif	
         __free_pages(psPage, 0);
 }
 
@@ -936,10 +903,6 @@ NewVMallocLinuxMemArea(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AreaFlags)
         goto failed;
     }
 /* PG_reserved was deprecated in linux-2.6.15 */
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-    /* Reserve those pages to allow them to be re-mapped to user space */
-    ReservePages(pvCpuVAddr, ui32Bytes);
-#endif
 #endif	/* defined(PVR_LINUX_MEM_AREA_USE_VMAP) */ 
 
     psLinuxMemArea->eAreaType = LINUX_MEM_AREA_VMALLOC;
@@ -1020,56 +983,11 @@ FreeVMallocLinuxMemArea(LinuxMemArea *psLinuxMemArea)
     
     FreePages(CanFreeToPool(psLinuxMemArea), ppsPageList, hBlockPageList, ui32NumPages);
 #else
-/* PG_reserved was deprecated in linux-2.6.15 */
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-    UnreservePages(psLinuxMemArea->uData.sVmalloc.pvVmallocAddress,
-                    psLinuxMemArea->ui32ByteSize);
-#endif
-
     VFreeWrapper(psLinuxMemArea->uData.sVmalloc.pvVmallocAddress);
 #endif	/* defined(PVR_LINUX_MEM_AREA_USE_VMAP) */ 
 
     LinuxMemAreaStructFree(psLinuxMemArea);
 }
-
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15))
-/* Reserve pages of memory in order that they're not automatically
-   deallocated after the last user reference dies. */
-static IMG_VOID
-ReservePages(IMG_VOID *pvAddress, IMG_UINT32 ui32Length)
-{
-	IMG_VOID *pvPage;
-	IMG_VOID *pvEnd = pvAddress + ui32Length;
-
-	for(pvPage = pvAddress; pvPage < pvEnd;  pvPage += PAGE_SIZE)
-	{
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0))
-		SetPageReserved(vmalloc_to_page(pvPage));
-#else
-		mem_map_reserve(vmalloc_to_page(pvPage));
-#endif
-	}
-}
-
-
-/* Un-reserve pages of memory in order that they can be freed. */
-static IMG_VOID
-UnreservePages(IMG_VOID *pvAddress, IMG_UINT32 ui32Length)
-{
-	IMG_VOID *pvPage;
-	IMG_VOID *pvEnd = pvAddress + ui32Length;
-
-	for(pvPage = pvAddress; pvPage < pvEnd;  pvPage += PAGE_SIZE)
-	{
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0))
-		ClearPageReserved(vmalloc_to_page(pvPage));
-#else
-		mem_map_unreserve(vmalloc_to_page(pvPage));
-#endif
-	}
-}
-#endif /* (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,15)) */
 
 
 IMG_VOID *
@@ -1567,11 +1485,7 @@ KMemCacheCreateWrapper(IMG_CHAR *pszName,
 #if defined(DEBUG_LINUX_SLAB_ALLOCATIONS)
     ui32Flags |= SLAB_POISON|SLAB_RED_ZONE;
 #endif
-    return kmem_cache_create(pszName, Size, Align, ui32Flags, NULL
-#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22))
-				, NULL
-#endif	/* (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,22) */
-			   );
+    return kmem_cache_create(pszName, Size, Align, ui32Flags, NULL);
 }
 
 
@@ -1584,11 +1498,7 @@ KMemCacheDestroyWrapper(LinuxKMemCache *psCache)
 
 IMG_VOID *
 _KMemCacheAllocWrapper(LinuxKMemCache *psCache,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14))
                       gfp_t Flags,
-#else
-                      IMG_INT Flags,
-#endif
                       IMG_CHAR *pszFileName,
                       IMG_UINT32 ui32Line)
 {

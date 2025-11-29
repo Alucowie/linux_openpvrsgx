@@ -27,45 +27,31 @@
 #ifndef __SYSLOCAL_H__
 #define __SYSLOCAL_H__
 
-#include <linux/version.h>
 #include <linux/clk.h>
 #include <linux/mutex.h>
 #include <asm/atomic.h>
 
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,26))
 #include <linux/semaphore.h>
 #include <linux/resource.h>
-#else 
-#include <asm/semaphore.h>
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,22))
-#include <asm/arch/resource.h>
-#endif 
-#endif 
 
-
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35))
 /*#define	PVR_LINUX_DYNAMIC_SGX_RESOURCE_INFO*/
 //#include <linux/platform_device.h>
-#endif
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,32)) && \
-    !defined(PVR_NO_OMAP_TIMER)
+#if !defined(PVR_NO_OMAP_TIMER)
 #define	PVR_OMAP3_TIMING_PRCM
 #endif
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35))
 /*#include <plat/gpu.h>*/
 #if !defined(PVR_NO_OMAP_TIMER)
 /*#define	PVR_OMAP_USE_DM_TIMER_API*/
 //#include <plat/dmtimer.h>
-#endif
 #endif
 
 #if !defined(PVR_NO_OMAP_TIMER)
 //#define PVR_OMAP_TIMER_BASE_IN_SYS_SPEC_DATA
 #endif
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35)) && defined(SGX_OCP_REGS_ENABLED)
+#if defined(SGX_OCP_REGS_ENABLED)
 /*#define SGX_OCP_NO_INT_BYPASS*/
 #endif
 
