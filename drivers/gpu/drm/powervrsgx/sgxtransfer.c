@@ -85,9 +85,6 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 		}
 	}
 #endif /* PDUMP */
-#if defined(FIX_HW_BRN_31620)
-	hDevMemContext = psKick->hDevMemContext;
-#endif
 	for (loop = 0; loop < SGX_MAX_TRANSFER_SYNC_OPS; loop++)
 	{
 		abSrcSyncEnable[loop] = IMG_TRUE;
@@ -519,9 +516,6 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmit2DKM(IMG_HANDLE hDevHandle, PVRSRV_2D_SGX_KICK 
 		}
 	}
 #endif /* PDUMP */
-#if defined(FIX_HW_BRN_31620)
-	hDevMemContext = psKick->hDevMemContext;
-#endif
 
 	if (!CCB_OFFSET_IS_VALID(SGXMKIF_2DCMD_SHARED, psCCBMemInfo, psKick, ui32SharedCmdCCBOffset))
 	{

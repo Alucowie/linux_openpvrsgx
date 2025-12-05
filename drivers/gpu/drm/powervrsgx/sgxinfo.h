@@ -87,9 +87,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_
 	IMG_HANDLE	hKernelCCBEventKickerMemInfo;
 	IMG_HANDLE	hKernelSGXHostCtlMemInfo;
 	IMG_HANDLE	hKernelSGXTA3DCtlMemInfo;
-#if defined(FIX_HW_BRN_31272) || defined(FIX_HW_BRN_31780) || defined(FIX_HW_BRN_33920)
-	IMG_HANDLE	hKernelSGXPTLAWriteBackMemInfo;
-#endif
 	IMG_HANDLE	hKernelSGXMiscMemInfo;
 
 	IMG_UINT32	aui32HostKickAddr[SGXMKIF_CMD_MAX];
@@ -106,32 +103,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_
 	IMG_HANDLE	hKernelTASigBufferMemInfo;
 	IMG_HANDLE	hKernel3DSigBufferMemInfo;
 
-#if defined(FIX_HW_BRN_29702)
-	IMG_HANDLE	hKernelCFIMemInfo;
-#endif
-#if defined(FIX_HW_BRN_29823)
-	IMG_HANDLE	hKernelDummyTermStreamMemInfo;
-#endif
-
-#if defined(FIX_HW_BRN_31542) || defined(FIX_HW_BRN_36513)
-	IMG_HANDLE hKernelClearClipWAVDMStreamMemInfo;
-	IMG_HANDLE hKernelClearClipWAIndexStreamMemInfo;
-	IMG_HANDLE hKernelClearClipWAPDSMemInfo;
-	IMG_HANDLE hKernelClearClipWAUSEMemInfo;
-	IMG_HANDLE hKernelClearClipWAParamMemInfo;
-	IMG_HANDLE hKernelClearClipWAPMPTMemInfo;
-	IMG_HANDLE hKernelClearClipWATPCMemInfo;
-	IMG_HANDLE hKernelClearClipWAPSGRgnHdrMemInfo;
-#endif
-
-#if defined(SGX_FEATURE_VDM_CONTEXT_SWITCH) && defined(FIX_HW_BRN_31559)
-	IMG_HANDLE	hKernelVDMSnapShotBufferMemInfo;
-	IMG_HANDLE	hKernelVDMCtrlStreamBufferMemInfo;
-#endif
-#if defined(SGX_FEATURE_VDM_CONTEXT_SWITCH) && \
-	defined(FIX_HW_BRN_33657) && defined(SUPPORT_SECURE_33657_FIX)
-	IMG_HANDLE	hKernelVDMStateUpdateBufferMemInfo;
-#endif
 #if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
 	IMG_HANDLE	hKernelEDMStatusBufferMemInfo;
 #endif

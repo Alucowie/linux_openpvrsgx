@@ -54,32 +54,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 /*
-	'switch-off' features if defined BRNs affect the feature
-*/
-
-#if defined(FIX_HW_BRN_27266)
-#undef SGX_FEATURE_36BIT_MMU
-#endif
-
-#if defined(SGX_FEATURE_SYSTEM_CACHE)
-	#if defined(SGX_FEATURE_36BIT_MMU)
-		#error SGX_FEATURE_SYSTEM_CACHE is incompatible with SGX_FEATURE_36BIT_MMU
-	#endif
-	#if defined(FIX_HW_BRN_26620) && !defined(SGX_FEATURE_MULTI_EVENT_KICK)
-		#define SGX_BYPASS_SYSTEM_CACHE
-	#endif
-#endif
-
-#if defined(FIX_HW_BRN_29954)
-#undef SGX_FEATURE_PERPIPE_BKPT_REGS
-#endif
-
-#if defined(FIX_HW_BRN_31620)
-#undef SGX_FEATURE_MULTIPLE_MEM_CONTEXTS
-#undef SGX_FEATURE_BIF_NUM_DIRLISTS
-#endif
-
-/*
 	Derive other definitions:
 */
 

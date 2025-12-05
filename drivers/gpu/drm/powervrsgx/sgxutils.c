@@ -271,11 +271,6 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 	SGXMKIF_COMMAND *psSGXCommand;
 	PVRSRV_SGXDEV_INFO 	*psDevInfo = psDeviceNode->pvDevice;
 	SGXMKIF_HOST_CTL	*psSGXHostCtl = psDevInfo->psSGXHostCtl;
-#if defined(FIX_HW_BRN_31620)
-	IMG_UINT32 ui32CacheMasks[4];
-	IMG_UINT32 i;
-	MMU_CONTEXT		*psMMUContext;
-#endif
 #if defined(PDUMP)
 	IMG_VOID *pvDumpCommand;
 	IMG_BOOL bPDumpIsSuspended = PDumpIsSuspended();
@@ -283,31 +278,6 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 #else
 	PVR_UNREFERENCED_PARAMETER(ui32CallerID);
 	PVR_UNREFERENCED_PARAMETER(ui32PDumpFlags);
-#endif
-
-#if defined(FIX_HW_BRN_31620)
-	for(i=0;i<4;i++)
-	{
-		ui32CacheMasks[i] = 0;
-	}
-
-	psMMUContext = psDevInfo->hKernelMMUContext;
-	psDeviceNode->pfnMMUGetCacheFlushRange(psMMUContext, &ui32CacheMasks[0]);
-
-	/* Put the apps memory context in the bottom half */
-	if (hDevMemContext)
-	{
-		BM_CONTEXT *psBMContext = (BM_CONTEXT *) hDevMemContext;
-
-		psMMUContext = psBMContext->psMMUContext;
-		psDeviceNode->pfnMMUGetCacheFlushRange(psMMUContext, &ui32CacheMasks[2]);
-	}
-
-	/* If we have an outstanding flush request then set the cachecontrol bit */
-	if (ui32CacheMasks[0] || ui32CacheMasks[1] || ui32CacheMasks[2] || ui32CacheMasks[3])
-	{
-		psDevInfo->ui32CacheControl |= SGXMKIF_CC_INVAL_BIF_PD;
-	}
 #endif
 
 #if 1 || defined(FIX_HW_BRN_28889)
@@ -371,52 +341,6 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 	PVR_UNREFERENCED_PARAMETER(hDevMemContext);
 #endif
 
-#if defined(FIX_HW_BRN_31620)
-	if ((eCmdType != SGXMKIF_CMD_FLUSHPDCACHE) && (psDevInfo->ui32CacheControl & SGXMKIF_CC_INVAL_BIF_PD))
-	{
-		SGXMKIF_COMMAND		sPDECacheCommand = {0};
-		IMG_DEV_PHYADDR		sDevPAddr;
-
-		/* Put the kernel info in the top 1/2 of the data */
-		psMMUContext = psDevInfo->hKernelMMUContext;
-
-		psDeviceNode->pfnMMUGetPDPhysAddr(psMMUContext, &sDevPAddr);
-		sPDECacheCommand.ui32Data[0] = sDevPAddr.uiAddr | 1;
-		sPDECacheCommand.ui32Data[1] = ui32CacheMasks[0];
-		sPDECacheCommand.ui32Data[2] = ui32CacheMasks[1];
-
-		/* Put the apps memory context in the bottom half */
-		if (hDevMemContext)
-		{
-			BM_CONTEXT *psBMContext = (BM_CONTEXT *) hDevMemContext;
-
-			psMMUContext = psBMContext->psMMUContext;
-
-			psDeviceNode->pfnMMUGetPDPhysAddr(psMMUContext, &sDevPAddr);
-			/* Or in 1 to the lsb to show we have a valid context */
-			sPDECacheCommand.ui32Data[3] = sDevPAddr.uiAddr | 1;
-			sPDECacheCommand.ui32Data[4] = ui32CacheMasks[2];
-			sPDECacheCommand.ui32Data[5] = ui32CacheMasks[3];
-		}
-
-		/* Only do a kick if there is any update */
-		if (sPDECacheCommand.ui32Data[1] | sPDECacheCommand.ui32Data[2] | sPDECacheCommand.ui32Data[4] |
-			sPDECacheCommand.ui32Data[5])
-		{
-			eError = SGXScheduleCCBCommand(psDeviceNode,
-										   SGXMKIF_CMD_FLUSHPDCACHE,
-										   &sPDECacheCommand,
-										   ui32CallerID,
-										   ui32PDumpFlags,
-										   hDevMemContext,
-										   bLastInScene);
-			if (eError != PVRSRV_OK)
-			{
-				goto Exit;
-			}
-		}
-	}
-#endif
 #if defined(PDUMP)
 	/*
 	 *	For persistent processes, the HW kicks should not go into the
@@ -531,22 +455,6 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 	}
 #endif
 
-#if defined(FIX_HW_BRN_26620) && defined(SGX_FEATURE_SYSTEM_CACHE) && !defined(SGX_BYPASS_SYSTEM_CACHE)
-	/* Make sure the previous command has been read before send the next one */
-	eError = PollForValueKM (psKernelCCB->pui32ReadOffset,
-								*psKernelCCB->pui32WriteOffset,
-								0xFF,
-								MAX_HW_TIME_US,
-								MAX_HW_TIME_US/WAIT_TRY_COUNT,
-								IMG_FALSE);
-	if (eError != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR, "SGXScheduleCCBCommand: Timeout waiting for previous command to be read")) ;
-		eError = PVRSRV_ERROR_TIMEOUT;
-		goto Exit;
-	}
-#endif
-
 	/*
 		Increment the write offset
 	*/
@@ -556,17 +464,6 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 	if ((ui32CallerID != ISR_ID) && (bPDumpIsSuspended == IMG_FALSE) &&
 		(bPersistentProcess == IMG_FALSE) )
 	{
-	#if defined(FIX_HW_BRN_26620) && defined(SGX_FEATURE_SYSTEM_CACHE) && !defined(SGX_BYPASS_SYSTEM_CACHE)
-		PDUMPCOMMENTWITHFLAGS(ui32PDumpFlags, "Poll for previous Kernel CCB CMD to be read\r\n");
-		PDUMPMEMPOL(psKernelCCB->psCCBCtlMemInfo,
-					offsetof(PVRSRV_SGX_CCB_CTL, ui32ReadOffset),
-					(psKernelCCB->ui32CCBDumpWOff),
-					0xFF,
-					PDUMP_POLL_OPERATOR_EQUAL,
-					ui32PDumpFlags,
-					MAKEUNIQUETAG(psKernelCCB->psCCBCtlMemInfo));
-	#endif
-
 		if (PDumpIsCaptureFrameKM()
 		|| ((ui32PDumpFlags & PDUMP_FLAGS_CONTINUOUS) != 0))
 		{
@@ -589,11 +486,7 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 				 ui32PDumpFlags,
 				 MAKEUNIQUETAG(psDevInfo->psKernelCCBEventKickerMemInfo));
 		PDUMPCOMMENTWITHFLAGS(ui32PDumpFlags, "Kick the SGX microkernel\r\n");
-	#if defined(FIX_HW_BRN_26620) && defined(SGX_FEATURE_SYSTEM_CACHE) && !defined(SGX_BYPASS_SYSTEM_CACHE)
-		PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, SGX_MP_CORE_SELECT(EUR_CR_EVENT_KICK2, 0), EUR_CR_EVENT_KICK2_NOW_MASK, ui32PDumpFlags);
-	#else
 		PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, SGX_MP_CORE_SELECT(EUR_CR_EVENT_KICK, 0), EUR_CR_EVENT_KICK_NOW_MASK, ui32PDumpFlags);
-	#endif
 	}
 #endif
 
@@ -608,15 +501,9 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 
 	OSWriteMemoryBarrier();
 
-#if defined(FIX_HW_BRN_26620) && defined(SGX_FEATURE_SYSTEM_CACHE) && !defined(SGX_BYPASS_SYSTEM_CACHE)
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM,
-				SGX_MP_CORE_SELECT(EUR_CR_EVENT_KICK2, 0),
-				EUR_CR_EVENT_KICK2_NOW_MASK);
-#else
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM,
 				SGX_MP_CORE_SELECT(EUR_CR_EVENT_KICK, 0),
 				EUR_CR_EVENT_KICK_NOW_MASK);
-#endif
 
 	OSMemoryBarrier();
 

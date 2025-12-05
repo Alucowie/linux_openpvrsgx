@@ -145,20 +145,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	PPVRSRV_KERNEL_MEM_INFO		psKernelHWPerfCBMemInfo;		/*!< Meminfo for hardware performace circular buffer */
 	PPVRSRV_KERNEL_MEM_INFO		psKernelTASigBufferMemInfo;		/*!< Meminfo for TA signature buffer */
 	PPVRSRV_KERNEL_MEM_INFO		psKernel3DSigBufferMemInfo;		/*!< Meminfo for 3D signature buffer */
-#if defined(FIX_HW_BRN_29702)
-	PPVRSRV_KERNEL_MEM_INFO psKernelCFIMemInfo;	/*!< Meminfo for cfi */
-#endif
-#if defined(FIX_HW_BRN_29823)
-	PPVRSRV_KERNEL_MEM_INFO	psKernelDummyTermStreamMemInfo; /*!< Meminfo for dummy terminate stream */
-#endif
-#if defined(SGX_FEATURE_VDM_CONTEXT_SWITCH) && defined(FIX_HW_BRN_31559)
-	PPVRSRV_KERNEL_MEM_INFO	psKernelVDMSnapShotBufferMemInfo; /*!< Meminfo for dummy snapshot buffer */
-	PPVRSRV_KERNEL_MEM_INFO	psKernelVDMCtrlStreamBufferMemInfo; /*!< Meminfo for dummy control stream */
-#endif
-#if defined(SGX_FEATURE_VDM_CONTEXT_SWITCH) && \
-	defined(FIX_HW_BRN_33657) && defined(SUPPORT_SECURE_33657_FIX)
-	PPVRSRV_KERNEL_MEM_INFO	psKernelVDMStateUpdateBufferMemInfo; /*!< Meminfo for state update buffer */
-#endif
 #if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
 	PPVRSRV_KERNEL_MEM_INFO	psKernelEDMStatusBufferMemInfo; /*!< Meminfo for EDM status buffer */
 #endif
@@ -221,10 +207,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	/* TA/3D control */
 	PVRSRV_KERNEL_MEM_INFO			*psKernelSGXTA3DCtlMemInfo;
 
-#if defined(FIX_HW_BRN_31272) || defined(FIX_HW_BRN_31780) || defined(FIX_HW_BRN_33920)
-	PVRSRV_KERNEL_MEM_INFO			*psKernelSGXPTLAWriteBackMemInfo;
-#endif
-
 	IMG_UINT32				ui32Flags;
 
 	/* memory tiling range usage */
@@ -247,21 +229,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	PDUMP_MMU_ATTRIB sMMUAttrib;
 #endif
 	IMG_UINT32				asSGXDevData[SGX_MAX_DEV_DATA];
-
-#if defined(FIX_HW_BRN_31620)
-	/* Dummy page refs */
-	IMG_VOID			*pvBRN31620DummyPageCpuVAddr;
-	IMG_HANDLE			hBRN31620DummyPageOSMemHandle;
-	IMG_DEV_PHYADDR			sBRN31620DummyPageDevPAddr;
-
-	/* Dummy PT refs */
-	IMG_VOID			*pvBRN31620DummyPTCpuVAddr;
-	IMG_HANDLE			hBRN31620DummyPTOSMemHandle;
-	IMG_DEV_PHYADDR			sBRN31620DummyPTDevPAddr;
-
-	IMG_HANDLE			hKernelMMUContext;
-#endif
-
 } PVRSRV_SGXDEV_INFO;
 
 
@@ -353,9 +320,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_KM_
 	IMG_HANDLE	hKernelCCBEventKickerMemInfo;
 	IMG_HANDLE	hKernelSGXHostCtlMemInfo;
 	IMG_HANDLE	hKernelSGXTA3DCtlMemInfo;
-#if defined(FIX_HW_BRN_31272) || defined(FIX_HW_BRN_31780) || defined(FIX_HW_BRN_33920)
-	IMG_HANDLE	hKernelSGXPTLAWriteBackMemInfo;
-#endif
 	IMG_HANDLE	hKernelSGXMiscMemInfo;
 
 	IMG_UINT32	aui32HostKickAddr[SGXMKIF_CMD_MAX];
@@ -372,12 +336,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_KM_
 	IMG_HANDLE	hKernelTASigBufferMemInfo;
 	IMG_HANDLE	hKernel3DSigBufferMemInfo;
 
-#if defined(FIX_HW_BRN_29702)
-	IMG_HANDLE	hKernelCFIMemInfo;
-#endif
-#if defined(FIX_HW_BRN_29823)
-	IMG_HANDLE	hKernelDummyTermStreamMemInfo;
-#endif
 #if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
 	IMG_HANDLE	hKernelEDMStatusBufferMemInfo;
 #endif

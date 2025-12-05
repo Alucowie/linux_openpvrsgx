@@ -137,10 +137,6 @@ typedef struct _SGXMKIF_HOST_CTL_
 	IMG_UINT32				ui32PerfGroup;									/*!< Specifies the HW's active group */
 #endif /* SGX_FEATURE_EXTENDED_PERF_COUNTERS */
 
-#if defined(FIX_HW_BRN_31939)
-	IMG_UINT32				ui32BRN31939Mem;
-#endif
-
 	IMG_UINT32				ui32OpenCLDelayCount;			/* Counter to keep track OpenCL task completion time in units of regular task time out events */
 } SGXMKIF_HOST_CTL;
 
@@ -328,9 +324,7 @@ typedef struct _SGXMKIF_HWDEVICE_SYNC_LIST_
 #if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
 #define PVRSRV_USSE_MISCINFO_MEMREAD			0x4UL	/*!< If set, getmiscinfo ukernel func reads arbitrary device mem */
 #define PVRSRV_USSE_MISCINFO_MEMWRITE			0x8UL	/*!< If set, getmiscinfo ukernel func writes arbitrary device mem */
-#if !defined(SGX_FEATURE_MULTIPLE_MEM_CONTEXTS)
 #define PVRSRV_USSE_MISCINFO_MEMREAD_FAIL		0x1UL << 31	/* If set, ukernel was unable to read from the mem context */
-#endif
 #endif
 
 
@@ -350,12 +344,7 @@ typedef struct _SGXMKIF_HWDEVICE_SYNC_LIST_
 #define PVRSRV_CTXSUSPCMD_SUSPEND	0x1U
 #define PVRSRV_CTXSUSPCMD_RESUME	0x2U
 
-
-#if defined(SGX_FEATURE_MULTIPLE_MEM_CONTEXTS)
-#define SGX_BIF_DIR_LIST_INDEX_EDM	(SGX_FEATURE_BIF_NUM_DIRLISTS - 1)
-#else
 #define SGX_BIF_DIR_LIST_INDEX_EDM	(0)
-#endif
 
 /*!
  ******************************************************************************

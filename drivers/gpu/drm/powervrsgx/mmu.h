@@ -454,35 +454,6 @@ PVRSRV_ERROR MMU_UnmapExtSystemCacheRegs(PVRSRV_DEVICE_NODE *psDeviceNode);
 ******************************************************************************/
 IMG_BOOL MMU_IsHeapShared(MMU_HEAP* pMMU_Heap);
 
-#if defined(FIX_HW_BRN_31620)
-/*
-******************************************************************************
-	FUNCTION:   MMU_GetCacheFlushRange
-
-	PURPOSE:    Gets device physical address of the mmu context.
-
-	PARAMETERS: In:  pMMUContext - the mmu context
-	            Out:  pui32RangeMask - Bit mask showing which PD cache
-		          lines have changed
-	RETURNS:    None
-******************************************************************************/
-IMG_VOID MMU_GetCacheFlushRange(MMU_CONTEXT *pMMUContext, IMG_UINT32 *pui32RangeMask);
-
-/*
-******************************************************************************
-	FUNCTION:   MMU_GetPDPhysAddr
-
-	PURPOSE:    Gets device physical address of the mmu contexts PD.
-
-	PARAMETERS: In:  pMMUContext - the mmu context
-	            Out:  psDevPAddr - Address of PD
-	RETURNS:    None
-******************************************************************************/
-IMG_VOID MMU_GetPDPhysAddr(MMU_CONTEXT *pMMUContext, IMG_DEV_PHYADDR *psDevPAddr);
-
-#endif
-
-
 IMG_VOID MMU_CheckFaultAddr(PVRSRV_SGXDEV_INFO *psDevInfo, IMG_UINT32 ui32PDDevPAddr, IMG_UINT32 ui32RegVal);
 
 #if defined(PDUMP)
