@@ -78,11 +78,7 @@ typedef		enum	img_tag_TriStateSwitch
  * unused parameter in a function parameter list, eg `int unref__ var'. This
  * should only be used in GCC build environments, for example, in files that
  * compile only on Linux. Other files should use UNREFERENCED_PARAMETER */
-#ifdef __GNUC__
 #define unref__ __attribute__ ((unused))
-#else
-#define unref__
-#endif
 
 /*
 	Wide character definitions
@@ -117,11 +113,7 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
 
 #define IMG_CONST const
 
-#if defined(__GNUC__)
 #define IMG_FORMAT_PRINTF(x,y)		__attribute__((format(printf,x,y)))
-#else
-#define IMG_FORMAT_PRINTF(x,y)
-#endif
 
 /*
  * Cleanup request defines
