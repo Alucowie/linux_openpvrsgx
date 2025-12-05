@@ -310,7 +310,7 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 	}
 #endif
 
-#if defined(FIX_HW_BRN_28889)
+#if 1 || defined(FIX_HW_BRN_28889)
 	/*
 		If the data cache and bif cache need invalidating there has been a cleanup
 		request. Therefore, we need to send the invalidate seperately and wait

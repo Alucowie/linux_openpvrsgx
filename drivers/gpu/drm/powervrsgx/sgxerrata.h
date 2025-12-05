@@ -56,8 +56,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		#define SGX_CORE_REV	SGX_CORE_REV_HEAD
 	#endif
 
-		#define FIX_HW_BRN_22934/* Workaround in sgx featuredefs */
-		#define FIX_HW_BRN_28889/* Workaround in services (srvkm) */
+		//#define FIX_HW_BRN_22934/* Workaround in sgx featuredefs */
+		//#define FIX_HW_BRN_28889/* Workaround in services (srvkm) */
 	/* signal that the Core Version has a valid definition */
 	#define SGX_CORE_DEFINED
 //#endif

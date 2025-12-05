@@ -110,7 +110,7 @@ typedef struct _SGXMKIF_HOST_CTL_
 	volatile IMG_UINT32		ui32InitStatus;				/*!< Microkernel Initialisation status */
 	volatile IMG_UINT32		ui32PowerStatus;			/*!< Microkernel Power Management status */
 	volatile IMG_UINT32		ui32CleanupStatus;			/*!< Microkernel Resource Management status */
-#if defined(FIX_HW_BRN_28889)
+#if 1 || defined(FIX_HW_BRN_28889)
 	volatile IMG_UINT32		ui32InvalStatus;			/*!< Microkernel BIF Cache Invalidate status */
 #endif
 	IMG_UINT32				ui32uKernelDetectedLockups;	/*!< counter relating to the number of lockups the uKernel has detected */
@@ -310,7 +310,7 @@ typedef struct _SGXMKIF_HWDEVICE_SYNC_LIST_
 #define PVRSRV_USSE_EDM_CLEANUPCMD_BUSY		 	(1UL << 1)	/*!< Signal from EDM->Host indicating clean-up is blocked as the resource is busy */
 #define PVRSRV_USSE_EDM_CLEANUPCMD_DONE		 	(1UL << 2)	/*!< Signal from EDM->Host indicating clean-up has been done */
 
-#if defined(FIX_HW_BRN_28889)
+#if 1 || defined(FIX_HW_BRN_28889)
 /*!
  *****************************************************************************
  * EDM BIF Cache Invalidate defines

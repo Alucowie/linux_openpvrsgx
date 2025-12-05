@@ -587,7 +587,7 @@ PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 						  "Initialise the microkernel\n");
 #endif /* PDUMP */
 
-#if defined(SGX_FEATURE_MULTI_EVENT_KICK)
+#if 0 && defined(SGX_FEATURE_MULTI_EVENT_KICK)
 	OSWriteMemoryBarrier();
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM,
 				 SGX_MP_CORE_SELECT(EUR_CR_EVENT_KICK2, 0),
@@ -608,7 +608,7 @@ PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	*/
 	if (!bPDumpIsSuspended)
 	{
-#if defined(SGX_FEATURE_MULTI_EVENT_KICK)
+#if 0 && defined(SGX_FEATURE_MULTI_EVENT_KICK)
 		PDUMPREG(SGX_PDUMPREG_NAME, SGX_MP_CORE_SELECT(EUR_CR_EVENT_KICK2, 0), EUR_CR_EVENT_KICK2_NOW_MASK);
 #else
 		psDevInfo->ui32KernelCCBEventKickerDumpVal = 1;
