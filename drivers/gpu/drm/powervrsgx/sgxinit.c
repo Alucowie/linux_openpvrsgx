@@ -2488,18 +2488,7 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			}
 
 			/* Copy the new group selector(s) to the host ctl for the ukernel */
-			#if defined(SGX_FEATURE_EXTENDED_PERF_COUNTERS)
-			OSMemCopy(&psDevInfo->psSGXHostCtl->aui32PerfGroup[0],
-					  &psSetHWPerfStatus->aui32PerfGroup[0],
-					  sizeof(psDevInfo->psSGXHostCtl->aui32PerfGroup));
-			OSMemCopy(&psDevInfo->psSGXHostCtl->aui32PerfBit[0],
-					  &psSetHWPerfStatus->aui32PerfBit[0],
-					  sizeof(psDevInfo->psSGXHostCtl->aui32PerfBit));
-			psDevInfo->psSGXHostCtl->ui32PerfCounterBitSelect = psSetHWPerfStatus->ui32PerfCounterBitSelect;
-			psDevInfo->psSGXHostCtl->ui32PerfSumMux = psSetHWPerfStatus->ui32PerfSumMux;
-			#else
 			psDevInfo->psSGXHostCtl->ui32PerfGroup = psSetHWPerfStatus->ui32PerfGroup;
-			#endif /* SGX_FEATURE_EXTENDED_PERF_COUNTERS */
 
 			/* Kick the ukernel to update the hardware state */
 			sCommandData.ui32Data[0] = psSetHWPerfStatus->ui32NewHWPerfStatus;

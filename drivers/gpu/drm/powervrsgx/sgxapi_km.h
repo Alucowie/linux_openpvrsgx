@@ -103,14 +103,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define SGX_MAX_DST_SYNCS_TQ				1
 #endif
 
-
-#if defined(SGX_FEATURE_EXTENDED_PERF_COUNTERS)
-#define	PVRSRV_SGX_HWPERF_NUM_COUNTERS	8
-#define	PVRSRV_SGX_HWPERF_NUM_MISC_COUNTERS 11
-#else
 #define	PVRSRV_SGX_HWPERF_NUM_COUNTERS	9
 #define	PVRSRV_SGX_HWPERF_NUM_MISC_COUNTERS 8
-#endif /* SGX543 */
 
 #define PVRSRV_SGX_HWPERF_INVALID					0x1
 
@@ -294,20 +288,9 @@ typedef struct _PVRSRV_SGX_MISCINFO_SET_HWPERF_STATUS
 {
 	/* See PVRSRV_SGX_HWPERF_STATUS_* */
 	IMG_UINT32	ui32NewHWPerfStatus;
-	
-	#if defined(SGX_FEATURE_EXTENDED_PERF_COUNTERS)
-	/* Specifies the HW's active group selectors */
-	IMG_UINT32	aui32PerfGroup[PVRSRV_SGX_HWPERF_NUM_COUNTERS];
-	/* Specifies the HW's active bit selectors */
-	IMG_UINT32	aui32PerfBit[PVRSRV_SGX_HWPERF_NUM_COUNTERS];
-	/* Specifies the HW's counter bit selectors */
-	IMG_UINT32	ui32PerfCounterBitSelect;
-	/* Specifies the HW's sum_mux selectors */
-	IMG_UINT32	ui32PerfSumMux;
-	#else
+
 	/* Specifies the HW's active group */
 	IMG_UINT32	ui32PerfGroup;
-	#endif /* SGX_FEATURE_EXTENDED_PERF_COUNTERS */
 } PVRSRV_SGX_MISCINFO_SET_HWPERF_STATUS;
 
 

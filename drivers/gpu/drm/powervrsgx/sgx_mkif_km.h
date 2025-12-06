@@ -119,14 +119,7 @@ typedef struct _SGXMKIF_HOST_CTL_
 	IMG_UINT32				ui32HostClock;				/*!< Host clock value at microkernel power-up time */
 	IMG_UINT32				ui32AssertFail;				/*!< Microkernel assert failure code */
 
-#if defined(SGX_FEATURE_EXTENDED_PERF_COUNTERS)
-	IMG_UINT32				aui32PerfGroup[PVRSRV_SGX_HWPERF_NUM_COUNTERS];	/*!< Specifies the HW's active group selectors */
-	IMG_UINT32				aui32PerfBit[PVRSRV_SGX_HWPERF_NUM_COUNTERS];	/*!< Specifies the HW's active bit selectors */
-	IMG_UINT32				ui32PerfCounterBitSelect;						/*!< Specifies the HW's counter bit selectors */
-	IMG_UINT32				ui32PerfSumMux;									/*!< Specifies the HW's sum_mux selectors */
-#else
 	IMG_UINT32				ui32PerfGroup;									/*!< Specifies the HW's active group */
-#endif /* SGX_FEATURE_EXTENDED_PERF_COUNTERS */
 
 	IMG_UINT32				ui32OpenCLDelayCount;			/* Counter to keep track OpenCL task completion time in units of regular task time out events */
 } SGXMKIF_HOST_CTL;
