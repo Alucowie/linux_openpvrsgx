@@ -787,25 +787,6 @@ PVRSRV_ERROR DevInitSGXPart2KM (PVRSRV_PER_PROCESS_DATA *psPerProc,
 	psDevInfo->sRegsPhysBase = psSGXDeviceMap->sRegsSysPBase;
 
 
-#if defined(SGX_FEATURE_HOST_PORT)
-	if (psSGXDeviceMap->ui32Flags & SGX_HOSTPORT_PRESENT)
-	{
-		/* Map Host Port */
-		psDevInfo->pvHostPortBaseKM = OSMapPhysToLin(psSGXDeviceMap->sHPCpuPBase,
-									  	           psSGXDeviceMap->ui32HPSize,
-									  	           PVRSRV_HAP_KERNEL_ONLY|PVRSRV_HAP_UNCACHED,
-									  	           IMG_NULL);
-		if (!psDevInfo->pvHostPortBaseKM)
-		{
-			PVR_DPF((PVR_DBG_ERROR,"DevInitSGXPart2KM: Failed to map in host port\n"));
-			return PVRSRV_ERROR_BAD_MAPPING;
-		}
-		psDevInfo->ui32HPSize = psSGXDeviceMap->ui32HPSize;
-		psDevInfo->sHPSysPAddr = psSGXDeviceMap->sHPSysPBase;
-	}
-#endif/* #ifdef SGX_FEATURE_HOST_PORT */
-
-
 	/* Set up ISR callback information. */
 	psDeviceNode->pvISRData = psDeviceNode;
 	/* ISR handler address was set up earlier */
@@ -964,21 +945,6 @@ static PVRSRV_ERROR DevDeInitSGX (IMG_VOID *pvDeviceNode)
 							 IMG_NULL);
 		}
 	}
-
-#if defined(SGX_FEATURE_HOST_PORT)
-	if (psSGXDeviceMap->ui32Flags & SGX_HOSTPORT_PRESENT)
-	{
-		/* unMap Host Port */
-		if (psDevInfo->pvHostPortBaseKM != IMG_NULL)
-		{
-			OSUnMapPhysToLin(psDevInfo->pvHostPortBaseKM,
-						   psDevInfo->ui32HPSize,
-						   PVRSRV_HAP_KERNEL_ONLY|PVRSRV_HAP_UNCACHED,
-						   IMG_NULL);
-		}
-	}
-#endif /* #ifdef SGX_FEATURE_HOST_PORT */
-
 
 	/* DeAllocate devinfo */
 	OSFreeMem(PVRSRV_OS_NON_PAGEABLE_HEAP,

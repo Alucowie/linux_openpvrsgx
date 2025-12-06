@@ -84,15 +84,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	/* Kernel mode linear address of device registers */
 	IMG_PVOID				pvRegsBaseKM;
 
-#if defined(SGX_FEATURE_HOST_PORT)
-	/* Kernel mode linear address of host port */
-	IMG_PVOID				pvHostPortBaseKM;
-	/* HP size */
-	IMG_UINT32				ui32HPSize;
-	/* HP syspaddr */
-	IMG_SYS_PHYADDR			sHPSysPAddr;
-#endif
-
 	/* FIXME: The alloc for this should go through OSAllocMem in future */
 	IMG_HANDLE				hRegMapping;
 
@@ -236,12 +227,6 @@ typedef struct _SGX_DEVICE_MAP_
 	IMG_CPU_PHYADDR			sRegsCpuPBase;
 	IMG_CPU_VIRTADDR		pvRegsCpuVBase;
 	IMG_UINT32				ui32RegsSize;
-
-#if defined(SGX_FEATURE_HOST_PORT)
-	IMG_SYS_PHYADDR			sHPSysPBase;
-	IMG_CPU_PHYADDR			sHPCpuPBase;
-	IMG_UINT32				ui32HPSize;
-#endif
 
 	/* Local Device Memory Region: (if present) */
 	IMG_SYS_PHYADDR			sLocalMemSysPBase;
