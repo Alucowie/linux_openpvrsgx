@@ -2256,9 +2256,7 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	/* Reset the misc info state flags */
 	*pui32MiscInfoFlags = 0;
 
-#if !defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
 	PVR_UNREFERENCED_PARAMETER(hDevMemContext);
-#endif
 
 	switch(psMiscInfo->eRequest)
 	{
@@ -2348,79 +2346,6 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			psMiscInfo->uData.sSGXFeatures = *psSGXFeatures;
 			return PVRSRV_OK;
 		}
-
-#if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
-		case SGX_MISC_INFO_REQUEST_MEMREAD:
-		case SGX_MISC_INFO_REQUEST_MEMCOPY:
-		{
-			PVRSRV_ERROR eError;
-			PVRSRV_SGX_MISCINFO_FEATURES		*psSGXFeatures;
-			PVRSRV_SGX_MISCINFO_MEMACCESS		*psSGXMemSrc;	/* user-defined mem read */
-			PVRSRV_SGX_MISCINFO_MEMACCESS		*psSGXMemDest;	/* user-defined mem write */
-
-			{				
-				/* Set the mem read flag; src is user-defined */
-				*pui32MiscInfoFlags |= PVRSRV_USSE_MISCINFO_MEMREAD;
-				psSGXMemSrc = &((PVRSRV_SGX_MISCINFO_INFO*)(psMemInfo->pvLinAddrKM))->sSGXMemAccessSrc;
-
-				if(psMiscInfo->sDevVAddrSrc.uiAddr != 0)
-				{
-					psSGXMemSrc->sDevVAddr = psMiscInfo->sDevVAddrSrc; /* src address */
-				}
-				else
-				{
-					return PVRSRV_ERROR_INVALID_PARAMS;
-				}				
-			}
-
-			if( psMiscInfo->eRequest == SGX_MISC_INFO_REQUEST_MEMCOPY)
-			{				
-				/* Set the mem write flag; dest is user-defined */
-				*pui32MiscInfoFlags |= PVRSRV_USSE_MISCINFO_MEMWRITE;
-				psSGXMemDest = &((PVRSRV_SGX_MISCINFO_INFO*)(psMemInfo->pvLinAddrKM))->sSGXMemAccessDest;
-				
-				if(psMiscInfo->sDevVAddrDest.uiAddr != 0)
-				{
-					psSGXMemDest->sDevVAddr = psMiscInfo->sDevVAddrDest; /* dest address */
-				}
-				else
-				{
-					return PVRSRV_ERROR_INVALID_PARAMS;
-				}
-			}
-
-			/* Get physical address of PD for memory read (may need to switch context in microkernel) */
-			if(psMiscInfo->hDevMemContext != IMG_NULL)
-			{
-				SGXGetMMUPDAddrKM( (IMG_HANDLE)psDeviceNode, hDevMemContext, &psSGXMemSrc->sPDDevPAddr);
-				
-				/* Single app will always use the same src and dest mem context */
-				psSGXMemDest->sPDDevPAddr = psSGXMemSrc->sPDDevPAddr;
-			}
-			else
-			{
-				return PVRSRV_ERROR_INVALID_PARAMS;
-			}
-
-			/* Submit the task to the ukernel */
-			eError = SGXGetMiscInfoUkernel(psDevInfo, psDeviceNode);
-			if(eError != PVRSRV_OK)
-			{
-				PVR_DPF((PVR_DBG_ERROR, "An error occurred in SGXGetMiscInfoUkernel: %d\n",
-						eError));
-				return eError;
-			}
-			psSGXFeatures = &((PVRSRV_SGX_MISCINFO_INFO*)(psMemInfo->pvLinAddrKM))->sSGXFeatures;
-
-			if(*pui32MiscInfoFlags & PVRSRV_USSE_MISCINFO_MEMREAD_FAIL)
-			{
-				return PVRSRV_ERROR_INVALID_MISCINFO;
-			}
-			/* Copy SGX features into misc info struct, to return to client */
-			psMiscInfo->uData.sSGXFeatures = *psSGXFeatures;
-			return PVRSRV_OK;
-		}
-#endif /* SUPPORT_SGX_EDM_MEMORY_DEBUG */
 
 		case SGX_MISC_INFO_REQUEST_SET_HWPERF_STATUS:
 		{

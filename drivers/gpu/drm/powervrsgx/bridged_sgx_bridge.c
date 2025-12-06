@@ -686,21 +686,6 @@ SGXGetMiscInfoBW(IMG_UINT32 ui32BridgeID,
 		return 0;
 	}
 
-#if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
-	/* Lookup handle for dev mem context */
-	if (psSGXGetMiscInfoIN->psMiscInfo->eRequest == SGX_MISC_INFO_REQUEST_MEMREAD)
-	{
-		psRetOUT->eError = PVRSRVLookupHandle(psPerProc->psHandleBase,
-								&hDevMemContextInt,
-								psSGXGetMiscInfoIN->psMiscInfo->hDevMemContext,
-								PVRSRV_HANDLE_TYPE_DEV_MEM_CONTEXT);
-
-		if(psRetOUT->eError != PVRSRV_OK)
-		{
-			return 0;
-		}
-	}
-#endif
 	/* device node is required for scheduling a CCB command */
 	psDeviceNode = hDevCookieInt;
 	PVR_ASSERT(psDeviceNode != IMG_NULL);

@@ -211,10 +211,6 @@ typedef enum _SGX_MISC_INFO_REQUEST_
 	SGX_MISC_INFO_REQUEST_CLOCKSPEED = 0,
 	SGX_MISC_INFO_REQUEST_SGXREV,
 	SGX_MISC_INFO_REQUEST_DRIVER_SGXREV,
-#if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
-	SGX_MISC_INFO_REQUEST_MEMREAD,
-	SGX_MISC_INFO_REQUEST_MEMCOPY,
-#endif /* SUPPORT_SGX_EDM_MEMORY_DEBUG */
 	SGX_MISC_INFO_REQUEST_SET_HWPERF_STATUS,
 	SGX_MISC_INFO_DUMP_DEBUG_INFO,
 	SGX_MISC_INFO_DUMP_DEBUG_INFO_FORCE_REGS,
@@ -240,9 +236,6 @@ typedef struct _PVRSRV_SGX_MISCINFO_FEATURES
 	IMG_UINT32			ui32CoreIdSW;	/*!< software core version (ID), e.g. SGX535, SGX540 */
 	IMG_UINT32			ui32CoreRevSW;	/*!< software core revision */
 	IMG_UINT32			ui32BuildOptions;	/*!< build options bit-field */
-#if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
-	IMG_UINT32			ui32DeviceMemValue;		/*!< device mem value read from ukernel */
-#endif
 #if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
 	IMG_DEV_VIRTADDR	sDevVAEDMStatusBuffer;	/*!< DevVAddr of the EDM status buffer */
 	IMG_PVOID			pvEDMStatusBuffer;		/*!< CPUVAddr of the EDM status buffer */
@@ -302,11 +295,6 @@ typedef struct _SGX_MISC_INFO_
 {
 	SGX_MISC_INFO_REQUEST	eRequest;	/*!< Command request to SGXGetMiscInfo() */
 	IMG_UINT32				ui32Padding;
-#if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
-	IMG_DEV_VIRTADDR			sDevVAddrSrc;		/*!< dev virtual addr for mem read */
-	IMG_DEV_VIRTADDR			sDevVAddrDest;		/*!< dev virtual addr for mem write */
-	IMG_HANDLE					hDevMemContext;		/*!< device memory context for mem debug */
-#endif
 	union
 	{
 		IMG_UINT32	reserved;	/*!< Unused: ensures valid code in the case everything else is compiled out */

@@ -284,11 +284,6 @@ typedef struct _SGXMKIF_HWDEVICE_SYNC_LIST_
  */
 #define PVRSRV_USSE_MISCINFO_READY		0x1UL
 #define PVRSRV_USSE_MISCINFO_GET_STRUCT_SIZES	0x2UL	/*!< If set, getmiscinfo ukernel func returns structure sizes */
-#if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
-#define PVRSRV_USSE_MISCINFO_MEMREAD			0x4UL	/*!< If set, getmiscinfo ukernel func reads arbitrary device mem */
-#define PVRSRV_USSE_MISCINFO_MEMWRITE			0x8UL	/*!< If set, getmiscinfo ukernel func writes arbitrary device mem */
-#define PVRSRV_USSE_MISCINFO_MEMREAD_FAIL		0x1UL << 31	/* If set, ukernel was unable to read from the mem context */
-#endif
 
 
 /* Cleanup command control word */
@@ -341,19 +336,6 @@ typedef struct _SGX_MISCINFO_STRUCT_SIZES_
 } SGX_MISCINFO_STRUCT_SIZES;
 
 
-#if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
-/*!
- *****************************************************************************
- * SGX misc info for accessing device memory from ukernel
- *****************************************************************************
- */
-typedef struct _PVRSRV_SGX_MISCINFO_MEMACCESS
-{
-	IMG_DEV_VIRTADDR	sDevVAddr;		/*!< dev virtual addr for mem access */
-	IMG_DEV_PHYADDR		sPDDevPAddr;	/*!< device physical addr of PD for the mem heap */
-} PVRSRV_SGX_MISCINFO_MEMACCESS;
-#endif
-
 /*!
  *****************************************************************************
  * SGX Misc Info structure used in the microkernel
@@ -364,10 +346,6 @@ typedef struct _PVRSRV_SGX_MISCINFO_INFO
 	IMG_UINT32						ui32MiscInfoFlags;
 	PVRSRV_SGX_MISCINFO_FEATURES	sSGXFeatures;		/*!< external info for client */
 	SGX_MISCINFO_STRUCT_SIZES		sSGXStructSizes;	/*!< internal info: microkernel structure sizes */
-#if defined(SUPPORT_SGX_EDM_MEMORY_DEBUG)
-	PVRSRV_SGX_MISCINFO_MEMACCESS	sSGXMemAccessSrc;	/*!< internal info: for reading dev memory */
-	PVRSRV_SGX_MISCINFO_MEMACCESS	sSGXMemAccessDest;	/*!< internal info: for writing dev memory */
-#endif
 } PVRSRV_SGX_MISCINFO_INFO;
 
 #ifdef PVRSRV_USSE_EDM_STATUS_DEBUG
