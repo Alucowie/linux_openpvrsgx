@@ -443,15 +443,6 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	*/
 	SGXResetSetupBIFContexts(psDevInfo);
 
-#if defined(SGX_FEATURE_2D_HARDWARE) && !defined(SGX_FEATURE_PTLA)
-	/* check that the heap base has the right alignment (1Mb) */
-	#if ((SGX_2D_HEAP_BASE & ~EUR_CR_BIF_TWOD_REQ_BASE_ADDR_MASK) != 0)
-		#error "SGXReset: SGX_2D_HEAP_BASE doesn't match EUR_CR_BIF_TWOD_REQ_BASE_ADDR_MASK alignment"
-	#endif
-	/* Set up 2D requestor base */
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_TWOD_REQ_BASE, SGX_2D_HEAP_BASE);
-#endif
-
 	/* Invalidate BIF Directory cache. */
 	SGXResetInvalDC(psDevInfo);
 

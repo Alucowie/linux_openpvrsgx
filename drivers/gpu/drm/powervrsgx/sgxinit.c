@@ -1912,23 +1912,6 @@ PVRSRV_ERROR SGXRegisterDevice (PVRSRV_DEVICE_NODE *psDeviceNode)
 #endif /* #if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP) */
 
 
-#if defined(SGX_FEATURE_2D_HARDWARE)
-	/************* 2D HW Heap ***************/
-	psDeviceMemoryHeap->ui32HeapID = HEAP_ID( PVRSRV_DEVICE_TYPE_SGX, SGX_2D_HEAP_ID);
-	psDeviceMemoryHeap->sDevVAddrBase.uiAddr = SGX_2D_HEAP_BASE;
-	psDeviceMemoryHeap->ui32HeapSize = SGX_2D_HEAP_SIZE;
-	psDeviceMemoryHeap->ui32Attribs = PVRSRV_HAP_WRITECOMBINE
-														| PVRSRV_MEM_RAM_BACKED_ALLOCATION
-														| PVRSRV_HAP_SINGLE_PROCESS;
-	psDeviceMemoryHeap->pszName = "2D";
-	psDeviceMemoryHeap->pszBSName = "2D BS";
-	psDeviceMemoryHeap->DevMemHeapType = DEVICE_MEMORY_HEAP_SHARED_EXPORTED;
-	/* set the default (4k). System can override these as required */
-	psDeviceMemoryHeap->ui32DataPageSize = SGX_MMU_PAGE_SIZE;
-	psDeviceMemoryHeap++;/* advance to the next heap */
-#endif /* #if defined(SGX_FEATURE_2D_HARDWARE) */
-
-
 	/* set the heap count */
 	psDevMemoryInfo->ui32HeapCount = (IMG_UINT32)(psDeviceMemoryHeap - psDevMemoryInfo->psDeviceMemoryHeap);
 
@@ -2171,10 +2154,6 @@ PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode)
 
 	CHECK_SIZE(HOST_CTL);
 	CHECK_SIZE(COMMAND);
-#if defined(SGX_FEATURE_2D_HARDWARE)
-	CHECK_SIZE(2DCMD);
-	CHECK_SIZE(2DCMD_SHARED);
-#endif
 	CHECK_SIZE(CMDTA);
 	CHECK_SIZE(CMDTA_SHARED);
 	CHECK_SIZE(TRANSFERCMD);

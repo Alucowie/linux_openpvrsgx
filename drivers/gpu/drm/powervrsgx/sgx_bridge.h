@@ -76,11 +76,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define PVRSRV_BRIDGE_SGX_REGISTER_HW_RENDER_CONTEXT	PVRSRV_IOWR(PVRSRV_BRIDGE_SGX_CMD_BASE+20)
 #define PVRSRV_BRIDGE_SGX_FLUSH_HW_RENDER_TARGET	PVRSRV_IOWR(PVRSRV_BRIDGE_SGX_CMD_BASE+21)
 #define PVRSRV_BRIDGE_SGX_UNREGISTER_HW_RENDER_CONTEXT	PVRSRV_IOWR(PVRSRV_BRIDGE_SGX_CMD_BASE+22)
-#if defined(SGX_FEATURE_2D_HARDWARE)
-#define PVRSRV_BRIDGE_SGX_SUBMIT2D					PVRSRV_IOWR(PVRSRV_BRIDGE_SGX_CMD_BASE+23)
-#define PVRSRV_BRIDGE_SGX_REGISTER_HW_2D_CONTEXT	PVRSRV_IOWR(PVRSRV_BRIDGE_SGX_CMD_BASE+24)
-#define PVRSRV_BRIDGE_SGX_UNREGISTER_HW_2D_CONTEXT	PVRSRV_IOWR(PVRSRV_BRIDGE_SGX_CMD_BASE+25)
-#endif
 #define PVRSRV_BRIDGE_SGX_REGISTER_HW_TRANSFER_CONTEXT	PVRSRV_IOWR(PVRSRV_BRIDGE_SGX_CMD_BASE+26)
 #define PVRSRV_BRIDGE_SGX_UNREGISTER_HW_TRANSFER_CONTEXT	PVRSRV_IOWR(PVRSRV_BRIDGE_SGX_CMD_BASE+27)
 
@@ -241,19 +236,6 @@ typedef struct PVRSRV_BRIDGE_IN_SUBMITTRANSFER_TAG
 	IMG_HANDLE				hDevCookie;
 	PVRSRV_TRANSFER_SGX_KICK 			sKick;
 }PVRSRV_BRIDGE_IN_SUBMITTRANSFER;
-
-#if defined(SGX_FEATURE_2D_HARDWARE)
-/*!
- *****************************************************************************
- *	`bridge in' Submit2D
- *****************************************************************************/ 
-typedef struct PVRSRV_BRIDGE_IN_SUBMIT2D_TAG
-{
-	IMG_UINT32				ui32BridgeFlags; /* Must be first member of structure */
-	IMG_HANDLE				hDevCookie;
-	PVRSRV_2D_SGX_KICK 		sKick;
-} PVRSRV_BRIDGE_IN_SUBMIT2D;
-#endif
 
 /*!
  *****************************************************************************
@@ -455,39 +437,6 @@ typedef struct PVRSRV_BRIDGE_IN_SGX_FLUSH_HW_RENDER_TARGET_TAG
 	IMG_HANDLE hDevCookie;
 	IMG_DEV_VIRTADDR sHWRTDataSetDevVAddr;
 }PVRSRV_BRIDGE_IN_SGX_FLUSH_HW_RENDER_TARGET;
-
-/*!
- *****************************************************************************
- *	SGX 2D specific defines
- *****************************************************************************/ 
-#if defined(SGX_FEATURE_2D_HARDWARE)
-typedef struct PVRSRV_BRIDGE_IN_SGX_REGISTER_HW_2D_CONTEXT_TAG
-{
-	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
-	IMG_HANDLE hDevCookie;
-    IMG_CPU_VIRTADDR pHW2DContextCpuVAddr;
-    IMG_UINT32       ui32HW2DContextSize;
-    IMG_UINT32       ui32OffsetToPDDevPAddr;
-    IMG_HANDLE       hDevMemContext;
-}PVRSRV_BRIDGE_IN_SGX_REGISTER_HW_2D_CONTEXT;
-
-typedef struct PVRSRV_BRIDGE_OUT_SGX_REGISTER_HW_2D_CONTEXT_TAG
-{
-	PVRSRV_ERROR eError;
-	IMG_HANDLE hHW2DContext;
-    IMG_DEV_VIRTADDR sHW2DContextDevVAddr;
-}PVRSRV_BRIDGE_OUT_SGX_REGISTER_HW_2D_CONTEXT;
-
-typedef struct PVRSRV_BRIDGE_IN_SGX_UNREGISTER_HW_2D_CONTEXT_TAG
-{
-	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
-	IMG_BOOL   bForceCleanup;
-	IMG_HANDLE hDevCookie;
-	IMG_HANDLE hHW2DContext;
-}PVRSRV_BRIDGE_IN_SGX_UNREGISTER_HW_2D_CONTEXT;
-
-#define	SGX2D_MAX_BLT_CMD_SIZ		256	/* Maximum size of a blit command, in bytes */
-#endif /* SGX_FEATURE_2D_HARDWARE */
 
 
 /*!

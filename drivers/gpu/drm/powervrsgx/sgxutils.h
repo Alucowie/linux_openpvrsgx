@@ -122,20 +122,6 @@ PVRSRV_ERROR SGXSetTransferContextPriorityKM(IMG_HANDLE       hDeviceNode,
                                              IMG_UINT32       ui32Priority,
                                              IMG_UINT32       ui32OffsetOfPriorityField);
 
-#if defined(SGX_FEATURE_2D_HARDWARE)
-IMG_IMPORT
-IMG_HANDLE SGXRegisterHW2DContextKM(IMG_HANDLE				psDeviceNode,
-                                    IMG_CPU_VIRTADDR        *psHW2DContextCpuVAddr,
-                                    IMG_UINT32              ui32HW2DContextSize,
-                                    IMG_UINT32              ui32OffsetToPDDevPAddr,
-                                    IMG_HANDLE              hDevMemContext,
-                                    IMG_DEV_VIRTADDR        *psHW2DContextDevVAddr,
-									PVRSRV_PER_PROCESS_DATA *psPerProc);
-
-IMG_IMPORT
-PVRSRV_ERROR SGXUnregisterHW2DContextKM(IMG_HANDLE hHW2DContext, IMG_BOOL bForceCleanup);
-#endif
-
 IMG_UINT32 SGXConvertTimeStamp(PVRSRV_SGXDEV_INFO	*psDevInfo,
 							   IMG_UINT32			ui32TimeWraps,
 							   IMG_UINT32			ui32Time);

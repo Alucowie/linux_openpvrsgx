@@ -409,30 +409,6 @@ typedef struct _PVRSRV_TRANSFER_SGX_KICK_KM_
 	IMG_UINT32		ui32PDumpFlags;
 } PVRSRV_TRANSFER_SGX_KICK_KM, *PPVRSRV_TRANSFER_SGX_KICK_KM;
 
-#if defined(SGX_FEATURE_2D_HARDWARE)
-typedef struct _PVRSRV_2D_SGX_KICK_KM_
-{
-	IMG_HANDLE		hCCBMemInfo;
-	IMG_UINT32		ui32SharedCmdCCBOffset;
-
-	IMG_DEV_VIRTADDR 	sHW2DContextDevVAddr;
-
-	IMG_UINT32		ui32NumSrcSync;
-	IMG_HANDLE		ahSrcSyncInfo[SGX_MAX_2D_SRC_SYNC_OPS];
-
-	/* need to be able to check reads and writes on dest, and update writes */
-	IMG_HANDLE 		hDstSyncInfo;
-
-	/* need to be able to check reads and writes on TA ops, and update writes */
-	IMG_HANDLE		hTASyncInfo;
-
-	/* need to be able to check reads and writes on 2D ops, and update writes */
-	IMG_HANDLE		h3DSyncInfo;
-
-	IMG_UINT32		ui32PDumpFlags;
-} PVRSRV_2D_SGX_KICK_KM, *PPVRSRV_2D_SGX_KICK_KM;
-#endif	/* defined(SGX_FEATURE_2D_HARDWARE) */
-
 /****************************************************************************/
 /* kernel only functions prototypes 										*/
 /****************************************************************************/

@@ -57,11 +57,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 #if SGX_FEATURE_ADDRESS_SPACE_SIZE == 32
-	#if defined(SGX_FEATURE_2D_HARDWARE)
-	#define SGX_2D_HEAP_BASE					 0x00100000
-	#define SGX_2D_HEAP_SIZE					(0x08000000-0x00100000-0x00001000)
-	#endif
-
 	#if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
 	#define SGX_GENERAL_MAPPING_HEAP_BASE		 0x08000000
 	#define SGX_GENERAL_MAPPING_HEAP_SIZE		(0x08000000-0x00001000)
@@ -270,17 +265,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*********************************************************************************
  *
- * The General Mapping heap must be within the 2D requestor range of the 2D heap base
- *
- ********************************************************************************/
-#if defined(SGX_FEATURE_2D_HARDWARE) && defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
-	#if ((SGX_GENERAL_MAPPING_HEAP_BASE + SGX_GENERAL_MAPPING_HEAP_SIZE - SGX_2D_HEAP_BASE) >= EUR_CR_BIF_TWOD_REQ_BASE_ADDR_MASK)
-		#error "sgxconfig.h: ERROR: SGX_GENERAL_MAPPING_HEAP inaccessable by 2D requestor"
-	#endif
-#endif
-
-/*********************************************************************************
- *
  * The kernel code heap base must be aligned to a USSE code page
  *
  ********************************************************************************/
@@ -295,18 +279,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * Heap overlap check
  *
  ********************************************************************************/
-#if defined(SGX_FEATURE_2D_HARDWARE)
-	#if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
-		#if ((SGX_2D_HEAP_BASE + SGX_2D_HEAP_SIZE) >= SGX_GENERAL_MAPPING_HEAP_BASE)
-			#error "sgxconfig.h: ERROR: SGX_2D_HEAP overlaps SGX_GENERAL_MAPPING_HEAP"
-		#endif
-	#else
-		#if ((SGX_2D_HEAP_BASE + SGX_2D_HEAP_SIZE) >= SGX_GENERAL_HEAP_BASE)
-			#error "sgxconfig.h: ERROR: SGX_2D_HEAP overlaps SGX_GENERAL_HEAP_BASE"
-		#endif
-	#endif
-#endif
-
 #if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
 	#if ((SGX_GENERAL_MAPPING_HEAP_BASE + SGX_GENERAL_MAPPING_HEAP_SIZE) >= SGX_GENERAL_HEAP_BASE)
 		#error "sgxconfig.h: ERROR: SGX_GENERAL_MAPPING_HEAP overlaps SGX_GENERAL_HEAP"

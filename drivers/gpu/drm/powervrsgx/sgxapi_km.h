@@ -67,9 +67,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
 #define SGX_GENERAL_MAPPING_HEAP_ID				11
 #endif
-#if defined(SGX_FEATURE_2D_HARDWARE)
-#define SGX_2D_HEAP_ID							12
-#endif
 #if defined(SUPPORT_MEMORY_TILING)
 #define SGX_VPB_TILED_HEAP_ID			14
 #endif
@@ -381,14 +378,6 @@ typedef struct _SGX_MISC_INFO_
 	} uData;
 } SGX_MISC_INFO;
 
-#if defined(SGX_FEATURE_2D_HARDWARE)
-/*
- * The largest number of source sync objects that can be associated with a blit
- * command.  Allows for src, pattern, and mask
- */
-#define PVRSRV_MAX_BLT_SRC_SYNCS		3
-#endif
-
 
 #define SGX_KICKTA_DUMPBITMAP_MAX_NAME_LENGTH		256
 
@@ -447,11 +436,6 @@ typedef struct _SGX_KICKTA_DUMP_BUFFER_
 	IMG_PCHAR			pszName;							/*< Name of buffer */
 } SGX_KICKTA_DUMP_BUFFER, *PSGX_KICKTA_DUMP_BUFFER;
 
-#if defined(SGX_FEATURE_2D_HARDWARE)
-/* Maximum size of ctrl stream for 2d blit command (in 32 bit words) */
-#define SGX_MAX_2D_BLIT_CMD_SIZE 		26
-#define SGX_MAX_2D_SRC_SYNC_OPS			3
-#endif
 #define SGX_MAX_TRANSFER_STATUS_VALS	2
 #define SGX_MAX_TRANSFER_SYNC_OPS	5
 
