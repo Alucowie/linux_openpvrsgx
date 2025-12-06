@@ -284,44 +284,6 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 		PVR_DPF((PVR_DBG_ERROR, "SGXSubmitTransferKM: SGXScheduleCCBCommandKM failed."));
 		return eError;
 	}
-	
 
-#if defined(NO_HARDWARE)
-	if ((psKick->ui32Flags & SGXMKIF_TQFLAGS_NOSYNCUPDATE) == 0)
-	{
-		/* Update sync objects pretending that we have done the job*/
-		for (loop = 0; loop < psKick->ui32NumSrcSync; loop++)
-		{
-			if (abSrcSyncEnable[loop])
-			{
-				psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psKick->ahSrcSyncInfo[loop];
-				psSyncInfo->psSyncData->ui32ReadOpsComplete = psSyncInfo->psSyncData->ui32ReadOpsPending;
-			}
-		}
-
-		for (loop = 0; loop < psKick->ui32NumDstSync; loop++)
-		{
-			if (abDstSyncEnable[loop])
-			{
-				psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psKick->ahDstSyncInfo[loop];
-				psSyncInfo->psSyncData->ui32WriteOpsComplete = psSyncInfo->psSyncData->ui32WriteOpsPending;
-			}
-		}
-
-		if (psKick->hTASyncInfo != IMG_NULL)
-		{
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psKick->hTASyncInfo;
-
-			psSyncInfo->psSyncData->ui32WriteOpsComplete = psSyncInfo->psSyncData->ui32WriteOpsPending;
-		}
-
-		if (psKick->h3DSyncInfo != IMG_NULL)
-		{
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psKick->h3DSyncInfo;
-
-			psSyncInfo->psSyncData->ui32WriteOpsComplete = psSyncInfo->psSyncData->ui32WriteOpsPending;
-		}
-	}
-#endif
 	return eError;
 }

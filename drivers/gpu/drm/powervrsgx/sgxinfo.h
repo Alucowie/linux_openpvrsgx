@@ -158,9 +158,6 @@ typedef struct _SGX_CCB_KICK_
 	SGX_INTERNEL_STATUS_UPDATE	as3DStatusUpdate[SGX_MAX_3D_STATUS_VALS];
 
 	IMG_BOOL	bFirstKickOrResume;
-#if defined(NO_HARDWARE)
-	IMG_BOOL	bTerminateOrAbort;
-#endif
 	IMG_BOOL	bLastInScene;
 
 	/* CCB offset of data structure associated with this kick */
@@ -186,9 +183,6 @@ typedef struct _SGX_CCB_KICK_
 
 	IMG_HANDLE	hTASyncInfo;
 	IMG_HANDLE	h3DSyncInfo;
-#if defined(NO_HARDWARE)
-	IMG_UINT32	ui32WriteOpsPendingVal;
-#endif
 	IMG_HANDLE	hDevMemContext;
 } SGX_CCB_KICK;
 

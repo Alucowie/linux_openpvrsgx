@@ -220,7 +220,6 @@ static IMG_VOID SGXPollForClockGating (PVRSRV_SGXDEV_INFO	*psDevInfo,
 	PVR_UNREFERENCED_PARAMETER(ui32RegisterValue);
 	PVR_UNREFERENCED_PARAMETER(pszComment);
 
-	#if !defined(NO_HARDWARE)
 	PVR_ASSERT(psDevInfo != IMG_NULL);
 
 	/* PRQA S 0505 1 */ /* QAC does not like assert() */
@@ -235,7 +234,6 @@ static IMG_VOID SGXPollForClockGating (PVRSRV_SGXDEV_INFO	*psDevInfo,
 		SGXDumpDebugInfo(psDevInfo, IMG_FALSE);
 		PVR_DBG_BREAK;
 	}
-	#endif /* NO_HARDWARE */
 }
 
 
@@ -301,7 +299,6 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 		}
 
 		/* Wait for the ukernel to complete processing. */
-		#if !defined(NO_HARDWARE)
 		if (PollForValueKM(&psDevInfo->psSGXHostCtl->ui32PowerStatus,
 							ui32CompleteStatus,
 							ui32CompleteStatus,
@@ -313,7 +310,6 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 			SGXDumpDebugInfo(psDevInfo, IMG_FALSE);
 			PVR_DBG_BREAK;
 		}
-		#endif /* NO_HARDWARE */
 
 		ui32CoresEnabled = 1;
 

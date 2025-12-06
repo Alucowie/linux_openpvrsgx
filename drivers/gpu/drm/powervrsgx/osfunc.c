@@ -1652,35 +1652,12 @@ OSUnReservePhys(IMG_VOID *pvCpuVAddr,
  **************************************************************************/
 PVRSRV_ERROR OSBaseAllocContigMemory(IMG_UINT32 ui32Size, IMG_CPU_VIRTADDR *pvLinAddr, IMG_CPU_PHYADDR *psPhysAddr)
 {
-#if !defined(NO_HARDWARE)
     PVR_UNREFERENCED_PARAMETER(ui32Size);
     PVR_UNREFERENCED_PARAMETER(pvLinAddr);
     PVR_UNREFERENCED_PARAMETER(psPhysAddr);
     PVR_DPF((PVR_DBG_ERROR, "%s: Not available", __FUNCTION__));
 
     return PVRSRV_ERROR_OUT_OF_MEMORY;
-#else
-/*
- * On Linux, the returned virtual address should be used for CPU access,
- * and not be remapped into the CPU virtual address using ioremap.  The fact
- * that the RAM is being managed by the kernel, and already has a virtual
- * address, seems to lead to problems when the attributes of the memory are
- * changed in the ioremap call (such as from cached to non-cached).
- */
-    IMG_VOID *pvKernLinAddr;
-
-    pvKernLinAddr = _KMallocWrapper(ui32Size, GFP_KERNEL, __FILE__, __LINE__);
-    if (!pvKernLinAddr)
-    {
-    return PVRSRV_ERROR_OUT_OF_MEMORY;
-    }
-
-    *pvLinAddr = pvKernLinAddr;
-
-    psPhysAddr->uiAddr = virt_to_phys(pvKernLinAddr);
-
-    return PVRSRV_OK;
-#endif	/* !defined(NO_HARDWARE) */
 }
 
 
@@ -1692,18 +1669,11 @@ PVRSRV_ERROR OSBaseAllocContigMemory(IMG_UINT32 ui32Size, IMG_CPU_VIRTADDR *pvLi
  **************************************************************************/
 PVRSRV_ERROR OSBaseFreeContigMemory(IMG_UINT32 ui32Size, IMG_CPU_VIRTADDR pvLinAddr, IMG_CPU_PHYADDR psPhysAddr)
 {
-#if !defined(NO_HARDWARE)
     PVR_UNREFERENCED_PARAMETER(ui32Size);
     PVR_UNREFERENCED_PARAMETER(pvLinAddr);
     PVR_UNREFERENCED_PARAMETER(psPhysAddr.uiAddr);
 
     PVR_DPF((PVR_DBG_WARNING, "%s: Not available", __FUNCTION__));
-#else
-    PVR_UNREFERENCED_PARAMETER(ui32Size);
-    PVR_UNREFERENCED_PARAMETER(psPhysAddr.uiAddr);
-
-    KFreeWrapper(pvLinAddr);
-#endif
     return PVRSRV_OK;
 }
 
@@ -1728,20 +1698,12 @@ PVRSRV_ERROR OSBaseFreeContigMemory(IMG_UINT32 ui32Size, IMG_CPU_VIRTADDR pvLinA
 
 IMG_UINT32 OSReadHWReg(IMG_PVOID pvLinRegBaseAddr, IMG_UINT32 ui32Offset)
 {
-#if !defined(NO_HARDWARE)
     return (IMG_UINT32) readl((IMG_PBYTE)pvLinRegBaseAddr+ui32Offset);
-#else
-    return *(IMG_UINT32 *)((IMG_PBYTE)pvLinRegBaseAddr+ui32Offset);
-#endif
 }
 
 IMG_VOID OSWriteHWReg(IMG_PVOID pvLinRegBaseAddr, IMG_UINT32 ui32Offset, IMG_UINT32 ui32Value)
 {
-#if !defined(NO_HARDWARE)
     writel(ui32Value, (IMG_PBYTE)pvLinRegBaseAddr+ui32Offset);
-#else
-    *(IMG_UINT32 *)((IMG_PBYTE)pvLinRegBaseAddr+ui32Offset) = ui32Value;
-#endif
 }
 
 #if defined(CONFIG_PCI)

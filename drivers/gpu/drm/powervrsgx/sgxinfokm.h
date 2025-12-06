@@ -318,9 +318,6 @@ typedef struct _SGX_CCB_KICK_KM_
 	SGX_INTERNEL_STATUS_UPDATE_KM	as3DStatusUpdate[SGX_MAX_3D_STATUS_VALS];
 
 	IMG_BOOL	bFirstKickOrResume;
-#if defined(NO_HARDWARE)
-	IMG_BOOL	bTerminateOrAbort;
-#endif
 
 	/* CCB offset of data structure associated with this kick */
 	IMG_UINT32	ui32CCBOffset;
@@ -345,9 +342,6 @@ typedef struct _SGX_CCB_KICK_KM_
 
 	IMG_HANDLE	hTASyncInfo;
 	IMG_HANDLE	h3DSyncInfo;
-#if defined(NO_HARDWARE)
-	IMG_UINT32	ui32WriteOpsPendingVal;
-#endif
 } SGX_CCB_KICK_KM;
 
 
@@ -412,26 +406,6 @@ IMG_VOID SGXDumpDebugInfo (PVRSRV_SGXDEV_INFO	*psDevInfo,
 PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode);
 
 IMG_VOID SysGetSGXTimingInformation(SGX_TIMING_INFORMATION *psSGXTimingInfo);
-
-/****************************************************************************/
-/* kernel only functions: 													*/
-/****************************************************************************/
-#if defined(NO_HARDWARE)
-static INLINE IMG_VOID NoHardwareGenerateEvent(PVRSRV_SGXDEV_INFO		*psDevInfo,
-												IMG_UINT32 ui32StatusRegister,
-												IMG_UINT32 ui32StatusValue,
-												IMG_UINT32 ui32StatusMask)
-{
-	IMG_UINT32 ui32RegVal;
-
-	ui32RegVal = OSReadHWReg(psDevInfo->pvRegsBaseKM, ui32StatusRegister);
-
-	ui32RegVal &= ~ui32StatusMask;
-	ui32RegVal |= (ui32StatusValue & ui32StatusMask);
-
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM, ui32StatusRegister, ui32RegVal);
-}
-#endif
 
 #endif /* __SGXINFOKM_H__ */
 
