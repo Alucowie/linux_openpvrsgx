@@ -632,11 +632,7 @@ PVRSRV_ERROR SGXCleanupRequest(PVRSRV_DEVICE_NODE *psDeviceNode,
 	}
 
 	/* Request the cache invalidate */
-#if defined(SGX_FEATURE_SYSTEM_CACHE)
-	psDevInfo->ui32CacheControl |= (SGXMKIF_CC_INVAL_BIF_SL | SGXMKIF_CC_INVAL_DATA);
-#else
 	psDevInfo->ui32CacheControl |= SGXMKIF_CC_INVAL_DATA;
-#endif
 	return eError;
 }
 

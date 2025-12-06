@@ -511,24 +511,6 @@ DisableHostAccess (MMU_CONTEXT *psMMUContext)
 #endif
 
 
-#if defined(SGX_FEATURE_SYSTEM_CACHE)
-/*!
-******************************************************************************
-	FUNCTION:   MMU_InvalidateSystemLevelCache
-
-	PURPOSE:    Invalidates the System Level Cache to purge stale PDEs and PTEs
-
-	PARAMETERS: In: psDevInfo
-	RETURNS:    None
-
-******************************************************************************/
-static IMG_VOID MMU_InvalidateSystemLevelCache(PVRSRV_SGXDEV_INFO *psDevInfo)
-{
-	/* The MMU always bypasses the SLC */
-	PVR_UNREFERENCED_PARAMETER(psDevInfo);
-}
-#endif /* SGX_FEATURE_SYSTEM_CACHE */
-
 /*!
 ******************************************************************************
 	FUNCTION:   MMU_InvalidateDirectoryCache
@@ -542,9 +524,6 @@ static IMG_VOID MMU_InvalidateSystemLevelCache(PVRSRV_SGXDEV_INFO *psDevInfo)
 IMG_VOID MMU_InvalidateDirectoryCache(PVRSRV_SGXDEV_INFO *psDevInfo)
 {
 	psDevInfo->ui32CacheControl |= SGXMKIF_CC_INVAL_BIF_PD;
-	#if defined(SGX_FEATURE_SYSTEM_CACHE)
-	MMU_InvalidateSystemLevelCache(psDevInfo);
-	#endif /* SGX_FEATURE_SYSTEM_CACHE */
 }
 
 
@@ -561,9 +540,6 @@ IMG_VOID MMU_InvalidateDirectoryCache(PVRSRV_SGXDEV_INFO *psDevInfo)
 static IMG_VOID MMU_InvalidatePageTableCache(PVRSRV_SGXDEV_INFO *psDevInfo)
 {
 	psDevInfo->ui32CacheControl |= SGXMKIF_CC_INVAL_BIF_PT;
-	#if defined(SGX_FEATURE_SYSTEM_CACHE)
-	MMU_InvalidateSystemLevelCache(psDevInfo);
-	#endif /* SGX_FEATURE_SYSTEM_CACHE */
 }
 
 /*!
@@ -1097,11 +1073,6 @@ _DeferredAllocPagetables(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT
 			PVR_ASSERT(pui32PDEntry[i] != 0);
 		}
 	}
-
-	#if defined(SGX_FEATURE_SYSTEM_CACHE)
-
-	MMU_InvalidateSystemLevelCache(pMMUHeap->psMMUContext->psDevInfo);
-	#endif /* SGX_FEATURE_SYSTEM_CACHE */
 
 	return IMG_TRUE;
 }

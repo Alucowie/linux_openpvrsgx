@@ -47,10 +47,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "sgx530defs.h"
 
-#if defined(SGX_FEATURE_SYSTEM_CACHE)
-#include "mnemedefs.h"
-#endif
-
 /*****************************************************************************
  Core specific defines.
 *****************************************************************************/

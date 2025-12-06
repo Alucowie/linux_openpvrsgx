@@ -349,12 +349,6 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_MEM_ARB_CONFIG, ui32RegVal);
 #endif /* EUR_CR_BIF_MEM_ARB_CONFIG */
 
-#if defined(SGX_FEATURE_SYSTEM_CACHE)
-			/* set the SLC to bypass cache-coherent accesses */
-			ui32RegVal = MNE_CR_CTRL_BYP_CC_MASK;
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM, MNE_CR_CTRL, ui32RegVal);
-#endif /* SGX_FEATURE_SYSTEM_CACHE */
-
 	if (bHardwareRecovery)
 	{
 		/*
