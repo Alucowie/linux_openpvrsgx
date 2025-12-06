@@ -188,15 +188,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	/* memory tiling range usage */
 	IMG_UINT32				ui32MemTilingUsage;
 
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-	/* SGX MMU dummy page details */
-	IMG_VOID				*pvDummyPTPageCpuVAddr;
-	IMG_DEV_PHYADDR			sDummyPTDevPAddr;
-	IMG_HANDLE				hDummyPTPageOSMemHandle;
-	IMG_VOID				*pvDummyDataPageCpuVAddr;
-	IMG_DEV_PHYADDR 		sDummyDataDevPAddr;
-	IMG_HANDLE				hDummyDataPageOSMemHandle;
-#endif
 	IMG_UINT32				asSGXDevData[SGX_MAX_DEV_DATA];
 } PVRSRV_SGXDEV_INFO;
 

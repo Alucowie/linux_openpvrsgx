@@ -208,11 +208,6 @@ struct _MMU_HEAP_
 };
 
 
-
-#if defined (SUPPORT_SGX_MMU_DUMMY_PAGE)
-#define DUMMY_DATA_PAGE_SIGNATURE	0xDEADBEEF
-#endif
-
 /* local prototypes: */
 static IMG_VOID
 _DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, IMG_BOOL bOSFreePT);
@@ -649,28 +644,8 @@ _AllocPageTableMemory (MMU_HEAP *pMMUHeap,
 	}
 
 	MakeKernelPageReadWrite(psPTInfoList->PTPageCpuVAddr);
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-	{
-		IMG_UINT32 *pui32Tmp;
-		IMG_UINT32 i;
-
-		pui32Tmp = (IMG_UINT32*)psPTInfoList->PTPageCpuVAddr;
-		/* point the new PT entries to the dummy data page */
-		for(i=0; i<pMMUHeap->ui32PTNumEntriesUsable; i++)
-		{
-			pui32Tmp[i] = (pMMUHeap->psMMUContext->psDevInfo->sDummyDataDevPAddr.uiAddr>>SGX_MMU_PTE_ADDR_ALIGNSHIFT)
-						| SGX_MMU_PTE_VALID;
-		}
-		/* zero the remaining allocated entries, if any */
-		for(; i<pMMUHeap->ui32PTNumEntriesAllocated; i++)
-		{
-			pui32Tmp[i] = 0;
-		}
-	}
-#else
 	/* Zero the page table. */
 	OSMemSet(psPTInfoList->PTPageCpuVAddr, 0, pMMUHeap->ui32PTSize);
-#endif
 	MakeKernelPageReadOnly(psPTInfoList->PTPageCpuVAddr);
 
 	/* return the DevPAddr */
@@ -792,19 +767,11 @@ _DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, IMG_BOOL bOS
 				pui32PDEntry = (IMG_UINT32*)psMMUContext->pvPDCpuVAddr;
 				pui32PDEntry += ui32PDIndex;
 
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-				/* point the PD entry to the dummy PT */
-				pui32PDEntry[ui32PTIndex] = (psMMUContext->psDevInfo->sDummyPTDevPAddr.uiAddr
-											>>SGX_MMU_PDE_ADDR_ALIGNSHIFT)
-											| SGX_MMU_PDE_PAGE_SIZE_4K
-											| SGX_MMU_PDE_VALID;
-#else
 				/* free the entry */
 				if(bOSFreePT)
 				{
 					pui32PDEntry[ui32PTIndex] = 0;
 				}
-#endif
 				MakeKernelPageReadOnly(psMMUContext->pvPDCpuVAddr);
 				/* advance to next context */
 				psMMUContext = psMMUContext->psNext;
@@ -819,19 +786,11 @@ _DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, IMG_BOOL bOS
 			pui32PDEntry = (IMG_UINT32*)pMMUHeap->psMMUContext->pvPDCpuVAddr;
 			pui32PDEntry += ui32PDIndex;
 
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-			/* point the PD entry to the dummy PT */
-			pui32PDEntry[ui32PTIndex] = (pMMUHeap->psMMUContext->psDevInfo->sDummyPTDevPAddr.uiAddr
-										>>SGX_MMU_PDE_ADDR_ALIGNSHIFT)
-										| SGX_MMU_PDE_PAGE_SIZE_4K
-										| SGX_MMU_PDE_VALID;
-#else
 			/* free the entry */
 			if(bOSFreePT)
 			{
 				pui32PDEntry[ui32PTIndex] = 0;
 			}
-#endif
 			MakeKernelPageReadOnly(pMMUHeap->psMMUContext->pvPDCpuVAddr);
 			break;
 		}
@@ -1003,13 +962,8 @@ _DeferredAllocPagetables(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT
 		&& ppsPTInfoList[i]->PTPageCpuVAddr == IMG_NULL)
 		{
 			IMG_DEV_PHYADDR	sDevPAddr;
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-			IMG_UINT32 *pui32Tmp;
-			IMG_UINT32 j;
-#else
 			/* no page table has been allocated so allocate one */
 			PVR_ASSERT(pui32PDEntry[i] == 0);
-#endif
 			if(_AllocPageTableMemory (pMMUHeap, ppsPTInfoList[i], &sDevPAddr) != IMG_TRUE)
 			{
 				PVR_DPF((PVR_DBG_ERROR, "_DeferredAllocPagetables: ERROR call to _AllocPageTableMemory failed"));
@@ -1152,64 +1106,6 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 		#if PAGE_TEST
 		PageTest(pvPDCpuVAddr, sPDDevPAddr);
 		#endif
-
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-		/* Allocate dummy PT and Data pages for the first context to be created */
-		if(!psDevInfo->pvMMUContextList)
-		{
-			/* Dummy PT page */
-			if (OSAllocPages(PVRSRV_HAP_WRITECOMBINE | PVRSRV_HAP_KERNEL_ONLY,
-							 SGX_MMU_PAGE_SIZE,
-							 SGX_MMU_PAGE_SIZE,
-							 IMG_NULL,
-							 0,
-							 IMG_NULL,
-							 &psDevInfo->pvDummyPTPageCpuVAddr,
-							 &psDevInfo->hDummyPTPageOSMemHandle) != PVRSRV_OK)
-			{
-				PVR_DPF((PVR_DBG_ERROR, "MMU_Initialise: ERROR call to OSAllocPages failed"));
-				return PVRSRV_ERROR_FAILED_TO_ALLOC_PAGES;
-			}
-
-			if(psDevInfo->pvDummyPTPageCpuVAddr)
-			{
-				sCpuPAddr = OSMapLinToCPUPhys(psDevInfo->hDummyPTPageOSMemHandle,
-											  psDevInfo->pvDummyPTPageCpuVAddr);
-			}
-			else
-			{
-				/* This is not used in all cases, since not all ports currently
-				 * support OSMemHandleToCpuPAddr */
-				sCpuPAddr = OSMemHandleToCpuPAddr(psDevInfo->hDummyPTPageOSMemHandle, 0);
-			}
-			psDevInfo->sDummyPTDevPAddr = SysCpuPAddrToDevPAddr (PVRSRV_DEVICE_TYPE_SGX, sCpuPAddr);
-
-			/* Dummy Data page */
-			if (OSAllocPages(PVRSRV_HAP_WRITECOMBINE | PVRSRV_HAP_KERNEL_ONLY,
-							 SGX_MMU_PAGE_SIZE,
-							 SGX_MMU_PAGE_SIZE,
-							 IMG_NULL,
-							 0,
-							 IMG_NULL,
-							 &psDevInfo->pvDummyDataPageCpuVAddr,
-							 &psDevInfo->hDummyDataPageOSMemHandle) != PVRSRV_OK)
-			{
-				PVR_DPF((PVR_DBG_ERROR, "MMU_Initialise: ERROR call to OSAllocPages failed"));
-				return PVRSRV_ERROR_FAILED_TO_ALLOC_PAGES;
-			}
-
-			if(psDevInfo->pvDummyDataPageCpuVAddr)
-			{
-				sCpuPAddr = OSMapLinToCPUPhys(psDevInfo->hDummyPTPageOSMemHandle,
-											  psDevInfo->pvDummyDataPageCpuVAddr);
-			}
-			else
-			{
-				sCpuPAddr = OSMemHandleToCpuPAddr(psDevInfo->hDummyDataPageOSMemHandle, 0);
-			}
-			psDevInfo->sDummyDataDevPAddr = SysCpuPAddrToDevPAddr (PVRSRV_DEVICE_TYPE_SGX, sCpuPAddr);
-		}
-#endif /* #if defined(SUPPORT_SGX_MMU_DUMMY_PAGE) */
 	}
 	else
 	{
@@ -1247,70 +1143,6 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 		#if PAGE_TEST
 		PageTest(pvPDCpuVAddr, sPDDevPAddr);
 		#endif
-
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-		/* Allocate dummy PT and Data pages for the first context to be created */
-		if(!psDevInfo->pvMMUContextList)
-		{
-			/* Dummy PT page */
-			if(RA_Alloc(psDeviceNode->psLocalDevMemArena,
-						SGX_MMU_PAGE_SIZE,
-						IMG_NULL,
-						IMG_NULL,
-						0,
-						SGX_MMU_PAGE_SIZE,
-						0,
-						IMG_NULL,
-						0,
-						&(sSysPAddr.uiAddr))!= IMG_TRUE)
-			{
-				PVR_DPF((PVR_DBG_ERROR, "MMU_Initialise: ERROR call to RA_Alloc failed"));
-				return PVRSRV_ERROR_FAILED_TO_ALLOC_VIRT_MEMORY;
-			}
-
-			/* derive the CPU virtual address */
-			sCpuPAddr = SysSysPAddrToCpuPAddr(sSysPAddr);
-			psDevInfo->sDummyPTDevPAddr = SysSysPAddrToDevPAddr(PVRSRV_DEVICE_TYPE_SGX, sSysPAddr);
-			psDevInfo->pvDummyPTPageCpuVAddr = OSMapPhysToLin(sCpuPAddr,
-																SGX_MMU_PAGE_SIZE,
-																PVRSRV_HAP_WRITECOMBINE|PVRSRV_HAP_KERNEL_ONLY,
-																&psDevInfo->hDummyPTPageOSMemHandle);
-			if(!psDevInfo->pvDummyPTPageCpuVAddr)
-			{
-				PVR_DPF((PVR_DBG_ERROR, "MMU_Initialise: ERROR failed to map page tables"));
-				return PVRSRV_ERROR_FAILED_TO_MAP_PAGE_TABLE;
-			}
-
-			/* Dummy Data page */
-			if(RA_Alloc(psDeviceNode->psLocalDevMemArena,
-						SGX_MMU_PAGE_SIZE,
-						IMG_NULL,
-						IMG_NULL,
-						0,
-						SGX_MMU_PAGE_SIZE,
-						0,
-						IMG_NULL,
-						0,
-						&(sSysPAddr.uiAddr))!= IMG_TRUE)
-			{
-				PVR_DPF((PVR_DBG_ERROR, "MMU_Initialise: ERROR call to RA_Alloc failed"));
-				return PVRSRV_ERROR_FAILED_TO_ALLOC_VIRT_MEMORY;
-			}
-
-			/* derive the CPU virtual address */
-			sCpuPAddr = SysSysPAddrToCpuPAddr(sSysPAddr);
-			psDevInfo->sDummyDataDevPAddr = SysSysPAddrToDevPAddr(PVRSRV_DEVICE_TYPE_SGX, sSysPAddr);
-			psDevInfo->pvDummyDataPageCpuVAddr = OSMapPhysToLin(sCpuPAddr,
-																SGX_MMU_PAGE_SIZE,
-																PVRSRV_HAP_WRITECOMBINE|PVRSRV_HAP_KERNEL_ONLY,
-																&psDevInfo->hDummyDataPageOSMemHandle);
-			if(!psDevInfo->pvDummyDataPageCpuVAddr)
-			{
-				PVR_DPF((PVR_DBG_ERROR, "MMU_Initialise: ERROR failed to map page tables"));
-				return PVRSRV_ERROR_FAILED_TO_MAP_PAGE_TABLE;
-			}
-		}
-#endif /* #if defined(SUPPORT_SGX_MMU_DUMMY_PAGE) */
 	}
 
 #ifdef SUPPORT_SGX_MMU_BYPASS
@@ -1327,45 +1159,6 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 		return PVRSRV_ERROR_INVALID_CPU_ADDR;
 	}
 
-
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-	MakeKernelPageReadWrite(pvPDCpuVAddr);
-	/*  wire-up the new PD to the dummy PT */
-	for(i=0; i<SGX_MMU_PD_SIZE; i++)
-	{
-		pui32Tmp[i] = (psDevInfo->sDummyPTDevPAddr.uiAddr>>SGX_MMU_PDE_ADDR_ALIGNSHIFT)
-					| SGX_MMU_PDE_PAGE_SIZE_4K
-					| SGX_MMU_PDE_VALID;
-	}
-	MakeKernelPageReadOnly(pvPDCpuVAddr);
-
-	if(!psDevInfo->pvMMUContextList)
-	{
-		/*
-			if we've just allocated the dummy pages
-			wire up the dummy PT to the dummy data page
-		*/
-		MakeKernelPageReadWrite(psDevInfo->pvDummyPTPageCpuVAddr);
-		pui32Tmp = (IMG_UINT32 *)psDevInfo->pvDummyPTPageCpuVAddr;
-		for(i=0; i<SGX_MMU_PT_SIZE; i++)
-		{
-			pui32Tmp[i] = (psDevInfo->sDummyDataDevPAddr.uiAddr>>SGX_MMU_PTE_ADDR_ALIGNSHIFT)
-						| SGX_MMU_PTE_VALID;
-		}
-		MakeKernelPageReadOnly(psDevInfo->pvDummyPTPageCpuVAddr);
-
-		/*
-			write a signature to the dummy data page
-		*/
-		MakeKernelPageReadWrite(psDevInfo->pvDummyDataPageCpuVAddr);
-		pui32Tmp = (IMG_UINT32 *)psDevInfo->pvDummyDataPageCpuVAddr;
-		for(i=0; i<(SGX_MMU_PAGE_SIZE/4); i++)
-		{
-			pui32Tmp[i] = DUMMY_DATA_PAGE_SIGNATURE;
-		}
-		MakeKernelPageReadOnly(psDevInfo->pvDummyDataPageCpuVAddr);
-	}
-#else /* #if defined(SUPPORT_SGX_MMU_DUMMY_PAGE) */
 	/* initialise the PD to invalid address state */
 	MakeKernelPageReadWrite(pvPDCpuVAddr);
 	for(i=0; i<SGX_MMU_PD_SIZE; i++)
@@ -1374,7 +1167,6 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 		pui32Tmp[i] = 0;
 	}
 	MakeKernelPageReadOnly(pvPDCpuVAddr);
-#endif /* #if defined(SUPPORT_SGX_MMU_DUMMY_PAGE) */
 
 	/* store PD info in the MMU context */
 	psMMUContext->pvPDCpuVAddr = pvPDCpuVAddr;
@@ -1419,10 +1211,6 @@ MMU_Finalise (MMU_CONTEXT *psMMUContext)
 	IMG_UINT32 *pui32Tmp, i;
 	SYS_DATA *psSysData;
 	MMU_CONTEXT **ppsMMUContext;
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-	PVRSRV_SGXDEV_INFO *psDevInfo = (PVRSRV_SGXDEV_INFO*)psMMUContext->psDevInfo;
-	MMU_CONTEXT *psMMUContextList = (MMU_CONTEXT*)psDevInfo->pvMMUContextList;
-#endif
 
 	SysAcquireData(&psSysData);
 
@@ -1449,21 +1237,6 @@ MMU_Finalise (MMU_CONTEXT *psMMUContext)
 						SGX_MMU_PAGE_SIZE,
 						psMMUContext->pvPDCpuVAddr,
 						psMMUContext->hPDOSMemHandle);
-
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-		/* if this is the last context free the dummy pages too */
-		if(!psMMUContextList->psNext)
-		{
-			OSFreePages(PVRSRV_HAP_WRITECOMBINE | PVRSRV_HAP_KERNEL_ONLY,
-							SGX_MMU_PAGE_SIZE,
-							psDevInfo->pvDummyPTPageCpuVAddr,
-							psDevInfo->hDummyPTPageOSMemHandle);
-			OSFreePages(PVRSRV_HAP_WRITECOMBINE | PVRSRV_HAP_KERNEL_ONLY,
-							SGX_MMU_PAGE_SIZE,
-							psDevInfo->pvDummyDataPageCpuVAddr,
-							psDevInfo->hDummyDataPageOSMemHandle);
-		}
-#endif
 	}
 	else
 	{
@@ -1482,38 +1255,6 @@ MMU_Finalise (MMU_CONTEXT *psMMUContext)
 							psMMUContext->hPDOSMemHandle);
 		/* and free the memory */
 		RA_Free (psMMUContext->psDeviceNode->psLocalDevMemArena, sSysPAddr.uiAddr, IMG_FALSE);
-
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-		/* if this is the last context free the dummy pages too */
-		if(!psMMUContextList->psNext)
-		{
-			/* free the Dummy PT Page */
-			sCpuPAddr = OSMapLinToCPUPhys(psDevInfo->hDummyPTPageOSMemHandle,
-										  psDevInfo->pvDummyPTPageCpuVAddr);
-			sSysPAddr = SysCpuPAddrToSysPAddr(sCpuPAddr);
-
-			/* unmap the CPU mapping */
-			OSUnMapPhysToLin(psDevInfo->pvDummyPTPageCpuVAddr,
-								SGX_MMU_PAGE_SIZE,
-                                PVRSRV_HAP_WRITECOMBINE|PVRSRV_HAP_KERNEL_ONLY,
-								psDevInfo->hDummyPTPageOSMemHandle);
-			/* and free the memory */
-			RA_Free (psMMUContext->psDeviceNode->psLocalDevMemArena, sSysPAddr.uiAddr, IMG_FALSE);
-
-			/* free the Dummy Data Page */
-			sCpuPAddr = OSMapLinToCPUPhys(psDevInfo->hDummyDataPageOSMemHandle,
-										  psDevInfo->pvDummyDataPageCpuVAddr);
-			sSysPAddr = SysCpuPAddrToSysPAddr(sCpuPAddr);
-
-			/* unmap the CPU mapping */
-			OSUnMapPhysToLin(psDevInfo->pvDummyDataPageCpuVAddr,
-								SGX_MMU_PAGE_SIZE,
-                                PVRSRV_HAP_WRITECOMBINE|PVRSRV_HAP_KERNEL_ONLY,
-								psDevInfo->hDummyDataPageOSMemHandle);
-			/* and free the memory */
-			RA_Free (psMMUContext->psDeviceNode->psLocalDevMemArena, sSysPAddr.uiAddr, IMG_FALSE);
-		}
-#endif
 	}
 
 	PVR_DPF ((PVR_DBG_MESSAGE, "MMU_Finalise"));
@@ -1572,10 +1313,8 @@ MMU_InsertHeap(MMU_CONTEXT *psMMUContext, MMU_HEAP *psMMUHeap)
 
 	for (ui32PDEntry = 0; ui32PDEntry < psMMUHeap->ui32PageTableCount; ui32PDEntry++)
 	{
-#if (!defined(SUPPORT_SGX_MMU_DUMMY_PAGE))
 		/* check we have invalidated target PDEs */
 		PVR_ASSERT(pui32PDCpuVAddr[ui32PDEntry] == 0);
-#endif
 		MakeKernelPageReadWrite(psMMUContext->pvPDCpuVAddr);
 		/* copy over the PDEs */
 		pui32PDCpuVAddr[ui32PDEntry] = pui32KernelPDCpuVAddr[ui32PDEntry];
@@ -1703,14 +1442,8 @@ MMU_UnmapPagesAndFreePTs (MMU_HEAP *psMMUHeap,
 			/* The page table count should not go below zero */
 			PVR_ASSERT((IMG_INT32)ppsPTInfoList[0]->ui32ValidPTECount >= 0);
 			MakeKernelPageReadWrite(ppsPTInfoList[0]->PTPageCpuVAddr);
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-			/* point the PT entry to the dummy data page */
-			pui32Tmp[ui32PTIndex] = (psMMUHeap->psMMUContext->psDevInfo->sDummyDataDevPAddr.uiAddr>>SGX_MMU_PTE_ADDR_ALIGNSHIFT)
-									| SGX_MMU_PTE_VALID;
-#else
 			/* invalidate entry */
 			pui32Tmp[ui32PTIndex] = 0;
-#endif
 			MakeKernelPageReadOnly(ppsPTInfoList[0]->PTPageCpuVAddr);
 			CheckPT(ppsPTInfoList[0]);
 		}
@@ -2184,7 +1917,6 @@ MMU_MapPage (MMU_HEAP *pMMUHeap,
 	/* setup pointer to the first entry in the PT page */
 	pui32Tmp = (IMG_UINT32*)ppsPTInfoList[0]->PTPageCpuVAddr;
 
-#if !defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
 	{
 		IMG_UINT32 uTmp = pui32Tmp[ui32Index];
 		
@@ -2203,7 +1935,6 @@ MMU_MapPage (MMU_HEAP *pMMUHeap,
 		}
 		PVR_ASSERT((uTmp & SGX_MMU_PTE_VALID) == 0);
 	}
-#endif
 
 	/* One more valid entry in the page table. */
 	ppsPTInfoList[0]->ui32ValidPTECount++;
@@ -2733,14 +2464,8 @@ MMU_UnmapPages (MMU_HEAP *psMMUHeap,
 		PVR_ASSERT((IMG_INT32)ppsPTInfoList[0]->ui32ValidPTECount >= 0);
 
 		MakeKernelPageReadWrite(ppsPTInfoList[0]->PTPageCpuVAddr);
-#if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
-		/* point the PT entry to the dummy data page */
-		pui32Tmp[ui32PTIndex] = (psMMUHeap->psMMUContext->psDevInfo->sDummyDataDevPAddr.uiAddr>>SGX_MMU_PTE_ADDR_ALIGNSHIFT)
-								| SGX_MMU_PTE_VALID;
-#else
 		/* invalidate entry */
 		pui32Tmp[ui32PTIndex] = 0;
-#endif
 		MakeKernelPageReadOnly(ppsPTInfoList[0]->PTPageCpuVAddr);
 
 		CheckPT(ppsPTInfoList[0]);
