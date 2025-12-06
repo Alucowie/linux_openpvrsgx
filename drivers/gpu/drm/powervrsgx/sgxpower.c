@@ -46,8 +46,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "sgxapi_km.h"
 #include "sgx_mkif_km.h"
 #include "sgxutils.h"
-#include "pdump_km.h"
-
 
 static PVRSRV_ERROR SGXAddTimer(PVRSRV_DEVICE_NODE		*psDeviceNode,
 								SGX_TIMING_INFORMATION	*psSGXTimingInfo,
@@ -143,13 +141,6 @@ static PVRSRV_ERROR SGXUpdateTimingInfo(PVRSRV_DEVICE_NODE	*psDeviceNode)
 
 	/* FIXME: no need to duplicate - remove it from psDevInfo */
 	psDevInfo->psSGXHostCtl->ui32uKernelTimerClock = psDevInfo->ui32uKernelTimerClock;
-#if defined(PDUMP)
-	PDUMPCOMMENT("Host Control - Microkernel clock");
-	PDUMPMEM(IMG_NULL, psDevInfo->psKernelSGXHostCtlMemInfo,
-			 offsetof(SGXMKIF_HOST_CTL, ui32uKernelTimerClock),
-			 sizeof(IMG_UINT32), PDUMP_FLAGS_CONTINUOUS,
-			 MAKEUNIQUETAG(psDevInfo->psKernelSGXHostCtlMemInfo));
-#endif /* PDUMP */
 
 	if (psSGXTimingInfo->bEnableActivePM)
 	{
@@ -171,12 +162,6 @@ static PVRSRV_ERROR SGXUpdateTimingInfo(PVRSRV_DEVICE_NODE	*psDeviceNode)
 	}
 
 	psDevInfo->psSGXHostCtl->ui32ActivePowManSampleRate = ui32ActivePowManSampleRate;
-#if defined(PDUMP)
-	PDUMPMEM(IMG_NULL, psDevInfo->psKernelSGXHostCtlMemInfo,
-			 offsetof(SGXMKIF_HOST_CTL, ui32ActivePowManSampleRate),
-			 sizeof(IMG_UINT32), PDUMP_FLAGS_CONTINUOUS,
-			 MAKEUNIQUETAG(psDevInfo->psKernelSGXHostCtlMemInfo));
-#endif /* PDUMP */
 
 	return PVRSRV_OK;
 }
@@ -251,9 +236,6 @@ static IMG_VOID SGXPollForClockGating (PVRSRV_SGXDEV_INFO	*psDevInfo,
 		PVR_DBG_BREAK;
 	}
 	#endif /* NO_HARDWARE */
-
-	PDUMPCOMMENT("%s", pszComment);
-	PDUMPREGPOL(SGX_PDUMPREG_NAME, ui32Register, 0, ui32RegisterValue, PDUMP_POLL_OPERATOR_EQUAL);
 }
 
 
@@ -301,19 +283,17 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 			/* Request the ukernel to idle SGX and save its state. */
 			ui32PowerCmd = PVRSRV_POWERCMD_POWEROFF;
 			ui32CompleteStatus = PVRSRV_USSE_EDM_POWMAN_POWEROFF_COMPLETE;
-			PDUMPCOMMENT("SGX power off request");
 		}
 		else
 		{
 			/* Request the ukernel to idle SGX. */
 			ui32PowerCmd = PVRSRV_POWERCMD_IDLE;
 			ui32CompleteStatus = PVRSRV_USSE_EDM_POWMAN_IDLE_COMPLETE;
-			PDUMPCOMMENT("SGX idle request");
 		}
 
 		sCommand.ui32Data[1] = ui32PowerCmd;
 
-		eError = SGXScheduleCCBCommand(psDeviceNode, SGXMKIF_CMD_POWER, &sCommand, KERNEL_ID, 0, IMG_NULL, IMG_FALSE);
+		eError = SGXScheduleCCBCommand(psDeviceNode, SGXMKIF_CMD_POWER, &sCommand, IMG_NULL, IMG_FALSE);
 		if (eError != PVRSRV_OK)
 		{
 			PVR_DPF((PVR_DBG_ERROR,"SGXPrePowerState: Failed to submit power down command"));
@@ -334,17 +314,6 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 			PVR_DBG_BREAK;
 		}
 		#endif /* NO_HARDWARE */
-
-		#if defined(PDUMP)
-		PDUMPCOMMENT("TA/3D CCB Control - Wait for power event on uKernel.");
-		PDUMPMEMPOL(psDevInfo->psKernelSGXHostCtlMemInfo,
-					offsetof(SGXMKIF_HOST_CTL, ui32PowerStatus),
-					ui32CompleteStatus,
-					ui32CompleteStatus,
-					PDUMP_POLL_OPERATOR_EQUAL,
-					0,
-					MAKEUNIQUETAG(psDevInfo->psKernelSGXHostCtlMemInfo));
-		#endif /* PDUMP */
 
 		ui32CoresEnabled = 1;
 
@@ -403,13 +372,6 @@ PVRSRV_ERROR SGXPostPowerState (IMG_HANDLE				hDevHandle,
 
 		/* Reset the power manager flags. */
 		psSGXHostCtl->ui32PowerStatus = 0;
-		#if defined(PDUMP)
-		PDUMPCOMMENT("Host Control - Reset power status");
-		PDUMPMEM(IMG_NULL, psDevInfo->psKernelSGXHostCtlMemInfo,
-				 offsetof(SGXMKIF_HOST_CTL, ui32PowerStatus),
-				 sizeof(IMG_UINT32), PDUMP_FLAGS_CONTINUOUS,
-				 MAKEUNIQUETAG(psDevInfo->psKernelSGXHostCtlMemInfo));
-		#endif /* PDUMP */
 
 		if (eCurrentPowerState == PVRSRV_DEV_POWER_STATE_OFF)
 		{
@@ -445,7 +407,7 @@ PVRSRV_ERROR SGXPostPowerState (IMG_HANDLE				hDevHandle,
 			SGXMKIF_COMMAND		sCommand = {0};
 
 			sCommand.ui32Data[1] = PVRSRV_POWERCMD_RESUME;
-			eError = SGXScheduleCCBCommand(psDeviceNode, SGXMKIF_CMD_POWER, &sCommand, ISR_ID, 0, IMG_NULL, IMG_FALSE);
+			eError = SGXScheduleCCBCommand(psDeviceNode, SGXMKIF_CMD_POWER, &sCommand, IMG_NULL, IMG_FALSE);
 			if (eError != PVRSRV_OK)
 			{
 				PVR_DPF((PVR_DBG_ERROR,"SGXPostPowerState failed to schedule CCB command: %u", eError));
@@ -493,14 +455,11 @@ PVRSRV_ERROR SGXPreClockSpeedChange (IMG_HANDLE				hDevHandle,
 			/*
 			 * Idle SGX.
 			 */
-			PDUMPSUSPEND();
-
 			eError = SGXPrePowerState(hDevHandle, PVRSRV_DEV_POWER_STATE_IDLE,
 									  PVRSRV_DEV_POWER_STATE_ON);
 
 			if (eError != PVRSRV_OK)
 			{
-				PDUMPRESUME();
 				return eError;
 			}
 		}
@@ -560,8 +519,6 @@ PVRSRV_ERROR SGXPostClockSpeedChange (IMG_HANDLE				hDevHandle,
 			 */
 			eError = SGXPostPowerState(hDevHandle, PVRSRV_DEV_POWER_STATE_ON,
 									   PVRSRV_DEV_POWER_STATE_IDLE);
-
-			PDUMPRESUME();
 
 			if (eError != PVRSRV_OK)
 			{

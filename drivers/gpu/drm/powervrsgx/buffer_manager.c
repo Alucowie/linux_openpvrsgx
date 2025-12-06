@@ -46,7 +46,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "sysconfig.h"
 #include "hash.h"
 #include "ra.h"
-#include "pdump_km.h"
 #include "lists.h"
 
 static IMG_BOOL
@@ -2009,9 +2008,6 @@ DevMemoryAlloc (BM_CONTEXT *pBMContext,
 				IMG_DEV_VIRTADDR *pDevVAddr)
 {
 	PVRSRV_DEVICE_NODE *psDeviceNode;
-#ifdef PDUMP
-	IMG_UINT32 ui32PDumpSize = (IMG_UINT32)pMapping->uSize;
-#endif
 
 	psDeviceNode = pBMContext->psDeviceNode;
 
@@ -2020,14 +2016,6 @@ DevMemoryAlloc (BM_CONTEXT *pBMContext,
 		/* double the size */
 		pMapping->uSize *= 2;
 	}
-
-#ifdef PDUMP
-	if(uFlags & PVRSRV_MEM_DUMMY)
-	{
-		/* only one page behind a dummy allocation */
-		ui32PDumpSize = pMapping->pBMHeap->sDevArena.ui32DataPageSize;
-	}
-#endif
 
 	/* Check we haven't fall through a gap */
 	PVR_ASSERT(pMapping->uSizeVM != 0);
@@ -2045,22 +2033,6 @@ DevMemoryAlloc (BM_CONTEXT *pBMContext,
 
 #ifdef SUPPORT_SGX_MMU_BYPASS
 	EnableHostAccess(pBMContext->psMMUContext);
-#endif
-
-#if defined(PDUMP)
-	/* pdump the memory allocate */
-	PDUMPMALLOCPAGES(&psDeviceNode->sDevId,
-					 pMapping->DevVAddr.uiAddr,
-					 pMapping->CpuVAddr,
-					 pMapping->hOSMemHandle,
-					 ui32PDumpSize,
-					 pMapping->pBMHeap->sDevArena.ui32DataPageSize,
-#if defined(SUPPORT_PDUMP_MULTI_PROCESS)
-					 psDeviceNode->pfnMMUIsHeapShared(pMapping->pBMHeap->pMMUHeap),
-#else
-					 IMG_FALSE, // unused
-#endif /* SUPPORT_PDUMP_MULTI_PROCESS */
-					 (IMG_HANDLE)pMapping);
 #endif
 
 	switch (pMapping->eCpuMemoryOrigin)
@@ -2158,35 +2130,12 @@ DevMemoryFree (BM_MAPPING *pMapping)
 {
 	PVRSRV_DEVICE_NODE *psDeviceNode;
 	IMG_DEV_PHYADDR     sDevPAddr;
-#ifdef PDUMP
-	IMG_UINT32 ui32PSize;
-#endif
 
 	psDeviceNode = pMapping->pBMHeap->pBMContext->psDeviceNode;
 	sDevPAddr = psDeviceNode->pfnMMUGetPhysPageAddr(pMapping->pBMHeap->pMMUHeap, pMapping->DevVAddr);
 
 	if (sDevPAddr.uiAddr != 0)
 	{
-#ifdef PDUMP
-		/* pdump the memory free */
-		if(pMapping->ui32Flags & PVRSRV_MEM_DUMMY)
-		{
-			/* physical memory size differs in the case of Dummy allocations */
-			ui32PSize = pMapping->pBMHeap->sDevArena.ui32DataPageSize;
-		}
-		else
-		{
-			ui32PSize = (IMG_UINT32)pMapping->uSize;
-		}
-	
-		PDUMPFREEPAGES(pMapping->pBMHeap,
-	                    pMapping->DevVAddr,
-	                    ui32PSize,
-	                    pMapping->pBMHeap->sDevArena.ui32DataPageSize,
-	                    (IMG_HANDLE)pMapping,
-	                    (pMapping->ui32Flags & PVRSRV_MEM_INTERLEAVED) ? IMG_TRUE : IMG_FALSE,
-	                    (pMapping->ui32Flags & PVRSRV_MEM_SPARSE) ? IMG_TRUE : IMG_FALSE);
-#endif
 	}
 	PVR_ASSERT(pMapping->uSizeVM != 0);
 	psDeviceNode->pfnMMUFree (pMapping->pBMHeap->pMMUHeap, pMapping->DevVAddr, IMG_CAST_TO_DEVVADDR_UINT(pMapping->uSizeVM));

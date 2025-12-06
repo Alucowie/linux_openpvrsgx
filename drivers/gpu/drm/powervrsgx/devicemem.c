@@ -44,7 +44,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "services_headers.h"
 #include "buffer_manager.h"
-#include "pdump_km.h"
 #include "pvr_bridge_km.h"
 #include "osfunc.h"
 
@@ -676,16 +675,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVAllocSyncInfoKM(IMG_HANDLE					hDevCookie,
 	psSyncData->ui32LastOpDumpVal = 0;
 	psSyncData->ui32LastReadOpDumpVal = 0;
 	psSyncData->ui64LastWrite = 0;
-
-#if defined(PDUMP)
-	PDUMPCOMMENT("Allocating kernel sync object");
-	PDUMPMEM(psKernelSyncInfo->psSyncDataMemInfoKM->pvLinAddrKM,
-			psKernelSyncInfo->psSyncDataMemInfoKM,
-			0,
-			(IMG_UINT32)psKernelSyncInfo->psSyncDataMemInfoKM->uAllocSize,
-			PDUMP_FLAGS_CONTINUOUS,
-			MAKEUNIQUETAG(psKernelSyncInfo->psSyncDataMemInfoKM));
-#endif
 
 	psKernelSyncInfo->sWriteOpsCompleteDevVAddr.uiAddr = psKernelSyncInfo->psSyncDataMemInfoKM->sDevVAddr.uiAddr + offsetof(PVRSRV_SYNC_DATA, ui32WriteOpsComplete);
 	psKernelSyncInfo->sReadOpsCompleteDevVAddr.uiAddr = psKernelSyncInfo->psSyncDataMemInfoKM->sDevVAddr.uiAddr + offsetof(PVRSRV_SYNC_DATA, ui32ReadOpsComplete);
@@ -2075,7 +2064,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceClassMemoryKM(PVRSRV_PER_PROCESS_DATA	*
 		 *	BM_Wrap pdumps only the virtual memory which better represents the driver
 		 *	behaviour.	
 		 */
-		PDUMPCOMMENT("Dump display surface");
 		PDUMPMEM(IMG_NULL, psMemInfo, ui32Offset, psMemInfo->uAllocSize, PDUMP_FLAGS_CONTINUOUS, ((BM_BUF*)psMemInfo->sMemBlk.hBuffer)->pMapping);
 	}
 #endif

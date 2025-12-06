@@ -65,8 +65,6 @@ IMG_IMPORT
 PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 								   SGXMKIF_CMD_TYPE		eCommandType,
 								   SGXMKIF_COMMAND		*psCommandData,
-								   IMG_UINT32			ui32CallerID,
-								   IMG_UINT32			ui32PDumpFlags,
 								   IMG_HANDLE			hDevMemContext,
 								   IMG_BOOL				bLastInScene);
 IMG_IMPORT
@@ -74,7 +72,6 @@ PVRSRV_ERROR SGXScheduleCCBCommandKM(PVRSRV_DEVICE_NODE		*psDeviceNode,
 									 SGXMKIF_CMD_TYPE		eCommandType,
 									 SGXMKIF_COMMAND		*psCommandData,
 									 IMG_UINT32				ui32CallerID,
-									 IMG_UINT32				ui32PDumpFlags,
 									 IMG_HANDLE				hDevMemContext,
 									 IMG_BOOL				bLastInScene);
 

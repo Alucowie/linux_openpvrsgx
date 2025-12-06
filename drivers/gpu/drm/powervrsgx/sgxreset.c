@@ -46,9 +46,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "sgxconfig.h"
 #include "sgxutils.h"
 
-#include "pdump_km.h"
-
-
 /*!
 *******************************************************************************
 
@@ -58,28 +55,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	Initialise the SGX clocks
 
  @Input psDevInfo - device info. structure
- @Input ui32PDUMPFlags - flags to control PDUMP output
 
  @Return   IMG_VOID
 
 ******************************************************************************/
-IMG_VOID SGXInitClocks(PVRSRV_SGXDEV_INFO	*psDevInfo,
-					   IMG_UINT32			ui32PDUMPFlags)
+IMG_VOID SGXInitClocks(PVRSRV_SGXDEV_INFO	*psDevInfo)
 {
 	IMG_UINT32	ui32RegVal;
-	
-#if !defined(PDUMP)
-	PVR_UNREFERENCED_PARAMETER(ui32PDUMPFlags);
-#endif /* PDUMP */
-	
+
 	ui32RegVal = psDevInfo->ui32ClkGateCtl;
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_CLKGATECTL, ui32RegVal);
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_CLKGATECTL, ui32RegVal, ui32PDUMPFlags);
 
 #if defined(EUR_CR_CLKGATECTL2)
 	ui32RegVal = psDevInfo->ui32ClkGateCtl2;
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_CLKGATECTL2, ui32RegVal);
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_CLKGATECTL2, ui32RegVal, ui32PDUMPFlags);
 #endif
 }
 
@@ -97,22 +86,14 @@ IMG_VOID SGXInitClocks(PVRSRV_SGXDEV_INFO	*psDevInfo,
  @Return   IMG_VOID
 
 ******************************************************************************/
-static IMG_VOID SGXResetInitBIFContexts(PVRSRV_SGXDEV_INFO	*psDevInfo,
-										IMG_UINT32			ui32PDUMPFlags)
+static IMG_VOID SGXResetInitBIFContexts(PVRSRV_SGXDEV_INFO	*psDevInfo)
 {
 	IMG_UINT32	ui32RegVal;
 
-#if !defined(PDUMP)
-	PVR_UNREFERENCED_PARAMETER(ui32PDUMPFlags);
-#endif /* PDUMP */
-
 	ui32RegVal = 0;
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_CTRL, ui32RegVal);
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_BIF_CTRL, ui32RegVal, ui32PDUMPFlags);
 
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Initialise the BIF directory list\r\n");
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_DIR_LIST_BASE0, ui32RegVal);
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_BIF_DIR_LIST_BASE0, ui32RegVal, ui32PDUMPFlags);
 }
 
 
@@ -129,14 +110,9 @@ static IMG_VOID SGXResetInitBIFContexts(PVRSRV_SGXDEV_INFO	*psDevInfo,
  @Return   IMG_VOID
 
 ******************************************************************************/
-static IMG_VOID SGXResetSetupBIFContexts(PVRSRV_SGXDEV_INFO	*psDevInfo,
-										 IMG_UINT32			ui32PDUMPFlags)
+static IMG_VOID SGXResetSetupBIFContexts(PVRSRV_SGXDEV_INFO	*psDevInfo)
 {
 	IMG_UINT32	ui32RegVal;
-
-#if !defined(PDUMP)
-	PVR_UNREFERENCED_PARAMETER(ui32PDUMPFlags);
-#endif /* PDUMP */
 
 	{
 		IMG_UINT32	ui32EDMDirListReg;
@@ -152,8 +128,6 @@ static IMG_VOID SGXResetSetupBIFContexts(PVRSRV_SGXDEV_INFO	*psDevInfo,
 		ui32RegVal = psDevInfo->sKernelPDDevPAddr.uiAddr >> SGX_MMU_PDE_ADDR_ALIGNSHIFT;
 
 		OSWriteHWReg(psDevInfo->pvRegsBaseKM, ui32EDMDirListReg, ui32RegVal);
-		PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Initialise the EDM's directory list base\r\n");
-		PDUMPPDREGWITHFLAGS(&psDevInfo->sMMUAttrib, ui32EDMDirListReg, ui32RegVal, ui32PDUMPFlags, PDUMP_PD_UNIQUETAG);
 	}
 }
 
@@ -169,37 +143,20 @@ static IMG_VOID SGXResetSetupBIFContexts(PVRSRV_SGXDEV_INFO	*psDevInfo,
  Required because no status registers are available to poll on.
 
  @Input psDevInfo - SGX Device Info
- @Input ui32PDUMPFlags - flags to control PDUMP output
- @Input bPDump - Pdump the sleep
 
  @Return   Nothing
 
 ******************************************************************************/
-static IMG_VOID SGXResetSleep(PVRSRV_SGXDEV_INFO	*psDevInfo,
-							  IMG_UINT32			ui32PDUMPFlags,
-							  IMG_BOOL				bPDump)
+static IMG_VOID SGXResetSleep(PVRSRV_SGXDEV_INFO	*psDevInfo)
 {
-#if defined(PDUMP) || defined(EMULATOR)
+#if defined(EMULATOR)
 	IMG_UINT32	ui32ReadRegister;
 
 	ui32ReadRegister = EUR_CR_SOFT_RESET;
 #endif
 
-#if !defined(PDUMP)
-	PVR_UNREFERENCED_PARAMETER(ui32PDUMPFlags);
-#endif /* PDUMP */
-
 	/* Sleep for 100 SGX clocks */
 	SGXWaitClocks(psDevInfo, 100);
-	if (bPDump)
-	{
-		PDUMPIDLWITHFLAGS(30, ui32PDUMPFlags);
-#if defined(PDUMP)
-		PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Read back to flush the register writes\r\n");
-		PDumpRegRead(SGX_PDUMPREG_NAME, ui32ReadRegister, ui32PDUMPFlags);
-#endif
-	}
-
 #if defined(EMULATOR)
 	/*
 		Read a register to make sure we wait long enough on the emulator...
@@ -220,16 +177,12 @@ static IMG_VOID SGXResetSleep(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
  @Input psDevInfo - SGX Device Info
  @Input bResetBIF - Include the BIF in the soft reset
- @Input ui32PDUMPFlags - flags to control PDUMP output
- @Input bPDump - Pdump the sleep
 
  @Return   Nothing
 
 ******************************************************************************/
 static IMG_VOID SGXResetSoftReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
-								  IMG_BOOL				bResetBIF,
-								  IMG_UINT32			ui32PDUMPFlags,
-								  IMG_BOOL				bPDump)
+								  IMG_BOOL				bResetBIF)
 {
 	IMG_UINT32 ui32SoftResetRegVal;
 
@@ -291,20 +244,12 @@ static IMG_VOID SGXResetSoftReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	ui32SoftResetRegVal |= EUR_CR_SOFT_RESET_DCU_L0L1_RESET_MASK;
 #endif
 
-#if !defined(PDUMP)
-	PVR_UNREFERENCED_PARAMETER(ui32PDUMPFlags);
-#endif /* PDUMP */
-
 	if (bResetBIF)
 	{
 		ui32SoftResetRegVal |= EUR_CR_SOFT_RESET_BIF_RESET_MASK;
 	}
 
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_SOFT_RESET, ui32SoftResetRegVal);
-	if (bPDump)
-	{
-		PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_SOFT_RESET, ui32SoftResetRegVal, ui32PDUMPFlags);
-	}
 }
 
 
@@ -318,14 +263,11 @@ static IMG_VOID SGXResetSoftReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
  Invalidate the BIF Directory Cache and wait for the operation to complete.
 
  @Input psDevInfo - SGX Device Info
- @Input ui32PDUMPFlags - flags to control PDUMP output
 
  @Return   Nothing
 
 ******************************************************************************/
-static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo,
-							    IMG_UINT32			ui32PDUMPFlags,
-								IMG_BOOL			bPDump)
+static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo)
 {
 	IMG_UINT32 ui32RegVal;
 
@@ -333,26 +275,14 @@ static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo,
 #if defined(EUR_CR_BIF_CTRL_INVAL)
 	ui32RegVal = EUR_CR_BIF_CTRL_INVAL_ALL_MASK;
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_CTRL_INVAL, ui32RegVal);
-	if (bPDump)
-	{
-		PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_BIF_CTRL_INVAL, ui32RegVal, ui32PDUMPFlags);
-	}
 #else
 	ui32RegVal = EUR_CR_BIF_CTRL_INVALDC_MASK;
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_CTRL, ui32RegVal);
-	if (bPDump)
-	{
-		PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_BIF_CTRL, ui32RegVal, ui32PDUMPFlags);
-	}
 
 	ui32RegVal = 0;
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_CTRL, ui32RegVal);
-	if (bPDump)
-	{
-		PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_BIF_CTRL, ui32RegVal, ui32PDUMPFlags);
-	}
 #endif
-	SGXResetSleep(psDevInfo, ui32PDUMPFlags, bPDump);
+	SGXResetSleep(psDevInfo);
 
 	{
 		/*
@@ -369,11 +299,6 @@ static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			PVR_DPF((PVR_DBG_ERROR,"Wait for DC invalidate failed."));
 			PVR_DBG_BREAK;
 		}
-
-		if (bPDump)
-		{
-			PDUMPREGPOLWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_BIF_MEM_REQ_STAT, 0, EUR_CR_BIF_MEM_REQ_STAT_READS_MASK, ui32PDUMPFlags, PDUMP_POLL_OPERATOR_EQUAL);
-		}
 	}
 }
 
@@ -389,15 +314,13 @@ static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
  @Input psDevInfo - device info. structure
  @Input bHardwareRecovery - true if recovering powered hardware,
- 							false if powering up
- @Input ui32PDUMPFlags - flags to control PDUMP output
+							false if powering up
 
  @Return   IMG_VOID
 
 ******************************************************************************/
 IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
-				  IMG_BOOL				bHardwareRecovery,
-				  IMG_UINT32			ui32PDUMPFlags)
+				  IMG_BOOL				bHardwareRecovery)
 {
 	IMG_UINT32 ui32RegVal;
 #if defined(EUR_CR_BIF_INT_STAT_FAULT_REQ_MASK)
@@ -406,21 +329,15 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	const IMG_UINT32 ui32BifFaultMask = EUR_CR_BIF_INT_STAT_FAULT_MASK;
 #endif
 
-#if !defined(PDUMP)
-	PVR_UNREFERENCED_PARAMETER(ui32PDUMPFlags);
-#endif /* PDUMP */
-
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Start of SGX reset sequence\r\n");
-
 	/* Reset all including BIF */
-	SGXResetSoftReset(psDevInfo, IMG_TRUE, ui32PDUMPFlags, IMG_TRUE);
+	SGXResetSoftReset(psDevInfo, IMG_TRUE);
 
-	SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_TRUE);
+	SGXResetSleep(psDevInfo);
 
 	/*
 		Initialise the BIF state.
 	*/
-	SGXResetInitBIFContexts(psDevInfo, ui32PDUMPFlags);
+	SGXResetInitBIFContexts(psDevInfo);
 
 #if defined(EUR_CR_BIF_MEM_ARB_CONFIG)
 	/*
@@ -430,14 +347,12 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 				  (7UL << EUR_CR_BIF_MEM_ARB_CONFIG_BEST_CNT_SHIFT) |
 				  (12UL << EUR_CR_BIF_MEM_ARB_CONFIG_TTE_THRESH_SHIFT);
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_MEM_ARB_CONFIG, ui32RegVal);
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_BIF_MEM_ARB_CONFIG, ui32RegVal, ui32PDUMPFlags);
 #endif /* EUR_CR_BIF_MEM_ARB_CONFIG */
 
 #if defined(SGX_FEATURE_SYSTEM_CACHE)
 			/* set the SLC to bypass cache-coherent accesses */
 			ui32RegVal = MNE_CR_CTRL_BYP_CC_MASK;
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, MNE_CR_CTRL, ui32RegVal);
-	PDUMPREG(SGX_PDUMPREG_NAME, MNE_CR_CTRL, ui32RegVal);
 #endif /* SGX_FEATURE_SYSTEM_CACHE */
 
 	if (bHardwareRecovery)
@@ -453,13 +368,13 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 		ui32RegVal = (IMG_UINT32)psDevInfo->sBIFResetPDDevPAddr.uiAddr;
 		OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_DIR_LIST_BASE0, ui32RegVal);
 
-		SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_FALSE);
+		SGXResetSleep(psDevInfo);
 
 		/* Bring BIF out of reset. */
-		SGXResetSoftReset(psDevInfo, IMG_FALSE, ui32PDUMPFlags, IMG_TRUE);
-		SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_FALSE);
+		SGXResetSoftReset(psDevInfo, IMG_FALSE);
+		SGXResetSleep(psDevInfo);
 
-		SGXResetInvalDC(psDevInfo, ui32PDUMPFlags, IMG_FALSE);
+		SGXResetInvalDC(psDevInfo);
 
 		/*
 			Check for a page fault from parts of SGX which do not have a reset.
@@ -485,7 +400,7 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			ui32PTIndex = (sBifFault.uiAddr & SGX_MMU_PT_MASK) >> SGX_MMU_PAGE_SHIFT;
 
 			/* Put the BIF into reset. */
-			SGXResetSoftReset(psDevInfo, IMG_TRUE, ui32PDUMPFlags, IMG_FALSE);
+			SGXResetSoftReset(psDevInfo, IMG_TRUE);
 
 			/* Map in the dummy page. */
 			psDevInfo->pui32BIFResetPD[ui32PDIndex] = (psDevInfo->sBIFResetPTDevPAddr.uiAddr
@@ -502,14 +417,14 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			ui32RegVal = OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_EVENT_STATUS2);
 			OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_EVENT_HOST_CLEAR2, ui32RegVal);
 
-			SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_FALSE);
+			SGXResetSleep(psDevInfo);
 
 			/* Bring the BIF out of reset. */
-			SGXResetSoftReset(psDevInfo, IMG_FALSE, ui32PDUMPFlags, IMG_FALSE);
-			SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_FALSE);
+			SGXResetSoftReset(psDevInfo, IMG_FALSE);
+			SGXResetSleep(psDevInfo);
 
 			/* Invalidate Directory Cache. */
-			SGXResetInvalDC(psDevInfo, ui32PDUMPFlags, IMG_FALSE);
+			SGXResetInvalDC(psDevInfo);
 
 			/* Unmap the dummy page and try again. */
 			psDevInfo->pui32BIFResetPD[ui32PDIndex] = 0;
@@ -519,14 +434,14 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	else
 	{
 		/* Bring BIF out of reset. */
-		SGXResetSoftReset(psDevInfo, IMG_FALSE, ui32PDUMPFlags, IMG_TRUE);
-		SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_FALSE);
+		SGXResetSoftReset(psDevInfo, IMG_FALSE);
+		SGXResetSleep(psDevInfo);
 	}	
 
 	/*
 		Initialise the BIF memory contexts before bringing the rest of SGX out of reset.
 	*/
-	SGXResetSetupBIFContexts(psDevInfo, ui32PDUMPFlags);
+	SGXResetSetupBIFContexts(psDevInfo);
 
 #if defined(SGX_FEATURE_2D_HARDWARE) && !defined(SGX_FEATURE_PTLA)
 	/* check that the heap base has the right alignment (1Mb) */
@@ -535,23 +450,19 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	#endif
 	/* Set up 2D requestor base */
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BIF_TWOD_REQ_BASE, SGX_2D_HEAP_BASE);
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_BIF_TWOD_REQ_BASE, SGX_2D_HEAP_BASE, ui32PDUMPFlags);
 #endif
 
 	/* Invalidate BIF Directory cache. */
-	SGXResetInvalDC(psDevInfo, ui32PDUMPFlags, IMG_TRUE);
+	SGXResetInvalDC(psDevInfo);
 
 	PVR_DPF((PVR_DBG_MESSAGE,"Soft Reset of SGX"));
 
 	/* Take chip out of reset */
 	ui32RegVal = 0;
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_SOFT_RESET, ui32RegVal);
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_SOFT_RESET, ui32RegVal, ui32PDUMPFlags);
 
 	/* wait a bit */
-	SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_TRUE);
-
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "End of SGX reset sequence\r\n");
+	SGXResetSleep(psDevInfo);
 }
 
 /******************************************************************************

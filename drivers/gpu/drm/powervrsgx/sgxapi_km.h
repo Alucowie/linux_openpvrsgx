@@ -447,26 +447,6 @@ typedef struct _SGX_KICKTA_DUMP_BUFFER_
 	IMG_PCHAR			pszName;							/*< Name of buffer */
 } SGX_KICKTA_DUMP_BUFFER, *PSGX_KICKTA_DUMP_BUFFER;
 
-#ifdef PDUMP
-/*
-	PDUMP version of above kick structure
-*/
-typedef struct _SGX_KICKTA_PDUMP_
-{
-	// Bitmaps to dump
-	PSGX_KICKTA_DUMPBITMAP		psPDumpBitmapArray;
-	IMG_UINT32						ui32PDumpBitmapSize;
-
-	// Misc buffers to dump (e.g. TA, PDS etc..)
-	PSGX_KICKTA_DUMP_BUFFER	psBufferArray;
-	IMG_UINT32						ui32BufferArraySize;
-
-	// Roffs to dump
-	PSGX_KICKTA_DUMP_ROFF		psROffArray;
-	IMG_UINT32						ui32ROffArraySize;
-} SGX_KICKTA_PDUMP, *PSGX_KICKTA_PDUMP;
-#endif	/* PDUMP */
-
 #if defined(SGX_FEATURE_2D_HARDWARE)
 /* Maximum size of ctrl stream for 2d blit command (in 32 bit words) */
 #define SGX_MAX_2D_BLIT_CMD_SIZE 		26

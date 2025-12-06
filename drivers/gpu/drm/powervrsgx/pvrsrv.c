@@ -45,7 +45,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_bridge_km.h"
 #include "handle.h"
 #include "perproc.h"
-#include "pdump_km.h"
 #include "deviceid.h"
 #include "ra.h"
 
@@ -56,7 +55,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 IMG_UINT32	g_ui32InitFlags;
 
 /* mark which parts of Services were initialised */
-#define		INIT_DATA_ENABLE_PDUMPINIT	0x1U
 #define		INIT_DATA_ENABLE_TTARCE		0x2U
 
 /*!
@@ -409,10 +407,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVInit(PSYS_DATA psSysData)
 	psSysData->pfnHighResTimerGetus = OSFuncHighResTimerGetus;
 	psSysData->pfnHighResTimerDestroy = OSFuncHighResTimerDestroy;
 
-	/* Initialise pdump */
-	PDUMPINIT();
-	g_ui32InitFlags |= INIT_DATA_ENABLE_PDUMPINIT;
-
 	return eError;
 
 Error:
@@ -446,12 +440,6 @@ IMG_VOID IMG_CALLCONV PVRSRVDeInit(PSYS_DATA psSysData)
 		return;
 	}
 
-	/* deinitialise pdump */
-	if( (g_ui32InitFlags & INIT_DATA_ENABLE_PDUMPINIT) > 0)
-	{
-		PDUMPDEINIT();
-	}
-	
 	/* destroy event object */
 	if(psSysData->psGlobalEventObject)
 	{
@@ -701,9 +689,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVFinaliseSystem(IMG_BOOL bInitSuccessful)
 			return eError;
 		}
 	}
-
-	/* Some platforms call this too early in the boot phase. */
-	PDUMPENDINITPHASE();
 
 	return PVRSRV_OK;
 }

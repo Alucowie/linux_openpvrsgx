@@ -165,7 +165,7 @@ typedef struct _SGX_CCB_KICK_
 	SGX_INTERNEL_STATUS_UPDATE	as3DStatusUpdate[SGX_MAX_3D_STATUS_VALS];
 
 	IMG_BOOL	bFirstKickOrResume;
-#if defined(NO_HARDWARE) || defined(PDUMP)
+#if defined(NO_HARDWARE)
 	IMG_BOOL	bTerminateOrAbort;
 #endif
 	IMG_BOOL	bLastInScene;
@@ -193,9 +193,6 @@ typedef struct _SGX_CCB_KICK_
 
 	IMG_HANDLE	hTASyncInfo;
 	IMG_HANDLE	h3DSyncInfo;
-#if defined(PDUMP)
-	IMG_UINT32	ui32CCBDumpWOff;
-#endif
 #if defined(NO_HARDWARE)
 	IMG_UINT32	ui32WriteOpsPendingVal;
 #endif
@@ -263,9 +260,6 @@ typedef struct _PVRSRV_TRANSFER_SGX_KICK_
 	IMG_UINT32		ui32Flags;
 
 	IMG_UINT32		ui32PDumpFlags;
-#if defined(PDUMP)
-	IMG_UINT32		ui32CCBDumpWOff;
-#endif
 	IMG_HANDLE		hDevMemContext;
 } PVRSRV_TRANSFER_SGX_KICK, *PPVRSRV_TRANSFER_SGX_KICK;
 
@@ -290,9 +284,6 @@ typedef struct _PVRSRV_2D_SGX_KICK_
 	IMG_HANDLE		h3DSyncInfo;
 
 	IMG_UINT32		ui32PDumpFlags;
-#if defined(PDUMP)
-	IMG_UINT32		ui32CCBDumpWOff;
-#endif
 	IMG_HANDLE		hDevMemContext;
 } PVRSRV_2D_SGX_KICK, *PPVRSRV_2D_SGX_KICK;
 #endif	/* defined(SGX_FEATURE_2D_HARDWARE) */

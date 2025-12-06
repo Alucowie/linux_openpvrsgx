@@ -46,7 +46,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "buffer_manager.h"
 #include "sgxinfo.h"
 #include "sysconfig.h"
-#include "pdump_km.h"
 #include "mmu.h"
 #include "pvr_bridge.h"
 #include "sgx_bridge_km.h"
@@ -69,22 +68,6 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 	IMG_BOOL					abDstSyncEnable[SGX_MAX_TRANSFER_SYNC_OPS];
 	IMG_UINT32					ui32RealDstSyncNum = 0;
 
-
-#if defined(PDUMP)
-	IMG_BOOL bPersistentProcess = IMG_FALSE;
-	/*
-	 *	For persistent processes, the HW kicks should not go into the
-	 *	extended init phase; only keep memory transactions from the
-	 *	window system which are necessary to run the client app.
-	 */
-	{
-		PVRSRV_PER_PROCESS_DATA* psPerProc = PVRSRVFindPerProcessData();
-		if(psPerProc != IMG_NULL)
-		{
-			bPersistentProcess = psPerProc->bPDumpPersistent;
-		}
-	}
-#endif /* PDUMP */
 	for (loop = 0; loop < SGX_MAX_TRANSFER_SYNC_OPS; loop++)
 	{
 		abSrcSyncEnable[loop] = IMG_TRUE;
@@ -254,143 +237,9 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 		}
 	}
 
-#if defined(PDUMP)
-	if ((PDumpIsCaptureFrameKM()
-	|| ((psKick->ui32PDumpFlags & PDUMP_FLAGS_CONTINUOUS) != 0)) 
-	&&  (bPersistentProcess == IMG_FALSE) )
-	{
-		PDUMPCOMMENT("Shared part of transfer command\r\n");
-		PDUMPMEM(psSharedTransferCmd,
-				psCCBMemInfo,
-				psKick->ui32CCBDumpWOff,
-				sizeof(SGXMKIF_TRANSFERCMD_SHARED),
-				psKick->ui32PDumpFlags,
-				MAKEUNIQUETAG(psCCBMemInfo));
-
-		if ((psKick->ui32Flags & SGXMKIF_TQFLAGS_KEEPPENDING) == 0UL)
-		{
-			IMG_UINT32 i = 0;
-
-			for (loop = 0; loop < psKick->ui32NumSrcSync; loop++)
-			{
-				if (abSrcSyncEnable[loop])
-				{
-					psSyncInfo = psKick->ahSrcSyncInfo[loop];
-
-					PDUMPCOMMENT("Tweak src surface write op in transfer cmd\r\n");
-					PDUMPMEM(&psSyncInfo->psSyncData->ui32LastOpDumpVal,
-							psCCBMemInfo,
-							psKick->ui32CCBDumpWOff + (IMG_UINT32)(offsetof(SGXMKIF_TRANSFERCMD_SHARED, asSrcSyncs) + i * sizeof(PVRSRV_DEVICE_SYNC_OBJECT) + offsetof(PVRSRV_DEVICE_SYNC_OBJECT, ui32WriteOpsPendingVal)),
-							sizeof(psSyncInfo->psSyncData->ui32LastOpDumpVal),
-							psKick->ui32PDumpFlags,
-							MAKEUNIQUETAG(psCCBMemInfo));
-
-					PDUMPCOMMENT("Tweak src surface read op in transfer cmd\r\n");
-					PDUMPMEM(&psSyncInfo->psSyncData->ui32LastReadOpDumpVal,
-							psCCBMemInfo,
-							psKick->ui32CCBDumpWOff + (IMG_UINT32)(offsetof(SGXMKIF_TRANSFERCMD_SHARED, asSrcSyncs) + i * sizeof(PVRSRV_DEVICE_SYNC_OBJECT) + offsetof(PVRSRV_DEVICE_SYNC_OBJECT, ui32ReadOpsPendingVal)),
-							sizeof(psSyncInfo->psSyncData->ui32LastReadOpDumpVal),
-							psKick->ui32PDumpFlags,
-							MAKEUNIQUETAG(psCCBMemInfo));
-					i++;
-				}
-			}
-
-			i = 0;
-			for (loop = 0; loop < psKick->ui32NumDstSync; loop++)
-			{
-				if (abDstSyncEnable[i])
-				{
-					IMG_UINT32 ui32PDumpReadOp2 = 0;
-					psSyncInfo = psKick->ahDstSyncInfo[loop];
-
-					PDUMPCOMMENT("Tweak dest surface write op in transfer cmd\r\n");
-					PDUMPMEM(&psSyncInfo->psSyncData->ui32LastOpDumpVal,
-							psCCBMemInfo,
-							psKick->ui32CCBDumpWOff + (IMG_UINT32)(offsetof(SGXMKIF_TRANSFERCMD_SHARED, asDstSyncs) + i * sizeof(PVRSRV_DEVICE_SYNC_OBJECT) + offsetof(PVRSRV_DEVICE_SYNC_OBJECT, ui32WriteOpsPendingVal)),
-							sizeof(psSyncInfo->psSyncData->ui32LastOpDumpVal),
-							psKick->ui32PDumpFlags,
-							MAKEUNIQUETAG(psCCBMemInfo));
-
-					PDUMPCOMMENT("Tweak dest surface read op in transfer cmd\r\n");
-					PDUMPMEM(&psSyncInfo->psSyncData->ui32LastReadOpDumpVal,
-							psCCBMemInfo,
-							psKick->ui32CCBDumpWOff + (IMG_UINT32)(offsetof(SGXMKIF_TRANSFERCMD_SHARED, asDstSyncs) + i * sizeof(PVRSRV_DEVICE_SYNC_OBJECT) + offsetof(PVRSRV_DEVICE_SYNC_OBJECT, ui32ReadOpsPendingVal)),
-							sizeof(psSyncInfo->psSyncData->ui32LastReadOpDumpVal),
-							psKick->ui32PDumpFlags,
-							MAKEUNIQUETAG(psCCBMemInfo));
-
-					PDUMPCOMMENT("Tweak dest surface read op2 in transfer cmd\r\n");
-					PDUMPMEM(&ui32PDumpReadOp2,
-							psCCBMemInfo,
-							psKick->ui32CCBDumpWOff + (IMG_UINT32)(offsetof(SGXMKIF_TRANSFERCMD_SHARED, asDstSyncs) + i * sizeof(PVRSRV_DEVICE_SYNC_OBJECT) + offsetof(PVRSRV_DEVICE_SYNC_OBJECT, ui32ReadOps2PendingVal)),
-							sizeof(ui32PDumpReadOp2),
-							psKick->ui32PDumpFlags,
-							MAKEUNIQUETAG(psCCBMemInfo));
-					i++;
-				}
-			}
-
-			/*
-			 * We allow the first source and destination sync objects to be the
-			 * same, which is why the read/write pending updates are delayed
-			 * until the transfer command has been updated with the current
-			 * values from the objects.
-			 */
-			for (loop = 0; loop < (psKick->ui32NumSrcSync); loop++)
-			{
-				if (abSrcSyncEnable[loop])
-				{	
-					psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psKick->ahSrcSyncInfo[loop];
-					psSyncInfo->psSyncData->ui32LastReadOpDumpVal++;
-				}
-			}
-
-			for (loop = 0; loop < (psKick->ui32NumDstSync); loop++)
-			{
-				if (abDstSyncEnable[loop])
-				{
-					psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psKick->ahDstSyncInfo[0];
-					psSyncInfo->psSyncData->ui32LastOpDumpVal++;
-				}
-			}
-		}
-
-		if (psKick->hTASyncInfo != IMG_NULL)
-		{
-			psSyncInfo = psKick->hTASyncInfo;
-
-			PDUMPCOMMENT("Tweak TA/TQ surface write op in transfer cmd\r\n");
-			PDUMPMEM(&psSyncInfo->psSyncData->ui32LastOpDumpVal,
-					psCCBMemInfo,
-					psKick->ui32CCBDumpWOff + (IMG_UINT32)(offsetof(SGXMKIF_TRANSFERCMD_SHARED, ui32TASyncWriteOpsPendingVal)),
-					sizeof(psSyncInfo->psSyncData->ui32LastOpDumpVal),
-					psKick->ui32PDumpFlags,
-					MAKEUNIQUETAG(psCCBMemInfo));
-
-			psSyncInfo->psSyncData->ui32LastOpDumpVal++;
-		}
-
-		if (psKick->h3DSyncInfo != IMG_NULL)
-		{
-			psSyncInfo = psKick->h3DSyncInfo;
-
-			PDUMPCOMMENT("Tweak 3D/TQ surface write op in transfer cmd\r\n");
-			PDUMPMEM(&psSyncInfo->psSyncData->ui32LastOpDumpVal,
-					psCCBMemInfo,
-					psKick->ui32CCBDumpWOff + (IMG_UINT32)(offsetof(SGXMKIF_TRANSFERCMD_SHARED, ui323DSyncWriteOpsPendingVal)),
-					sizeof(psSyncInfo->psSyncData->ui32LastOpDumpVal),
-					psKick->ui32PDumpFlags,
-					MAKEUNIQUETAG(psCCBMemInfo));
-
-			psSyncInfo->psSyncData->ui32LastOpDumpVal++;
-		}
-	}
-#endif
-
 	sCommand.ui32Data[1] = psKick->sHWTransferContextDevVAddr.uiAddr;
 
-	eError = SGXScheduleCCBCommandKM(hDevHandle, SGXMKIF_CMD_TRANSFER, &sCommand, KERNEL_ID, psKick->ui32PDumpFlags, hDevMemContext, IMG_FALSE);
+	eError = SGXScheduleCCBCommandKM(hDevHandle, SGXMKIF_CMD_TRANSFER, &sCommand, KERNEL_ID, hDevMemContext, IMG_FALSE);
 
 	if (eError == PVRSRV_ERROR_RETRY)
 	{
@@ -403,13 +252,6 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 				{
 					psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psKick->ahSrcSyncInfo[loop];
 					psSyncInfo->psSyncData->ui32ReadOpsPending--;
-#if defined(PDUMP)
-					if (PDumpIsCaptureFrameKM()
-							|| ((psKick->ui32PDumpFlags & PDUMP_FLAGS_CONTINUOUS) != 0))
-					{
-						psSyncInfo->psSyncData->ui32LastReadOpDumpVal--;
-					}
-#endif
 				}
 			}
 			for (loop = 0; loop < psKick->ui32NumDstSync; loop++)
@@ -418,13 +260,6 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 				{
 					psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *)psKick->ahDstSyncInfo[loop];
 					psSyncInfo->psSyncData->ui32WriteOpsPending--;
-#if defined(PDUMP)
-					if (PDumpIsCaptureFrameKM()
-							|| ((psKick->ui32PDumpFlags & PDUMP_FLAGS_CONTINUOUS) != 0))
-					{
-						psSyncInfo->psSyncData->ui32LastOpDumpVal--;
-					}
-#endif
 				}
 			}
 		}
@@ -501,21 +336,6 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmit2DKM(IMG_HANDLE hDevHandle, PVRSRV_2D_SGX_KICK 
 	PVRSRV_ERROR eError;
 	IMG_UINT32 i;
 	IMG_HANDLE hDevMemContext = IMG_NULL;
-#if defined(PDUMP)
-	IMG_BOOL bPersistentProcess = IMG_FALSE;
-	/*
-	 *	For persistent processes, the HW kicks should not go into the
-	 *	extended init phase; only keep memory transactions from the
-	 *	window system which are necessary to run the client app.
-	 */
-	{
-		PVRSRV_PER_PROCESS_DATA* psPerProc = PVRSRVFindPerProcessData();
-		if(psPerProc != IMG_NULL)
-		{
-			bPersistentProcess = psPerProc->bPDumpPersistent;
-		}
-	}
-#endif /* PDUMP */
 
 	if (!CCB_OFFSET_IS_VALID(SGXMKIF_2DCMD_SHARED, psCCBMemInfo, psKick, ui32SharedCmdCCBOffset))
 	{
@@ -596,111 +416,15 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmit2DKM(IMG_HANDLE hDevHandle, PVRSRV_2D_SGX_KICK 
 		psSyncInfo->psSyncData->ui32WriteOpsPending++;
 	}
 
-#if defined(PDUMP)
-	if ((PDumpIsCaptureFrameKM()
-	|| ((psKick->ui32PDumpFlags & PDUMP_FLAGS_CONTINUOUS) != 0))
-	&&  (bPersistentProcess == IMG_FALSE) )
-	{
-		/* Pdump the command from the per context CCB */
-		PDUMPCOMMENT("Shared part of 2D command\r\n");
-		PDUMPMEM(ps2DCmd,
-				psCCBMemInfo,
-				psKick->ui32CCBDumpWOff,
-				sizeof(SGXMKIF_2DCMD_SHARED),
-				psKick->ui32PDumpFlags,
-				MAKEUNIQUETAG(psCCBMemInfo));
-
-		for (i = 0; i < psKick->ui32NumSrcSync; i++)
-		{
-			psSyncInfo = psKick->ahSrcSyncInfo[i];
-
-			PDUMPCOMMENT("Tweak src surface write op in 2D cmd\r\n");
-			PDUMPMEM(&psSyncInfo->psSyncData->ui32LastOpDumpVal,
-					psCCBMemInfo,
-					psKick->ui32CCBDumpWOff + (IMG_UINT32)offsetof(SGXMKIF_2DCMD_SHARED, sSrcSyncData[i].ui32WriteOpsPendingVal),
-					sizeof(psSyncInfo->psSyncData->ui32LastOpDumpVal),
-					psKick->ui32PDumpFlags,
-					MAKEUNIQUETAG(psCCBMemInfo));
-
-			PDUMPCOMMENT("Tweak src surface read op in 2D cmd\r\n");
-			PDUMPMEM(&psSyncInfo->psSyncData->ui32LastReadOpDumpVal,
-					psCCBMemInfo,
-					psKick->ui32CCBDumpWOff + (IMG_UINT32)offsetof(SGXMKIF_2DCMD_SHARED, sSrcSyncData[i].ui32ReadOpsPendingVal),
-					sizeof(psSyncInfo->psSyncData->ui32LastReadOpDumpVal),
-					psKick->ui32PDumpFlags,
-					MAKEUNIQUETAG(psCCBMemInfo));
-		}
-
-		if (psKick->hDstSyncInfo != IMG_NULL)
-		{
-			IMG_UINT32 ui32PDumpReadOp2 = 0;
-			psSyncInfo = psKick->hDstSyncInfo;
-
-			PDUMPCOMMENT("Tweak dest surface write op in 2D cmd\r\n");
-			PDUMPMEM(&psSyncInfo->psSyncData->ui32LastOpDumpVal,
-					psCCBMemInfo,
-					psKick->ui32CCBDumpWOff + (IMG_UINT32)offsetof(SGXMKIF_2DCMD_SHARED, sDstSyncData.ui32WriteOpsPendingVal),
-					sizeof(psSyncInfo->psSyncData->ui32LastOpDumpVal),
-					psKick->ui32PDumpFlags,
-					MAKEUNIQUETAG(psCCBMemInfo));
-
-			PDUMPCOMMENT("Tweak dest surface read op in 2D cmd\r\n");
-			PDUMPMEM(&psSyncInfo->psSyncData->ui32LastReadOpDumpVal,
-					psCCBMemInfo,
-					psKick->ui32CCBDumpWOff + (IMG_UINT32)offsetof(SGXMKIF_2DCMD_SHARED, sDstSyncData.ui32ReadOpsPendingVal),
-					sizeof(psSyncInfo->psSyncData->ui32LastReadOpDumpVal),
-					psKick->ui32PDumpFlags,
-					MAKEUNIQUETAG(psCCBMemInfo));
-			PDUMPCOMMENT("Tweak dest surface read op2 in 2D cmd\r\n");
-			PDUMPMEM(&ui32PDumpReadOp2,
-					psCCBMemInfo,
-					psKick->ui32CCBDumpWOff + (IMG_UINT32)offsetof(SGXMKIF_2DCMD_SHARED, sDstSyncData.ui32ReadOps2PendingVal),
-					sizeof(ui32PDumpReadOp2),
-					psKick->ui32PDumpFlags,
-					MAKEUNIQUETAG(psCCBMemInfo));
-		}
-
-		/* Read/Write ops pending updates, delayed from above */
-		for (i = 0; i < psKick->ui32NumSrcSync; i++)
-		{
-			psSyncInfo = psKick->ahSrcSyncInfo[i];
-			psSyncInfo->psSyncData->ui32LastReadOpDumpVal++;
-		}
-
-		if (psKick->hDstSyncInfo != IMG_NULL)
-		{
-			psSyncInfo = psKick->hDstSyncInfo;
-			psSyncInfo->psSyncData->ui32LastOpDumpVal++;
-		}
-	}		
-#endif
-
 	sCommand.ui32Data[1] = psKick->sHW2DContextDevVAddr.uiAddr;
-	
-	eError = SGXScheduleCCBCommandKM(hDevHandle, SGXMKIF_CMD_2D, &sCommand, KERNEL_ID, psKick->ui32PDumpFlags, hDevMemContext, IMG_FALSE);	
+
+	eError = SGXScheduleCCBCommandKM(hDevHandle, SGXMKIF_CMD_2D, &sCommand, KERNEL_ID, hDevMemContext, IMG_FALSE);
 
 	if (eError == PVRSRV_ERROR_RETRY)
 	{
 		/* Client will retry, so undo the write ops pending increment
 		   done above.
 		 */
-#if defined(PDUMP)
-		if (PDumpIsCaptureFrameKM())
-		{
-			for (i = 0; i < psKick->ui32NumSrcSync; i++)
-			{
-				psSyncInfo = psKick->ahSrcSyncInfo[i];
-				psSyncInfo->psSyncData->ui32LastReadOpDumpVal--;
-			}
-
-			if (psKick->hDstSyncInfo != IMG_NULL)
-			{
-				psSyncInfo = psKick->hDstSyncInfo;
-				psSyncInfo->psSyncData->ui32LastOpDumpVal--;
-			}
-		}
-#endif
-
 		for (i = 0; i < psKick->ui32NumSrcSync; i++)
 		{
 			psSyncInfo = psKick->ahSrcSyncInfo[i];

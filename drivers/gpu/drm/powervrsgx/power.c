@@ -41,7 +41,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
 
 #include "services_headers.h"
-#include "pdump_km.h"
 
 #include "lists.h"
 
@@ -466,37 +465,11 @@ PVRSRV_ERROR PVRSRVSetDevicePowerStateKM(IMG_UINT32				ui32DeviceIndex,
 
 	SysAcquireData(&psSysData);
 
-	#if defined(PDUMP)
-	if (eNewPowerState == PVRSRV_DEV_POWER_STATE_DEFAULT)
-	{
-		/*
-			Pdump a power-up regardless of the default state.
-			Then disable pdump and transition to the default power state.
-			This ensures that a power-up is always present in the pdump when necessary.
-		*/
-		eError = PVRSRVDevicePrePowerStateKM(IMG_FALSE, ui32DeviceIndex, PVRSRV_DEV_POWER_STATE_ON);
-		if(eError != PVRSRV_OK)
-		{
-			goto Exit;
-		}
-
-		eError = PVRSRVDevicePostPowerStateKM(IMG_FALSE, ui32DeviceIndex, PVRSRV_DEV_POWER_STATE_ON);
-
-		if (eError != PVRSRV_OK)
-		{
-			goto Exit;
-		}
-
-		PDUMPSUSPEND();
-	}
-	#endif /* PDUMP */
-
 	eError = PVRSRVDevicePrePowerStateKM(IMG_FALSE, ui32DeviceIndex, eNewPowerState);
 	if(eError != PVRSRV_OK)
 	{
 		if (eNewPowerState == PVRSRV_DEV_POWER_STATE_DEFAULT)
 		{
-			PDUMPRESUME();
 		}
 		goto Exit;
 	}
@@ -505,7 +478,6 @@ PVRSRV_ERROR PVRSRVSetDevicePowerStateKM(IMG_UINT32				ui32DeviceIndex,
 
 	if (eNewPowerState == PVRSRV_DEV_POWER_STATE_DEFAULT)
 	{
-		PDUMPRESUME();
 	}
 
 Exit:

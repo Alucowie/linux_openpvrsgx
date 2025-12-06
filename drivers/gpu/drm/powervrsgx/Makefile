@@ -21,7 +21,6 @@ powervrsgx-y := \
 	omap3_sysutils.o \
 	osfunc.o \
 	osperproc.o \
-	pdump.o \
 	perproc.o \
 	power.o \
 	proc.o \

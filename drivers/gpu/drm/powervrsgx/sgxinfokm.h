@@ -134,9 +134,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	PVRSRV_SGX_CCB_CTL		*psKernelCCBCtl;		/*!< kernel mode linear address of CCB control in device accessible memory */
 	PPVRSRV_KERNEL_MEM_INFO psKernelCCBEventKickerMemInfo; /*!< meminfo for kernel CCB event kicker */
 	IMG_UINT32				*pui32KernelCCBEventKicker; /*!< kernel mode linear address of kernel CCB event kicker */
-#if defined(PDUMP)
-	IMG_UINT32				ui32KernelCCBEventKickerDumpVal; /*!< pdump copy of the kernel CCB event kicker */
-#endif /* PDUMP */
  	PVRSRV_KERNEL_MEM_INFO	*psKernelSGXMiscMemInfo;	/*!< kernel mode linear address of SGX misc info buffer */
 	IMG_UINT32				aui32HostKickAddr[SGXMKIF_CMD_MAX];		/*!< ukernel host kick offests */
 #if defined(SGX_SUPPORT_HWPROFILING)
@@ -206,10 +203,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	/* memory tiling range usage */
 	IMG_UINT32				ui32MemTilingUsage;
 
-	#if defined(PDUMP)
-	PVRSRV_SGX_PDUMP_CONTEXT	sPDContext;
-	#endif
-
 #if defined(SUPPORT_SGX_MMU_DUMMY_PAGE)
 	/* SGX MMU dummy page details */
 	IMG_VOID				*pvDummyPTPageCpuVAddr;
@@ -218,9 +211,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	IMG_VOID				*pvDummyDataPageCpuVAddr;
 	IMG_DEV_PHYADDR 		sDummyDataDevPAddr;
 	IMG_HANDLE				hDummyDataPageOSMemHandle;
-#endif
-#if defined(PDUMP)
-	PDUMP_MMU_ATTRIB sMMUAttrib;
 #endif
 	IMG_UINT32				asSGXDevData[SGX_MAX_DEV_DATA];
 } PVRSRV_SGXDEV_INFO;
@@ -266,11 +256,6 @@ typedef struct _SGX_DEVICE_MAP_
 
 	/* device interrupt IRQ */
 	IMG_UINT32				ui32IRQ;
-
-#if defined(PDUMP)
-	/* pdump memory region name */
-	IMG_CHAR				*pszPDumpDevName;
-#endif
 } SGX_DEVICE_MAP;
 
 
@@ -301,9 +286,6 @@ typedef struct _PVRSRV_SGX_CCB_INFO_
 	SGXMKIF_COMMAND		*psCommands;			/*!< linear address of the array of commands */
 	IMG_UINT32				*pui32WriteOffset;		/*!< linear address of the write offset into array of commands */
 	volatile IMG_UINT32		*pui32ReadOffset;		/*!< linear address of the read offset into array of commands */
-#if defined(PDUMP)
-	IMG_UINT32				ui32CCBDumpWOff;		/*!< for pdumping */
-#endif
 } PVRSRV_SGX_CCB_INFO;
 
 
@@ -373,7 +355,7 @@ typedef struct _SGX_CCB_KICK_KM_
 	SGX_INTERNEL_STATUS_UPDATE_KM	as3DStatusUpdate[SGX_MAX_3D_STATUS_VALS];
 
 	IMG_BOOL	bFirstKickOrResume;
-#if defined(NO_HARDWARE) || defined(PDUMP)
+#if defined(NO_HARDWARE)
 	IMG_BOOL	bTerminateOrAbort;
 #endif
 
@@ -400,9 +382,6 @@ typedef struct _SGX_CCB_KICK_KM_
 
 	IMG_HANDLE	hTASyncInfo;
 	IMG_HANDLE	h3DSyncInfo;
-#if defined(PDUMP)
-	IMG_UINT32	ui32CCBDumpWOff;
-#endif
 #if defined(NO_HARDWARE)
 	IMG_UINT32	ui32WriteOpsPendingVal;
 #endif
@@ -428,9 +407,6 @@ typedef struct _PVRSRV_TRANSFER_SGX_KICK_KM_
 	IMG_UINT32		ui32Flags;
 
 	IMG_UINT32		ui32PDumpFlags;
-#if defined(PDUMP)
-	IMG_UINT32		ui32CCBDumpWOff;
-#endif
 } PVRSRV_TRANSFER_SGX_KICK_KM, *PPVRSRV_TRANSFER_SGX_KICK_KM;
 
 #if defined(SGX_FEATURE_2D_HARDWARE)
@@ -454,9 +430,6 @@ typedef struct _PVRSRV_2D_SGX_KICK_KM_
 	IMG_HANDLE		h3DSyncInfo;
 
 	IMG_UINT32		ui32PDumpFlags;
-#if defined(PDUMP)
-	IMG_UINT32		ui32CCBDumpWOff;
-#endif
 } PVRSRV_2D_SGX_KICK_KM, *PPVRSRV_2D_SGX_KICK_KM;
 #endif	/* defined(SGX_FEATURE_2D_HARDWARE) */
 
@@ -468,11 +441,9 @@ PVRSRV_ERROR SGXRegisterDevice (PVRSRV_DEVICE_NODE *psDeviceNode);
 IMG_VOID SGXOSTimer(IMG_VOID *pvData);
 
 IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
-				  IMG_BOOL				bHardwareRecovery,
-				  IMG_UINT32			ui32PDUMPFlags);
+				  IMG_BOOL				bHardwareRecovery);
 
-IMG_VOID SGXInitClocks(PVRSRV_SGXDEV_INFO	*psDevInfo,
-					   IMG_UINT32			ui32PDUMPFlags);
+IMG_VOID SGXInitClocks(PVRSRV_SGXDEV_INFO	*psDevInfo);
 
 PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 						   IMG_BOOL				bHardwareRecovery);

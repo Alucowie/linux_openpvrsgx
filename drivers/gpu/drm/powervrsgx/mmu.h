@@ -456,17 +456,4 @@ IMG_BOOL MMU_IsHeapShared(MMU_HEAP* pMMU_Heap);
 
 IMG_VOID MMU_CheckFaultAddr(PVRSRV_SGXDEV_INFO *psDevInfo, IMG_UINT32 ui32PDDevPAddr, IMG_UINT32 ui32RegVal);
 
-#if defined(PDUMP)
-/*
-******************************************************************************
-	FUNCTION:   MMU_GetPDumpContextID
-
-	PURPOSE:    translates device mem context to unique pdump identifier
-
-	PARAMETERS: In:  hDevMemContext - device memory per-process context
-	RETURNS:	context identifier used internally in pdump
-******************************************************************************/
-IMG_UINT32 MMU_GetPDumpContextID(IMG_HANDLE hDevMemContext);
-#endif /* #ifdef PDUMP */
-
 #endif /* __MMU_H__ */

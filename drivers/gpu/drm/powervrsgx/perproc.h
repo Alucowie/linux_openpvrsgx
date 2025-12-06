@@ -60,16 +60,6 @@ typedef struct _PVRSRV_PER_PROCESS_DATA_
 
 	/* True if the process is the initialisation server. */
 	IMG_BOOL		bInitProcess;
-#if defined(PDUMP)
-	/* True if pdump data from the process is 'persistent' */
-	IMG_BOOL		bPDumpPersistent;
-#if defined(SUPPORT_PDUMP_MULTI_PROCESS)
-	/* True if this process is marked for pdumping. This flag is
-	 * significant in a multi-app environment.
-	 */
-	IMG_BOOL		bPDumpActive;
-#endif /* SUPPORT_PDUMP_MULTI_PROCESS */
-#endif
 	/*
 	 * OS specific data can be stored via this handle.
 	 * See osperproc.h for a generic mechanism for initialising

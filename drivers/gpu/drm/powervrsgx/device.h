@@ -324,15 +324,6 @@ typedef struct _PVRSRV_DEVICE_NODE_
 	
 	struct _PVRSRV_DEVICE_NODE_	*psNext;
 	struct _PVRSRV_DEVICE_NODE_	**ppsThis;
-	
-#if defined(PDUMP)
-	/* 	device-level callback which is called when pdump.exe starts.
-	 *	Should be implemented in device-specific init code, e.g. sgxinit.c
-	 */
-	PVRSRV_ERROR			(*pfnPDumpInitDevice)(struct _PVRSRV_DEVICE_NODE_ *psDeviceNode);
-	/* device-level callback to return pdump ID associated to a memory context */
-	IMG_UINT32				(*pfnMMUGetContextID)(IMG_HANDLE hDevMemContext);
-#endif
 } PVRSRV_DEVICE_NODE;
 
 PVRSRV_ERROR IMG_CALLCONV PVRSRVRegisterDevice(PSYS_DATA psSysData,

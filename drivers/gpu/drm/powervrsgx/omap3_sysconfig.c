@@ -188,17 +188,6 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 #endif
 #endif 
 
-#if defined(PDUMP)
-	{
-		
-		static IMG_CHAR pszPDumpDevName[] = "SGXMEM";
-		gsSGXDeviceMap.pszPDumpDevName = pszPDumpDevName;
-	}
-#endif
-
-	
-
-
 	return PVRSRV_OK;
 }
 

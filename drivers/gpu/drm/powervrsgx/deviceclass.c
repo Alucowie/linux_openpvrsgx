@@ -45,7 +45,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "kernelbuffer.h"
 #include "kerneldisplay.h"
 #include "pvr_bridge_km.h"
-#include "pdump_km.h"
 #include "deviceid.h"
 
 #include "lists.h"
@@ -1372,18 +1371,6 @@ PVRSRV_ERROR PVRSRVCreateDCSwapChainKM (PVRSRV_PER_PROCESS_DATA	*psPerProc,
 	psSwapChain->ui32BufferCount = ui32BufferCount;
 	psSwapChain->psDCInfo = psDCInfo;
 
-#if defined(PDUMP)
-	PDUMPCOMMENT("Allocate DC swap chain (SwapChainID == %u, BufferCount == %u)",
-			*pui32SwapChainID,
-			ui32BufferCount);
-	PDUMPCOMMENT("  Src surface dimensions == %u x %u",
-			psSrcSurfAttrib->sDims.ui32Width,
-			psSrcSurfAttrib->sDims.ui32Height);
-	PDUMPCOMMENT("  Dst surface dimensions == %u x %u",
-			psDstSurfAttrib->sDims.ui32Width,
-			psDstSurfAttrib->sDims.ui32Height);
-#endif
-
 	eError = psDCInfo->psFuncTable->pfnGetDCInfo(psDCInfo->hExtDevice, &sDisplayInfo);
 	if (eError != PVRSRV_OK)
 	{
@@ -1407,7 +1394,6 @@ PVRSRV_ERROR PVRSRVCreateDCSwapChainKM (PVRSRV_PER_PROCESS_DATA	*psPerProc,
 	if(eError != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR,"PVRSRVCreateDCSwapChainKM: Failed to create 3rd party SwapChain"));
-		PDUMPCOMMENT("Swapchain allocation failed.");
 		goto ErrorExit;
 	}
 
@@ -1418,7 +1404,6 @@ PVRSRV_ERROR PVRSRVCreateDCSwapChainKM (PVRSRV_PER_PROCESS_DATA	*psPerProc,
 	if( eError != PVRSRV_OK ) 
 	{
 		PVR_DPF((PVR_DBG_ERROR,"PVRSRVCreateDCSwapChainKM: Couldn't create swap chain reference"));
-		PDUMPCOMMENT("Swapchain allocation failed.");
 		goto ErrorExit;
 	}
 
