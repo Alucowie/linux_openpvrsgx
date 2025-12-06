@@ -497,18 +497,11 @@ PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	psSGXHostCtl->ui32HostClock = OSClockus();
 
 	psSGXHostCtl->ui32InitStatus = 0;
-#if 0 && defined(SGX_FEATURE_MULTI_EVENT_KICK)
-	OSWriteMemoryBarrier();
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM,
-				 SGX_MP_CORE_SELECT(EUR_CR_EVENT_KICK2, 0),
-				 EUR_CR_EVENT_KICK2_NOW_MASK);
-#else
 	*psDevInfo->pui32KernelCCBEventKicker = (*psDevInfo->pui32KernelCCBEventKicker + 1) & 0xFF;
 	OSWriteMemoryBarrier();
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM,
 				 SGX_MP_CORE_SELECT(EUR_CR_EVENT_KICK, 0),
 				 EUR_CR_EVENT_KICK_NOW_MASK);
-#endif /* SGX_FEATURE_MULTI_EVENT_KICK */
 
 	OSMemoryBarrier();
 
