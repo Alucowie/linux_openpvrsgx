@@ -1612,91 +1612,6 @@ BM_Alloc (  IMG_HANDLE			hDevMemHeap,
 }
 
 
-
-#if defined(PVR_LMA)
-/*!
-******************************************************************************
-
-	@Function   ValidSysPAddrArrayForDev
-
-	@Description    Verify the array of system address is accessible
-                    by the given device.
-
-	@Input      psDeviceNode
-    @Input      psSysPAddr - system address array
-    @Input      ui32PageSize - size of address array
-    
-	@Return     IMG_BOOL
-
- *****************************************************************************/
-static IMG_BOOL
-ValidSysPAddrArrayForDev(PVRSRV_DEVICE_NODE *psDeviceNode, IMG_SYS_PHYADDR *psSysPAddr, IMG_UINT32 ui32PageCount, IMG_SIZE_T ui32PageSize)
-{
-	IMG_UINT32 i;
-
-	for (i = 0; i < ui32PageCount; i++)
-	{
-		IMG_SYS_PHYADDR sStartSysPAddr = psSysPAddr[i];
-		IMG_SYS_PHYADDR sEndSysPAddr;
-
-		if (!SysVerifySysPAddrToDevPAddr(psDeviceNode->sDevId.eDeviceType, sStartSysPAddr))
-		{
-			return IMG_FALSE;
-		}
-
-		sEndSysPAddr.uiAddr = sStartSysPAddr.uiAddr + ui32PageSize;
-
-		if (!SysVerifySysPAddrToDevPAddr(psDeviceNode->sDevId.eDeviceType, sEndSysPAddr))
-		{
-			return IMG_FALSE;
-		}
-	}
-
-	return IMG_TRUE;
-}
-
-/*!
-******************************************************************************
-
-	@Function  ValidSysPAddrRangeForDev
-
-	@Description   Verify a system address range is accessible
-		   by the given device.
-
-	@Input      psDeviceNode
-    @Input      sStartSysPAddr - starting system address
-    @Input      ui32Range - length of address range
-
-	@Return     IMG_BOOL
-
- *****************************************************************************/
-static IMG_BOOL
-ValidSysPAddrRangeForDev(PVRSRV_DEVICE_NODE *psDeviceNode, IMG_SYS_PHYADDR sStartSysPAddr, IMG_SIZE_T ui32Range)
-{
-	IMG_SYS_PHYADDR sEndSysPAddr;
-
-	if (!SysVerifySysPAddrToDevPAddr(psDeviceNode->sDevId.eDeviceType, sStartSysPAddr))
-	{
-		return IMG_FALSE;
-	}
-
-	sEndSysPAddr.uiAddr = sStartSysPAddr.uiAddr + ui32Range;
-
-	if (!SysVerifySysPAddrToDevPAddr(psDeviceNode->sDevId.eDeviceType, sEndSysPAddr))
-	{
-		return IMG_FALSE;
-	}
-
-	return IMG_TRUE;
-}
-
-#define	WRAP_MAPPING_SIZE(ui32ByteSize, ui32PageOffset) HOST_PAGEALIGN((ui32ByteSize) + (ui32PageOffset))
-
-#define	WRAP_PAGE_COUNT(ui32ByteSize, ui32PageOffset, ui32HostPageSize)	(WRAP_MAPPING_SIZE(ui32ByteSize, ui32PageOffset) / (ui32HostPageSize))
-
-#endif
-
-
 /*!
 ******************************************************************************
 
@@ -1753,26 +1668,6 @@ BM_Wrap (	IMG_HANDLE hDevMemHeap,
 
 	SysAcquireData(&psSysData);
 
-#if defined(PVR_LMA)
-	if (bPhysContig)
-	{
-		if (!ValidSysPAddrRangeForDev(psBMContext->psDeviceNode, *psSysAddr, WRAP_MAPPING_SIZE(ui32Size, ui32Offset)))
-		{
-			PVR_DPF((PVR_DBG_ERROR, "BM_Wrap: System address range invalid for device"));
-			return IMG_FALSE;
-		}
-	}
-	else
-	{
-		IMG_SIZE_T ui32HostPageSize = HOST_PAGESIZE();
-
-		if (!ValidSysPAddrArrayForDev(psBMContext->psDeviceNode, psSysAddr, WRAP_PAGE_COUNT(ui32Size, ui32Offset, ui32HostPageSize), ui32HostPageSize))
-		{
-			PVR_DPF((PVR_DBG_ERROR, "BM_Wrap: Array of system addresses invalid for device"));
-			return IMG_FALSE;
-		}
-	}
-#endif
 	/*
 	 * Insert the System Physical Address of the first page into the hash so we can optimise multiple wraps of the
 	 * same memory.
