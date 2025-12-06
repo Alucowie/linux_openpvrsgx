@@ -154,15 +154,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * SGX_PDSPIXEL_CODEDATA_HEAP_BASE + 64MB range must include PDSVERTEX_CODEDATA and KERNEL_CODE heaps
  *
  ********************************************************************************/
-#if !defined (SGX_FEATURE_EDM_VERTEX_PDSADDR_FULL_RANGE)
 	#if ((SGX_KERNEL_CODE_HEAP_BASE + SGX_KERNEL_CODE_HEAP_SIZE - SGX_PDSPIXEL_CODEDATA_HEAP_BASE) >  0x4000000)
-	 	#error "sgxconfig.h: ERROR: SGX_KERNEL_CODE_HEAP_BASE out of range of SGX_PDSPIXEL_CODEDATA_HEAP_BASE"
+		#error "sgxconfig.h: ERROR: SGX_KERNEL_CODE_HEAP_BASE out of range of SGX_PDSPIXEL_CODEDATA_HEAP_BASE"
 	#endif
-	
+
 	#if ((SGX_PDSVERTEX_CODEDATA_HEAP_BASE + SGX_PDSVERTEX_CODEDATA_HEAP_SIZE - SGX_PDSPIXEL_CODEDATA_HEAP_BASE) >  0x4000000)
-	 	#error "sgxconfig.h: ERROR: SGX_PDSVERTEX_CODEDATA_HEAP_BASE out of range of SGX_PDSPIXEL_CODEDATA_HEAP_BASE"
+		#error "sgxconfig.h: ERROR: SGX_PDSVERTEX_CODEDATA_HEAP_BASE out of range of SGX_PDSPIXEL_CODEDATA_HEAP_BASE"
 	#endif
-#endif	
 
 /*********************************************************************************
  *
