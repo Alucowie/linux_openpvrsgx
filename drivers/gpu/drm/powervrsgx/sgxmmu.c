@@ -944,9 +944,7 @@ _DeferredAllocPagetables(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT
 	IMG_DEV_VIRTADDR sHighDevVAddr;
 
 	/* Check device linear address */
-#if SGX_FEATURE_ADDRESS_SPACE_SIZE < 32
 	PVR_ASSERT(DevVAddr.uiAddr < (1<<SGX_FEATURE_ADDRESS_SPACE_SIZE));
-#endif
 
 	/* get the sysdata */
 	SysAcquireData(&psSysData);

@@ -56,103 +56,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define SGX_KERNEL_DATA_HEAP_OFFSET		0x00000000
 #endif
 
-#if SGX_FEATURE_ADDRESS_SPACE_SIZE == 32
-	#if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
-	#define SGX_GENERAL_MAPPING_HEAP_BASE		 0x08000000
-	#define SGX_GENERAL_MAPPING_HEAP_SIZE		(0x08000000-0x00001000)
-	#endif
-
-	#if !defined(SUPPORT_MEMORY_TILING)
-			#define SGX_GENERAL_HEAP_BASE				 0x10000000
-			#define SGX_GENERAL_HEAP_SIZE				(0xC2000000-0x00001000)
-	#else
-		/* Create heaps with memory tiling enabled.
-	 	 * SGX HW limit is 10 heaps.
-	 	 */
-	 	/* Tiled heap space is taken from general heap */
-	 	#define SGX_GENERAL_HEAP_BASE				 0x10000000
-		#define SGX_GENERAL_HEAP_SIZE				(0xB5000000-0x00001000)
-
-		#define SGX_VPB_TILED_HEAP_STRIDE			TILING_TILE_STRIDE_2K
-		#define SGX_VPB_TILED_HEAP_BASE		 0xC5000000
-		#define SGX_VPB_TILED_HEAP_SIZE	(0x0D000000-0x00001000)
-
-		/* Check tiled heap base alignment */
-		#if((SGX_VPB_TILED_HEAP_BASE & SGX_BIF_TILING_ADDR_INV_MASK) != 0)
-		#error "sgxconfig.h: SGX_VPB_TILED_HEAP has insufficient alignment"
-		#endif
-
-	#endif /* SUPPORT_MEMORY_TILING */
-
-	/*
-	 * For hybrid PB we have to split virtual PB range between the shared
-	 * PB and percontext PB due to the fact we only have one heap config
-	 * per device.
-	 * If hybrid PB is enabled we split the space acording to HYBRID_SHARED_PB_SIZE.
-	 * i.e. HYBRID_SHARED_PB_SIZE defines the size of the shared PB and the
-	 * remainder is the size of the percontext PB.
-	 * If hybrid PB is not enabled then we still create both heaps (helps keep
-	 * the code clean) and define the size of the unused one to 0
-	 */
-
-	#define SGX_3DPARAMETERS_HEAP_SIZE			0x10000000
-
-	/* By default we split the PB 50/50 */
-#if !defined(HYBRID_SHARED_PB_SIZE)
-	#define HYBRID_SHARED_PB_SIZE				(SGX_3DPARAMETERS_HEAP_SIZE >> 1)
-#endif
-#if defined(SUPPORT_HYBRID_PB)
-	#define SGX_SHARED_3DPARAMETERS_SIZE			(HYBRID_SHARED_PB_SIZE)
-	#define SGX_SHARED_3DPARAMETERS_HEAP_SIZE		(HYBRID_SHARED_PB_SIZE-0x00001000)
-	#define SGX_PERCONTEXT_3DPARAMETERS_HEAP_SIZE		(SGX_3DPARAMETERS_HEAP_SIZE - SGX_SHARED_3DPARAMETERS_SIZE - 0x00001000)
-#else
-	#define SGX_SHARED_3DPARAMETERS_SIZE			0
-	#define SGX_SHARED_3DPARAMETERS_HEAP_SIZE		0
-	#define SGX_PERCONTEXT_3DPARAMETERS_HEAP_SIZE		(SGX_3DPARAMETERS_HEAP_SIZE - 0x00001000)
-#if defined(SUPPORT_SHARED_PB)
-	#define SGX_SHARED_3DPARAMETERS_SIZE			SGX_3DPARAMETERS_HEAP_SIZE
-	#define SGX_SHARED_3DPARAMETERS_HEAP_SIZE		(SGX_3DPARAMETERS_HEAP_SIZE - 0x00001000)
-	#define SGX_PERCONTEXT_3DPARAMETERS_HEAP_SIZE		0
-#endif
-#endif
-
-	#define SGX_SHARED_3DPARAMETERS_HEAP_BASE		 0xD2000000
-	/* Size is defiend above */
-
-	#define SGX_PERCONTEXT_3DPARAMETERS_HEAP_BASE		 (SGX_SHARED_3DPARAMETERS_HEAP_BASE + SGX_SHARED_3DPARAMETERS_SIZE)
-	/* Size is defiend above */
-
-	#define SGX_TADATA_HEAP_BASE				 0xE2000000
-	#define SGX_TADATA_HEAP_SIZE				(0x0D000000-0x00001000)
-
-	#define SGX_SYNCINFO_HEAP_BASE				 0xEF000000
-	#define SGX_SYNCINFO_HEAP_SIZE				(0x01000000-0x00001000)
-
-	#define SGX_PDSPIXEL_CODEDATA_HEAP_BASE		 0xF0000000
-	#define SGX_PDSPIXEL_CODEDATA_HEAP_SIZE		(0x02000000-0x00001000)
-
-	#define SGX_KERNEL_CODE_HEAP_BASE			 0xF2000000
-	#define SGX_KERNEL_CODE_HEAP_SIZE			(0x00080000-0x00001000)
-
-	#define SGX_PDSVERTEX_CODEDATA_HEAP_BASE	 0xF2400000
-	#define SGX_PDSVERTEX_CODEDATA_HEAP_SIZE	(0x01C00000-0x00001000)
-
-	#define SGX_KERNEL_DATA_HEAP_BASE		 	(0xF4000000+SGX_KERNEL_DATA_HEAP_OFFSET)
-	#define SGX_KERNEL_DATA_HEAP_SIZE			(0x05000000-(0x00001000+SGX_KERNEL_DATA_HEAP_OFFSET))
-
-	/* Actual Pixel and Vertex shared heaps sizes may be reduced by
-	 * override - see SGX_USE_CODE_SEGMENT_RANGE_BITS.*/
-	#define SGX_PIXELSHADER_HEAP_BASE			 0xF9000000
-	#define SGX_PIXELSHADER_HEAP_SIZE			(0x05000000-0x00001000)
-	
-	#define SGX_VERTEXSHADER_HEAP_BASE			 0xFE000000
-	#define SGX_VERTEXSHADER_HEAP_SIZE			(0x02000000-0x00001000)
-	/* signal we've identified the core by the build */
-	#define SGX_CORE_IDENTIFIED
-#endif /* SGX_FEATURE_ADDRESS_SPACE_SIZE == 32 */
-
-#if SGX_FEATURE_ADDRESS_SPACE_SIZE == 28
-
 #if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
 	#define SGX_GENERAL_MAPPING_HEAP_BASE		 0x00001000
 	#define SGX_GENERAL_MAPPING_HEAP_SIZE		(0x01800000-0x00001000-0x00001000)
@@ -241,8 +144,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	/* signal we've identified the core by the build */
 	#define SGX_CORE_IDENTIFIED
-
-#endif /* SGX_FEATURE_ADDRESS_SPACE_SIZE == 28 */
 
 #if !defined(SGX_CORE_IDENTIFIED)
 	#error "sgxconfig.h: ERROR: unspecified SGX Core version"
