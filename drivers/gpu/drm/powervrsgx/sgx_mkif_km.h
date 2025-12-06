@@ -50,16 +50,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #if !defined (SGX_MP_CORE_SELECT)
 /* MP register control macros */
-#if defined(SGX_FEATURE_MP)
-	#define SGX_REG_BANK_SHIFT 			(14)
-	#define SGX_REG_BANK_SIZE 			(1 << SGX_REG_BANK_SHIFT)
-	#define SGX_REG_BANK_BASE_INDEX		(2)
-	#define	SGX_REG_BANK_MASTER_INDEX	(1)
-	#define SGX_MP_CORE_SELECT(x,i) 	(x + ((i + SGX_REG_BANK_BASE_INDEX) * SGX_REG_BANK_SIZE))
-	#define SGX_MP_MASTER_SELECT(x) 	(x + (SGX_REG_BANK_MASTER_INDEX * SGX_REG_BANK_SIZE))
-#else
 	#define SGX_MP_CORE_SELECT(x,i) 	(x)
-#endif /* SGX_FEATURE_MP */
 #endif
 
 

@@ -114,12 +114,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_
 	IMG_UINT32 ui32ClkGateCtl2;
 	IMG_UINT32 ui32ClkGateStatusReg;
 	IMG_UINT32 ui32ClkGateStatusMask;
-#if defined(SGX_FEATURE_MP)
-	IMG_UINT32 ui32MasterClkGateStatusReg;
-	IMG_UINT32 ui32MasterClkGateStatusMask;
-	IMG_UINT32 ui32MasterClkGateStatus2Reg;
-	IMG_UINT32 ui32MasterClkGateStatus2Mask;
-#endif /* SGX_FEATURE_MP */
 
 	IMG_UINT32 ui32CacheControl;
 

@@ -182,11 +182,7 @@ static IMG_VOID SGXResetSleep(PVRSRV_SGXDEV_INFO	*psDevInfo,
 #if defined(PDUMP) || defined(EMULATOR)
 	IMG_UINT32	ui32ReadRegister;
 
-	#if defined(SGX_FEATURE_MP)
-	ui32ReadRegister = EUR_CR_MASTER_SOFT_RESET;
-	#else
 	ui32ReadRegister = EUR_CR_SOFT_RESET;
-	#endif /* SGX_FEATURE_MP */
 #endif
 
 #if !defined(PDUMP)
@@ -213,7 +209,6 @@ static IMG_VOID SGXResetSleep(PVRSRV_SGXDEV_INFO	*psDevInfo,
 }
 
 
-#if !defined(SGX_FEATURE_MP)
 /*!
 *******************************************************************************
 
@@ -381,7 +376,6 @@ static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo,
 		}
 	}
 }
-#endif /* SGX_FEATURE_MP */
 
 
 /*!
@@ -404,7 +398,6 @@ static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo,
 IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 				  IMG_BOOL				bHardwareRecovery,
 				  IMG_UINT32			ui32PDUMPFlags)
-#if !defined(SGX_FEATURE_MP)
 {
 	IMG_UINT32 ui32RegVal;
 #if defined(EUR_CR_BIF_INT_STAT_FAULT_REQ_MASK)
@@ -560,95 +553,6 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "End of SGX reset sequence\r\n");
 }
-
-#else
-
-{
-	IMG_UINT32 ui32RegVal;
-	
-	PVR_UNREFERENCED_PARAMETER(bHardwareRecovery);
-
-#if !defined(PDUMP)
-	PVR_UNREFERENCED_PARAMETER(ui32PDUMPFlags);
-#endif /* PDUMP */
-
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Start of SGX MP reset sequence\r\n");
-
-	/* Put hydra into soft reset */
-	ui32RegVal = EUR_CR_MASTER_SOFT_RESET_BIF_RESET_MASK  |
-				 EUR_CR_MASTER_SOFT_RESET_IPF_RESET_MASK  |
-				 EUR_CR_MASTER_SOFT_RESET_DPM_RESET_MASK  |
-				 EUR_CR_MASTER_SOFT_RESET_VDM_RESET_MASK;
-
-	if (bHardwareRecovery)
-	{
-		ui32RegVal |= EUR_CR_MASTER_SOFT_RESET_MCI_RESET_MASK;
-	}
-
-#if defined(SGX_FEATURE_PTLA)
-	ui32RegVal |= EUR_CR_MASTER_SOFT_RESET_PTLA_RESET_MASK;
-#endif
-#if defined(SGX_FEATURE_SYSTEM_CACHE)
-	ui32RegVal |= EUR_CR_MASTER_SOFT_RESET_SLC_RESET_MASK;
-#endif
-
-	/* Hard reset the slave cores */
-	ui32RegVal |= EUR_CR_MASTER_SOFT_RESET_CORE_RESET_MASK(0)  |
-				  EUR_CR_MASTER_SOFT_RESET_CORE_RESET_MASK(1)  |
-				  EUR_CR_MASTER_SOFT_RESET_CORE_RESET_MASK(2)  |
-				  EUR_CR_MASTER_SOFT_RESET_CORE_RESET_MASK(3);
-
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_SOFT_RESET, ui32RegVal);
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Soft reset hydra partition, hard reset the cores\r\n");
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_MASTER_SOFT_RESET, ui32RegVal, ui32PDUMPFlags);
-
-	SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_TRUE);
-
-	ui32RegVal = 0;
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_BIF_CTRL, ui32RegVal);
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Initialise the hydra BIF control\r\n");
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_MASTER_BIF_CTRL, ui32RegVal, ui32PDUMPFlags);
-
-#if defined(SGX_FEATURE_SYSTEM_CACHE)
-		ui32RegVal = EUR_CR_MASTER_SLC_CTRL_USSE_INVAL_REQ0_MASK |
-		#if defined(PVR_SLC_8KB_ADDRESS_MODE)
-						(4 << EUR_CR_MASTER_SLC_CTRL_ADDR_DECODE_MODE_SHIFT) |
-		#endif
-						(0xC << EUR_CR_MASTER_SLC_CTRL_ARB_PAGE_SIZE_SHIFT);
-		OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_SLC_CTRL, ui32RegVal);
-		PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Initialise the hydra SLC control\r\n");
-		PDUMPREG(SGX_PDUMPREG_NAME, EUR_CR_MASTER_SLC_CTRL, ui32RegVal);
-
-		ui32RegVal = EUR_CR_MASTER_SLC_CTRL_BYPASS_BYP_CC_MASK;
-		OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_SLC_CTRL_BYPASS, ui32RegVal);
-		PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Initialise the hydra SLC bypass control\r\n");
-		PDUMPREG(SGX_PDUMPREG_NAME, EUR_CR_MASTER_SLC_CTRL_BYPASS, ui32RegVal);
-#endif /* SGX_FEATURE_SYSTEM_CACHE */
-
-	SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_TRUE);
-
-	/* Remove the resets */
-	ui32RegVal = 0;
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_SOFT_RESET, ui32RegVal);
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Remove the resets from all of SGX\r\n");
-	PDUMPREGWITHFLAGS(SGX_PDUMPREG_NAME, EUR_CR_MASTER_SOFT_RESET, ui32RegVal, ui32PDUMPFlags);
-	
-	SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_TRUE);
-
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Turn on the slave cores' clock gating\r\n");
-	SGXInitClocks(psDevInfo, ui32PDUMPFlags);
-
-	SGXResetSleep(psDevInfo, ui32PDUMPFlags, IMG_TRUE);
-
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "Initialise the slave BIFs\r\n");
-
-	SGXResetInitBIFContexts(psDevInfo, ui32PDUMPFlags);
-	SGXResetSetupBIFContexts(psDevInfo, ui32PDUMPFlags);
-	
-	PDUMPCOMMENTWITHFLAGS(ui32PDUMPFlags, "End of SGX MP reset sequence\r\n");
-}	
-#endif /* SGX_FEATURE_MP */
-
 
 /******************************************************************************
  End of file (sgxreset.c)

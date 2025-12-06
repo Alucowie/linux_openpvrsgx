@@ -545,12 +545,8 @@ DisableHostAccess (MMU_CONTEXT *psMMUContext)
 ******************************************************************************/
 static IMG_VOID MMU_InvalidateSystemLevelCache(PVRSRV_SGXDEV_INFO *psDevInfo)
 {
-	#if defined(SGX_FEATURE_MP)
-	psDevInfo->ui32CacheControl |= SGXMKIF_CC_INVAL_BIF_SL;
-	#else
 	/* The MMU always bypasses the SLC */
 	PVR_UNREFERENCED_PARAMETER(psDevInfo);
-	#endif /* SGX_FEATURE_MP */
 }
 #endif /* SGX_FEATURE_SYSTEM_CACHE */
 

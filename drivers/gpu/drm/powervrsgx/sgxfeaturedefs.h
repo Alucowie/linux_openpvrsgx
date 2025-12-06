@@ -58,26 +58,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 /* define default MP core count */
-#if defined(SGX_FEATURE_MP)
-#if defined(SGX_FEATURE_MP_CORE_COUNT_TA) && defined(SGX_FEATURE_MP_CORE_COUNT_3D)
-#if (SGX_FEATURE_MP_CORE_COUNT_TA > SGX_FEATURE_MP_CORE_COUNT_3D)
-#error Number of TA cores larger than number of 3D cores not supported in current driver
-#endif /* (SGX_FEATURE_MP_CORE_COUNT_TA > SGX_FEATURE_MP_CORE_COUNT_3D) */
-#else
-#if defined(SGX_FEATURE_MP_CORE_COUNT)
-#define SGX_FEATURE_MP_CORE_COUNT_TA		(SGX_FEATURE_MP_CORE_COUNT)
-#define SGX_FEATURE_MP_CORE_COUNT_3D		(SGX_FEATURE_MP_CORE_COUNT)
-#else
-#error Either SGX_FEATURE_MP_CORE_COUNT or \
-both SGX_FEATURE_MP_CORE_COUNT_TA and SGX_FEATURE_MP_CORE_COUNT_3D \
-must be defined when SGX_FEATURE_MP is defined
-#endif /* SGX_FEATURE_MP_CORE_COUNT */
-#endif /* defined(SGX_FEATURE_MP_CORE_COUNT_TA) && defined(SGX_FEATURE_MP_CORE_COUNT_3D) */
-#else
 #define SGX_FEATURE_MP_CORE_COUNT		(1)
 #define SGX_FEATURE_MP_CORE_COUNT_TA	(1)
 #define SGX_FEATURE_MP_CORE_COUNT_3D	(1)
-#endif /* SGX_FEATURE_MP */
 
 #include "img_types.h"
 

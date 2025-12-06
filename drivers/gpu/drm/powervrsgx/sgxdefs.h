@@ -47,17 +47,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "sgx530defs.h"
 
-#if defined(SGX_FEATURE_MP)
-#if defined(SGX554)
-#include "sgxmpplusdefs.h"
-#else
-#include "sgxmpdefs.h"
-#endif /* SGX554 */
-#else /* SGX_FEATURE_MP */
 #if defined(SGX_FEATURE_SYSTEM_CACHE)
 #include "mnemedefs.h"
 #endif
-#endif /* SGX_FEATURE_MP */
 
 /*****************************************************************************
  Core specific defines.

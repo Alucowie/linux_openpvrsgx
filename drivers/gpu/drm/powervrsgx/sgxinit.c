@@ -272,13 +272,6 @@ static PVRSRV_ERROR InitDevInfo(PVRSRV_PER_PROCESS_DATA *psPerProc,
 	psDevInfo->ui32ClkGateCtl2 = psInitInfo->ui32ClkGateCtl2;
 	psDevInfo->ui32ClkGateStatusReg = psInitInfo->ui32ClkGateStatusReg;
 	psDevInfo->ui32ClkGateStatusMask = psInitInfo->ui32ClkGateStatusMask;
-#if defined(SGX_FEATURE_MP)
-	psDevInfo->ui32MasterClkGateStatusReg = psInitInfo->ui32MasterClkGateStatusReg;
-	psDevInfo->ui32MasterClkGateStatusMask = psInitInfo->ui32MasterClkGateStatusMask;
-	psDevInfo->ui32MasterClkGateStatus2Reg = psInitInfo->ui32MasterClkGateStatus2Reg;
-	psDevInfo->ui32MasterClkGateStatus2Mask = psInitInfo->ui32MasterClkGateStatus2Mask;
-#endif /* SGX_FEATURE_MP */
-
 
 	/* Initialise Dev Data */
 	OSMemCopy(&psDevInfo->asSGXDevData, &psInitInfo->asInitDevData, sizeof(psDevInfo->asSGXDevData));
@@ -445,12 +438,8 @@ PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	IMG_BOOL				bPDumpIsSuspended = PDumpIsSuspended();
 #endif /* PDUMP */
 
-#if defined(SGX_FEATURE_MP)
-	/* Slave core clocks must be enabled during reset */
-#else
 	SGXInitClocks(psDevInfo, PDUMP_FLAGS_CONTINUOUS);
-#endif /* SGX_FEATURE_MP */
-	
+
 	/*
 		Part 1 of the initialisation script runs before resetting SGX.
 	*/
@@ -465,11 +454,9 @@ PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 	/* Reset the chip */
 	psDevInfo->ui32NumResets++;
-	
-#if !defined(SGX_FEATURE_MP)
+
 	bHardwareRecovery |= bFirstTime;
-#endif /* SGX_FEATURE_MP */
-	
+
 	SGXReset(psDevInfo, bHardwareRecovery, PDUMP_FLAGS_CONTINUOUS);
 
 #if defined(EUR_CR_POWER)
@@ -710,14 +697,6 @@ static PVRSRV_ERROR DevInitSGXPart1 (IMG_VOID *pvDeviceNode)
 
 	/* pdump info about the core */
 	PDUMPCOMMENT("SGX Core Version Information: %s", SGX_CORE_FRIENDLY_NAME);
-	
-	#if defined(SGX_FEATURE_MP)
-	#if !defined(SGX_FEATURE_MP_PLUS)
-	PDUMPCOMMENT("SGX Multi-processor: %d cores", SGX_FEATURE_MP_CORE_COUNT);
-	#else
-	PDUMPCOMMENT("SGX Multi-processor: %d TA cores, %d 3D cores", SGX_FEATURE_MP_CORE_COUNT_TA, SGX_FEATURE_MP_CORE_COUNT_3D);
-	#endif
-	#endif /* SGX_FEATURE_MP */
 
 #if (SGX_CORE_REV == 0)
 	PDUMPCOMMENT("SGX Core Revision Information: head RTL");
@@ -1139,35 +1118,6 @@ static PVRSRV_ERROR DevDeInitSGX (IMG_VOID *pvDeviceNode)
 }
 
 
-#if defined(RESTRICTED_REGISTERS) && defined(SGX_FEATURE_MP)
-
-/*!
-*******************************************************************************
-
- @Function	SGXDumpMasterDebugReg
-
- @Description
-
- Dump a single SGX debug register value
-
- @Input psDevInfo - SGX device info
- @Input pszName - string used for logging
- @Input ui32RegAddr - SGX register offset
-
- @Return   IMG_VOID
-
-******************************************************************************/
-static IMG_VOID SGXDumpMasterDebugReg (PVRSRV_SGXDEV_INFO	*psDevInfo,
-								 IMG_CHAR			*pszName,
-								 IMG_UINT32			ui32RegAddr)
-{
-	IMG_UINT32	ui32RegVal;
-	ui32RegVal = OSReadHWReg(psDevInfo->pvRegsBaseKM, ui32RegAddr);
-	PVR_LOG(("(HYD) %s%08X", pszName, ui32RegVal));
-}
-
-#endif /* defined(RESTRICTED_REGISTERS) */
-
 /*!
 *******************************************************************************
 
@@ -1225,27 +1175,6 @@ IMG_VOID SGXDumpDebugInfo (PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 		SGXDumpDebugReg(psDevInfo, 0, "EUR_CR_CORE_ID:          ", EUR_CR_CORE_ID);
 		SGXDumpDebugReg(psDevInfo, 0, "EUR_CR_CORE_REVISION:    ", EUR_CR_CORE_REVISION);
-#if defined(RESTRICTED_REGISTERS) && defined(SGX_FEATURE_MP)
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_BIF_INT_STAT:   ", EUR_CR_MASTER_BIF_INT_STAT);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_BIF_FAULT:      ",EUR_CR_MASTER_BIF_FAULT);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_CLKGATESTATUS2: ",EUR_CR_MASTER_CLKGATESTATUS2 );
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_VDM_PIM_STATUS: ",EUR_CR_MASTER_VDM_PIM_STATUS);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_BIF_BANK_SET:   ",EUR_CR_MASTER_BIF_BANK_SET);
-
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_EVENT_STATUS:   ",EUR_CR_MASTER_EVENT_STATUS);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_EVENT_STATUS2:  ",EUR_CR_MASTER_EVENT_STATUS2);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_MP_PRIMITIVE:   ",EUR_CR_MASTER_MP_PRIMITIVE);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_DPM_DPLIST_STATUS: ",EUR_CR_MASTER_DPM_DPLIST_STATUS);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_DPM_PROACTIVE_PIM_SPEC: ",EUR_CR_MASTER_DPM_PROACTIVE_PIM_SPEC);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_PAGE_MANAGEOP:  ",EUR_CR_MASTER_DPM_PAGE_MANAGEOP);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_VDM_CONTEXT_STORE_SNAPSHOT: ",EUR_CR_MASTER_VDM_CONTEXT_STORE_SNAPSHOT);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_VDM_CONTEXT_LOAD_STATUS: ",EUR_CR_MASTER_VDM_CONTEXT_LOAD_STATUS);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_VDM_CONTEXT_STORE_STREAM: ",EUR_CR_MASTER_VDM_CONTEXT_STORE_STREAM);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_VDM_CONTEXT_STORE_STATUS: ",EUR_CR_MASTER_VDM_CONTEXT_STORE_STATUS);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_VDM_CONTEXT_STORE_STATE0: ",EUR_CR_MASTER_VDM_CONTEXT_STORE_STATE0);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_VDM_CONTEXT_STORE_STATE1: ",EUR_CR_MASTER_VDM_CONTEXT_STORE_STATE1);
-		SGXDumpMasterDebugReg(psDevInfo, "EUR_CR_MASTER_VDM_WAIT_FOR_KICK: ",EUR_CR_MASTER_VDM_WAIT_FOR_KICK);
-#endif
 		for (ui32CoreNum = 0; ui32CoreNum < SGX_FEATURE_MP_CORE_COUNT_3D; ui32CoreNum++)
 		{
 			/* Dump HW event status */
@@ -1788,11 +1717,7 @@ static IMG_VOID SGXCacheInvalidate(PVRSRV_DEVICE_NODE *psDeviceNode)
 {
 	PVRSRV_SGXDEV_INFO *psDevInfo = psDeviceNode->pvDevice;
 
-	#if defined(SGX_FEATURE_MP)
-	psDevInfo->ui32CacheControl |= SGXMKIF_CC_INVAL_BIF_SL;
-	#else
 	PVR_UNREFERENCED_PARAMETER(psDevInfo);
-	#endif /* SGX_FEATURE_MP */
 }
 
 /*!
@@ -2692,43 +2617,16 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			   breakpoint, it is not possible to guarantee that the
 			   uKernel would be able to run */
 #if !defined(NO_HARDWARE)
-#if defined(SGX_FEATURE_MP)
-			IMG_BOOL bTrappedBPMaster;
-			IMG_UINT32 ui32CoreNum, ui32TrappedBPCoreNum;
-			IMG_BOOL bTrappedBPAny;
-#endif /* defined(SGX_FEATURE_MP) */
 			IMG_BOOL bFoundOne;
 
-#if defined(SGX_FEATURE_MP)
-			ui32TrappedBPCoreNum = 0;
-			bTrappedBPMaster = !!(EUR_CR_MASTER_BREAKPOINT_TRAPPED_MASK & OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_BREAKPOINT));
-			bTrappedBPAny = bTrappedBPMaster;
-			for (ui32CoreNum = 0; ui32CoreNum < SGX_FEATURE_MP_CORE_COUNT_3D; ui32CoreNum++)
-			{
-				bFoundOne = !!(EUR_CR_BREAKPOINT_TRAPPED_MASK & OSReadHWReg(psDevInfo->pvRegsBaseKM, SGX_MP_CORE_SELECT(EUR_CR_BREAKPOINT, ui32CoreNum)));
-				if (bFoundOne)
-				{
-					bTrappedBPAny = IMG_TRUE;
-					ui32TrappedBPCoreNum = ui32CoreNum;
-				}
-			}
-
-			psMiscInfo->uData.sSGXBreakpointInfo.bTrappedBP = bTrappedBPAny;
-#else /* defined(SGX_FEATURE_MP) */
 			psMiscInfo->uData.sSGXBreakpointInfo.bTrappedBP = 0 != (EUR_CR_BREAKPOINT_TRAPPED_MASK & OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BREAKPOINT));
-#endif /* defined(SGX_FEATURE_MP) */
 
 			if (psMiscInfo->uData.sSGXBreakpointInfo.bTrappedBP)
 			{
 				IMG_UINT32 ui32Info0, ui32Info1;
 
-#if defined(SGX_FEATURE_MP)
-				ui32Info0 = OSReadHWReg(psDevInfo->pvRegsBaseKM, bTrappedBPMaster?EUR_CR_MASTER_BREAKPOINT_TRAP_INFO0:SGX_MP_CORE_SELECT(EUR_CR_BREAKPOINT_TRAP_INFO0, ui32TrappedBPCoreNum));
-				ui32Info1 = OSReadHWReg(psDevInfo->pvRegsBaseKM, bTrappedBPMaster?EUR_CR_MASTER_BREAKPOINT_TRAP_INFO1:SGX_MP_CORE_SELECT(EUR_CR_BREAKPOINT_TRAP_INFO1, ui32TrappedBPCoreNum));
-#else /* defined(SGX_FEATURE_MP) */
 				ui32Info0 = OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BREAKPOINT_TRAP_INFO0);
 				ui32Info1 = OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BREAKPOINT_TRAP_INFO1);
-#endif /* defined(SGX_FEATURE_MP) */
 
 				psMiscInfo->uData.sSGXBreakpointInfo.ui32BPIndex = (ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_NUMBER_MASK) >> EUR_CR_BREAKPOINT_TRAP_INFO1_NUMBER_SHIFT;
 				psMiscInfo->uData.sSGXBreakpointInfo.sTrappedBPDevVAddr.uiAddr = ui32Info0 & EUR_CR_BREAKPOINT_TRAP_INFO0_ADDRESS_MASK;
@@ -2736,13 +2634,8 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 				psMiscInfo->uData.sSGXBreakpointInfo.bTrappedBPRead = !!(ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_RNW_MASK);
 				psMiscInfo->uData.sSGXBreakpointInfo.ui32TrappedBPDataMaster = (ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_DATA_MASTER_MASK) >> EUR_CR_BREAKPOINT_TRAP_INFO1_DATA_MASTER_SHIFT;
 				psMiscInfo->uData.sSGXBreakpointInfo.ui32TrappedBPTag = (ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_TAG_MASK) >> EUR_CR_BREAKPOINT_TRAP_INFO1_TAG_SHIFT;
-#if defined(SGX_FEATURE_MP)
-				/* mp, regbanks unsplit */
-				psMiscInfo->uData.sSGXBreakpointInfo.ui32CoreNum = bTrappedBPMaster?65535:ui32TrappedBPCoreNum;
-#else /* defined(SGX_FEATURE_MP) */
 				/* non-mp */
 				psMiscInfo->uData.sSGXBreakpointInfo.ui32CoreNum = 65534;
-#endif /* defined(SGX_FEATURE_MP) */
 			}
 #endif /* !defined(NO_HARDWARE) */
 			return PVRSRV_OK;
@@ -2754,29 +2647,8 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			/* Core number must be supplied */
 			/* Polls for notify to be acknowledged by h/w */
 #if !defined(NO_HARDWARE)
-#if defined(SGX_FEATURE_MP)
-			IMG_UINT32 ui32CoreNum;
-			IMG_BOOL bMaster;
-#endif /* defined(SGX_FEATURE_MP) */
 			IMG_UINT32 ui32OldSeqNum, ui32NewSeqNum;
 
-#if defined(SGX_FEATURE_MP)
-			ui32CoreNum = psMiscInfo->uData.sSGXBreakpointInfo.ui32CoreNum;
-			bMaster = ui32CoreNum > SGX_FEATURE_MP_CORE_COUNT_3D;
-			if (bMaster)
-			{
-				/* master */
-				/* EUR_CR_MASTER_BREAKPOINT_TRAPPED_MASK | EUR_CR_MASTER_BREAKPOINT_SEQNUM_MASK */
-				ui32OldSeqNum = 0x1c & OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_BREAKPOINT);
-				OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_BREAKPOINT_TRAP, EUR_CR_MASTER_BREAKPOINT_TRAP_WRNOTIFY_MASK | EUR_CR_MASTER_BREAKPOINT_TRAP_CONTINUE_MASK);
-				do
-				{
-					ui32NewSeqNum = 0x1c & OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_BREAKPOINT);
-				}
-				while (ui32OldSeqNum == ui32NewSeqNum);
-			}
-			else
-#endif /* defined(SGX_FEATURE_MP) */
 			{
 				/* core */
 				ui32OldSeqNum = 0x1c & OSReadHWReg(psDevInfo->pvRegsBaseKM, SGX_MP_CORE_SELECT(EUR_CR_BREAKPOINT, ui32CoreNum));

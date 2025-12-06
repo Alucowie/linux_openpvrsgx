@@ -346,11 +346,7 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 					MAKEUNIQUETAG(psDevInfo->psKernelSGXHostCtlMemInfo));
 		#endif /* PDUMP */
 
-#if defined(SGX_FEATURE_MP)
-		ui32CoresEnabled = ((OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_MASTER_CORE) & EUR_CR_MASTER_CORE_ENABLE_MASK) >> EUR_CR_MASTER_CORE_ENABLE_SHIFT) + 1;
-#else
 		ui32CoresEnabled = 1;
-#endif
 
 		for (ui32Core = 0; ui32Core < ui32CoresEnabled; ui32Core++)
 		{
@@ -360,19 +356,6 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 								  psDevInfo->ui32ClkGateStatusMask,
 								  "Wait for SGX clock gating");
 		}
-
-		#if defined(SGX_FEATURE_MP)
-		/* Wait for SGX master clock gating. */
-		SGXPollForClockGating(psDevInfo,
-							  psDevInfo->ui32MasterClkGateStatusReg,
-							  psDevInfo->ui32MasterClkGateStatusMask,
-							  "Wait for SGX master clock gating");
-
-		SGXPollForClockGating(psDevInfo,
-							  psDevInfo->ui32MasterClkGateStatus2Reg,
-							  psDevInfo->ui32MasterClkGateStatus2Mask,
-							  "Wait for SGX master clock gating (2)");
-		#endif /* SGX_FEATURE_MP */
 
 		if (eNewPowerState == PVRSRV_DEV_POWER_STATE_OFF)
 		{
