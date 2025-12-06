@@ -1451,9 +1451,6 @@ IMG_BOOL SGX_ISRHandler (IMG_VOID *pvData)
 	{
 		IMG_UINT32 ui32EventStatus, ui32EventEnable;
 		IMG_UINT32 ui32EventClear = 0;
-#if defined(SGX_FEATURE_DATA_BREAKPOINTS)
-		IMG_UINT32 ui32EventStatus2, ui32EventEnable2;
-#endif		
 		IMG_UINT32 ui32EventClear2 = 0;
 		PVRSRV_DEVICE_NODE *psDeviceNode;
 		PVRSRV_SGXDEV_INFO *psDevInfo;
@@ -1474,14 +1471,6 @@ IMG_BOOL SGX_ISRHandler (IMG_VOID *pvData)
 		/* test only the unmasked bits */
 		ui32EventStatus &= ui32EventEnable;
 
-#if defined(SGX_FEATURE_DATA_BREAKPOINTS)
-		ui32EventStatus2 = OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_EVENT_STATUS2);
-		ui32EventEnable2 = OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_EVENT_HOST_ENABLE2);
-
-		/* test only the unmasked bits */
-		ui32EventStatus2 &= ui32EventEnable2;
-#endif /* defined(SGX_FEATURE_DATA_BREAKPOINTS) */
-
 		/* Thought: is it better to insist that the bit assignment in
 		   the "clear" register(s) matches that of the "status" register(s)?
 		   It would greatly simplify this LISR */
@@ -1490,18 +1479,6 @@ IMG_BOOL SGX_ISRHandler (IMG_VOID *pvData)
 		{
 			ui32EventClear |= EUR_CR_EVENT_HOST_CLEAR_SW_EVENT_MASK;
 		}
-
-#if defined(SGX_FEATURE_DATA_BREAKPOINTS)
-		if (ui32EventStatus2 & EUR_CR_EVENT_STATUS2_DATA_BREAKPOINT_UNTRAPPED_MASK)
-		{
-			ui32EventClear2 |= EUR_CR_EVENT_HOST_CLEAR2_DATA_BREAKPOINT_UNTRAPPED_MASK;
-		}
-
-		if (ui32EventStatus2 & EUR_CR_EVENT_STATUS2_DATA_BREAKPOINT_TRAPPED_MASK)
-		{
-			ui32EventClear2 |= EUR_CR_EVENT_HOST_CLEAR2_DATA_BREAKPOINT_TRAPPED_MASK;
-		}
-#endif /* defined(SGX_FEATURE_DATA_BREAKPOINTS) */
 
 		if (ui32EventClear || ui32EventClear2)
 		{
@@ -2335,158 +2312,6 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 	switch(psMiscInfo->eRequest)
 	{
-#if defined(SGX_FEATURE_DATA_BREAKPOINTS)
-		case SGX_MISC_INFO_REQUEST_SET_BREAKPOINT:
-		{
-			IMG_UINT32      ui32MaskDM;
-			IMG_UINT32      ui32CtrlWEnable;
-			IMG_UINT32      ui32CtrlREnable;
-			IMG_UINT32      ui32CtrlTrapEnable;
-			IMG_UINT32		ui32RegVal;
-			IMG_UINT32		ui32StartRegVal;
-			IMG_UINT32		ui32EndRegVal;
-			SGXMKIF_COMMAND	sCommandData;
-
-			/* Set or Clear BP? */
-			if(psMiscInfo->uData.sSGXBreakpointInfo.bBPEnable)
-			{
-				/* set the break point */
-				IMG_DEV_VIRTADDR sBPDevVAddr = psMiscInfo->uData.sSGXBreakpointInfo.sBPDevVAddr;
-				IMG_DEV_VIRTADDR sBPDevVAddrEnd = psMiscInfo->uData.sSGXBreakpointInfo.sBPDevVAddrEnd;
-
-				/* BP address */
-				ui32StartRegVal = sBPDevVAddr.uiAddr & EUR_CR_BREAKPOINT0_START_ADDRESS_MASK;
-				ui32EndRegVal = sBPDevVAddrEnd.uiAddr & EUR_CR_BREAKPOINT0_END_ADDRESS_MASK;
-
-				ui32MaskDM = psMiscInfo->uData.sSGXBreakpointInfo.ui32DataMasterMask;
-				ui32CtrlWEnable = psMiscInfo->uData.sSGXBreakpointInfo.bWrite;
-				ui32CtrlREnable = psMiscInfo->uData.sSGXBreakpointInfo.bRead;
-				ui32CtrlTrapEnable = psMiscInfo->uData.sSGXBreakpointInfo.bTrapped;
-
-				/* normal data BP */
-				ui32RegVal = ((ui32MaskDM<<EUR_CR_BREAKPOINT0_MASK_DM_SHIFT) & EUR_CR_BREAKPOINT0_MASK_DM_MASK) |
-							 ((ui32CtrlWEnable<<EUR_CR_BREAKPOINT0_CTRL_WENABLE_SHIFT) & EUR_CR_BREAKPOINT0_CTRL_WENABLE_MASK) |
-							 ((ui32CtrlREnable<<EUR_CR_BREAKPOINT0_CTRL_RENABLE_SHIFT) & EUR_CR_BREAKPOINT0_CTRL_RENABLE_MASK) |
-							 ((ui32CtrlTrapEnable<<EUR_CR_BREAKPOINT0_CTRL_TRAPENABLE_SHIFT) & EUR_CR_BREAKPOINT0_CTRL_TRAPENABLE_MASK);
-			}
-			else
-			{
-				/* clear the break point */
-				ui32RegVal = ui32StartRegVal = ui32EndRegVal = 0;
-			}
-
-			/* setup the command */
-			sCommandData.ui32Data[0] = psMiscInfo->uData.sSGXBreakpointInfo.ui32BPIndex;
-			sCommandData.ui32Data[1] = ui32StartRegVal;
-			sCommandData.ui32Data[2] = ui32EndRegVal;
-			sCommandData.ui32Data[3] = ui32RegVal;
-
-			/* clear signal flags */
-			psDevInfo->psSGXHostCtl->ui32BPSetClearSignal = 0;
-
-			eError = SGXScheduleCCBCommandKM(psDeviceNode,
-											 SGXMKIF_CMD_DATABREAKPOINT,
-											 &sCommandData,
-											 KERNEL_ID,
-											 hDevMemContext,
-											 IMG_FALSE);
-
-			if (eError != PVRSRV_OK)
-			{
-				PVR_DPF((PVR_DBG_ERROR, "SGXGetMiscInfoKM: SGXScheduleCCBCommandKM failed."));
-				return eError;
-			}
-
-#if defined(NO_HARDWARE)
-			/* clear signal flags */
-			psDevInfo->psSGXHostCtl->ui32BPSetClearSignal = 0;
-#else
-			{
-				IMG_BOOL bExit;
-
-				bExit = IMG_FALSE;
-				LOOP_UNTIL_TIMEOUT(MAX_HW_TIME_US)
-				{
-					if (psDevInfo->psSGXHostCtl->ui32BPSetClearSignal != 0)
-					{
-						bExit = IMG_TRUE;
-						/* clear signal flags */
-						psDevInfo->psSGXHostCtl->ui32BPSetClearSignal = 0;
-						break;
-					}
-				} END_LOOP_UNTIL_TIMEOUT();
-
-				/*if the loop exited because a timeout*/
-				if (!bExit)
-				{
-					PVR_DPF((PVR_DBG_ERROR, "SGXGetMiscInfoKM: Timeout occurred waiting BP set/clear"));
-					return PVRSRV_ERROR_TIMEOUT;
-				}
-			}
-#endif /* NO_HARDWARE */
-
-			return PVRSRV_OK;
-		}
-
-		case SGX_MISC_INFO_REQUEST_POLL_BREAKPOINT:
-		{
-			/* This request checks to see whether a breakpoint has
-			   been trapped.  If so, it returns the number of the
-			   breakpoint number that was trapped in ui32BPIndex,
-			   sTrappedBPDevVAddr to the address which was trapped,
-			   and sets bTrappedBP.  Otherwise, bTrappedBP will be
-			   false, and other fields should be ignored. */
-			/* The uKernel is not used, since if we are stopped on a
-			   breakpoint, it is not possible to guarantee that the
-			   uKernel would be able to run */
-#if !defined(NO_HARDWARE)
-			IMG_BOOL bFoundOne;
-
-			psMiscInfo->uData.sSGXBreakpointInfo.bTrappedBP = 0 != (EUR_CR_BREAKPOINT_TRAPPED_MASK & OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BREAKPOINT));
-
-			if (psMiscInfo->uData.sSGXBreakpointInfo.bTrappedBP)
-			{
-				IMG_UINT32 ui32Info0, ui32Info1;
-
-				ui32Info0 = OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BREAKPOINT_TRAP_INFO0);
-				ui32Info1 = OSReadHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_BREAKPOINT_TRAP_INFO1);
-
-				psMiscInfo->uData.sSGXBreakpointInfo.ui32BPIndex = (ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_NUMBER_MASK) >> EUR_CR_BREAKPOINT_TRAP_INFO1_NUMBER_SHIFT;
-				psMiscInfo->uData.sSGXBreakpointInfo.sTrappedBPDevVAddr.uiAddr = ui32Info0 & EUR_CR_BREAKPOINT_TRAP_INFO0_ADDRESS_MASK;
-				psMiscInfo->uData.sSGXBreakpointInfo.ui32TrappedBPBurstLength = (ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_SIZE_MASK) >> EUR_CR_BREAKPOINT_TRAP_INFO1_SIZE_SHIFT;
-				psMiscInfo->uData.sSGXBreakpointInfo.bTrappedBPRead = !!(ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_RNW_MASK);
-				psMiscInfo->uData.sSGXBreakpointInfo.ui32TrappedBPDataMaster = (ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_DATA_MASTER_MASK) >> EUR_CR_BREAKPOINT_TRAP_INFO1_DATA_MASTER_SHIFT;
-				psMiscInfo->uData.sSGXBreakpointInfo.ui32TrappedBPTag = (ui32Info1 & EUR_CR_BREAKPOINT_TRAP_INFO1_TAG_MASK) >> EUR_CR_BREAKPOINT_TRAP_INFO1_TAG_SHIFT;
-				/* non-mp */
-				psMiscInfo->uData.sSGXBreakpointInfo.ui32CoreNum = 65534;
-			}
-#endif /* !defined(NO_HARDWARE) */
-			return PVRSRV_OK;
-		}
-
-		case SGX_MISC_INFO_REQUEST_RESUME_BREAKPOINT:
-		{
-			/* This request resumes from the currently trapped breakpoint. */
-			/* Core number must be supplied */
-			/* Polls for notify to be acknowledged by h/w */
-#if !defined(NO_HARDWARE)
-			IMG_UINT32 ui32OldSeqNum, ui32NewSeqNum;
-
-			{
-				/* core */
-				ui32OldSeqNum = 0x1c & OSReadHWReg(psDevInfo->pvRegsBaseKM, SGX_MP_CORE_SELECT(EUR_CR_BREAKPOINT, ui32CoreNum));
-				OSWriteHWReg(psDevInfo->pvRegsBaseKM, SGX_MP_CORE_SELECT(EUR_CR_BREAKPOINT_TRAP, ui32CoreNum), EUR_CR_BREAKPOINT_TRAP_WRNOTIFY_MASK | EUR_CR_BREAKPOINT_TRAP_CONTINUE_MASK);
-				do
-				{
-					ui32NewSeqNum = 0x1c & OSReadHWReg(psDevInfo->pvRegsBaseKM, SGX_MP_CORE_SELECT(EUR_CR_BREAKPOINT, ui32CoreNum));
-				}
-				while (ui32OldSeqNum == ui32NewSeqNum);
-			}
-#endif /* !defined(NO_HARDWARE) */
-			return PVRSRV_OK;
-		}
-#endif /* SGX_FEATURE_DATA_BREAKPOINTS)	*/
-
 		case SGX_MISC_INFO_REQUEST_CLOCKSPEED:
 		{
 			psMiscInfo->uData.ui32SGXClockSpeed = psDevInfo->ui32CoreClockSpeed;

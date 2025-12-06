@@ -222,11 +222,6 @@ typedef enum _SGX_MISC_INFO_REQUEST_
 	SGX_MISC_INFO_REQUEST_MEMCOPY,
 #endif /* SUPPORT_SGX_EDM_MEMORY_DEBUG */
 	SGX_MISC_INFO_REQUEST_SET_HWPERF_STATUS,
-#if defined(SGX_FEATURE_DATA_BREAKPOINTS)
-	SGX_MISC_INFO_REQUEST_SET_BREAKPOINT,
-	SGX_MISC_INFO_REQUEST_POLL_BREAKPOINT,
-	SGX_MISC_INFO_REQUEST_RESUME_BREAKPOINT,
-#endif /* SGX_FEATURE_DATA_BREAKPOINTS */
 	SGX_MISC_INFO_DUMP_DEBUG_INFO,
 	SGX_MISC_INFO_DUMP_DEBUG_INFO_FORCE_REGS,
 	SGX_MISC_INFO_PANIC,
@@ -291,40 +286,6 @@ typedef struct _PVRSRV_SGX_MISCINFO_SPM
 } PVRSRV_SGX_MISCINFO_SPM;
 
 
-#if defined(SGX_FEATURE_DATA_BREAKPOINTS)
-/*!
- ******************************************************************************
- * Structure for SGX break points control
- *****************************************************************************/
-typedef struct _SGX_BREAKPOINT_INFO
-{
-	/* set/clear BP boolean */
-	IMG_BOOL					bBPEnable;
-	/* Index of BP to set */
-	IMG_UINT32					ui32BPIndex;
-	/* On which DataMaster(s) should the breakpoint fire? */
-	IMG_UINT32                  ui32DataMasterMask;
-	/* DevVAddr of BP to set */
-	IMG_DEV_VIRTADDR			sBPDevVAddr, sBPDevVAddrEnd;
-	/* Whether or not the desired breakpoint will be trapped */
-	IMG_BOOL                    bTrapped;
-	/* Will the requested breakpoint fire for reads? */
-	IMG_BOOL                    bRead;
-	/* Will the requested breakpoint fire for writes? */
-	IMG_BOOL                    bWrite;
-	/* Has a breakpoint been trapped? */
-	IMG_BOOL                    bTrappedBP;
-	/* Extra information recorded about a trapped breakpoint */
-	IMG_UINT32                  ui32CoreNum;
-	IMG_DEV_VIRTADDR            sTrappedBPDevVAddr;
-	IMG_UINT32                  ui32TrappedBPBurstLength;
-	IMG_BOOL                    bTrappedBPRead;
-	IMG_UINT32                  ui32TrappedBPDataMaster;
-	IMG_UINT32                  ui32TrappedBPTag;
-} SGX_BREAKPOINT_INFO;
-#endif /* SGX_FEATURE_DATA_BREAKPOINTS */
-
-
 /*!
  ******************************************************************************
  * Structure for setting the hardware performance status
@@ -371,9 +332,6 @@ typedef struct _SGX_MISC_INFO_
 		PVRSRV_SGX_MISCINFO_ACTIVEPOWER						sActivePower;
 		PVRSRV_SGX_MISCINFO_LOCKUPS							sLockups;
 		PVRSRV_SGX_MISCINFO_SPM								sSPM;
-#if defined(SGX_FEATURE_DATA_BREAKPOINTS)
-		SGX_BREAKPOINT_INFO									sSGXBreakpointInfo;
-#endif
 		PVRSRV_SGX_MISCINFO_SET_HWPERF_STATUS				sSetHWPerfStatus;
 	} uData;
 } SGX_MISC_INFO;
