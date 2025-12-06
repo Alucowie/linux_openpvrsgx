@@ -127,9 +127,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	IMG_UINT32				*pui32KernelCCBEventKicker; /*!< kernel mode linear address of kernel CCB event kicker */
  	PVRSRV_KERNEL_MEM_INFO	*psKernelSGXMiscMemInfo;	/*!< kernel mode linear address of SGX misc info buffer */
 	IMG_UINT32				aui32HostKickAddr[SGXMKIF_CMD_MAX];		/*!< ukernel host kick offests */
-#if defined(SGX_SUPPORT_HWPROFILING)
-	PPVRSRV_KERNEL_MEM_INFO psKernelHWProfilingMemInfo;
-#endif
 	PPVRSRV_KERNEL_MEM_INFO		psKernelHWPerfCBMemInfo;		/*!< Meminfo for hardware performace circular buffer */
 	PPVRSRV_KERNEL_MEM_INFO		psKernelTASigBufferMemInfo;		/*!< Meminfo for TA signature buffer */
 	PPVRSRV_KERNEL_MEM_INFO		psKernel3DSigBufferMemInfo;		/*!< Meminfo for 3D signature buffer */
@@ -287,9 +284,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_KM_
 	IMG_UINT32	ui32ClientBuildOptions;
 	SGX_MISCINFO_STRUCT_SIZES	sSGXStructSizes;
 
-#if defined(SGX_SUPPORT_HWPROFILING)
-	IMG_HANDLE	hKernelHWProfilingMemInfo;
-#endif
 	IMG_HANDLE	hKernelHWPerfCBMemInfo;
 	IMG_HANDLE	hKernelTASigBufferMemInfo;
 	IMG_HANDLE	hKernel3DSigBufferMemInfo;

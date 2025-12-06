@@ -877,17 +877,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 		bLookupFailed = IMG_TRUE;
 	}
 
-#if defined(SGX_SUPPORT_HWPROFILING)
-	eError = PVRSRVLookupHandle(psPerProc->psHandleBase,
-						   &hDummy,
-						   psSGXDevInitPart2IN->sInitInfo.hKernelHWProfilingMemInfo,
-						   PVRSRV_HANDLE_TYPE_MEM_INFO);
-	if (eError != PVRSRV_OK)
-	{
-		bLookupFailed = IMG_TRUE;
-	}
-#endif
-
 	eError = PVRSRVLookupHandle(psPerProc->psHandleBase,
 						   &hDummy,
 						   psSGXDevInitPart2IN->sInitInfo.hKernelHWPerfCBMemInfo,
@@ -999,17 +988,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 	}
 
 
-#if defined(SGX_SUPPORT_HWPROFILING)
-	eError = PVRSRVLookupAndReleaseHandle(psPerProc->psHandleBase,
-						   &psSGXDevInitPart2IN->sInitInfo.hKernelHWProfilingMemInfo,
-						   psSGXDevInitPart2IN->sInitInfo.hKernelHWProfilingMemInfo,
-						   PVRSRV_HANDLE_TYPE_MEM_INFO);
-	if (eError != PVRSRV_OK)
-	{
-		bReleaseFailed = IMG_TRUE;
-	}
-#endif
-
 	eError = PVRSRVLookupAndReleaseHandle(psPerProc->psHandleBase,
 						   &psSGXDevInitPart2IN->sInitInfo.hKernelHWPerfCBMemInfo,
 						   psSGXDevInitPart2IN->sInitInfo.hKernelHWPerfCBMemInfo,
@@ -1104,11 +1082,6 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 		bDissociateFailed = IMG_TRUE;
 	}
 
-
-#if defined(SGX_SUPPORT_HWPROFILING)
-	eError = PVRSRVDissociateDeviceMemKM(hDevCookieInt, psSGXDevInitPart2IN->sInitInfo.hKernelHWProfilingMemInfo);
-	bDissociateFailed |= (IMG_BOOL)(eError != PVRSRV_OK);
-#endif
 
 	eError = PVRSRVDissociateDeviceMemKM(hDevCookieInt, psSGXDevInitPart2IN->sInitInfo.hKernelHWPerfCBMemInfo);
 	if (eError != PVRSRV_OK)

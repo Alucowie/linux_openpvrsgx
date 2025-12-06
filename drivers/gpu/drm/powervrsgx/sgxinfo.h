@@ -96,9 +96,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_
 	IMG_UINT32	ui32ClientBuildOptions;
 	SGX_MISCINFO_STRUCT_SIZES	sSGXStructSizes;
 
-#if defined(SGX_SUPPORT_HWPROFILING)
-	IMG_HANDLE	hKernelHWProfilingMemInfo;
-#endif
 	IMG_HANDLE	hKernelHWPerfCBMemInfo;
 	IMG_HANDLE	hKernelTASigBufferMemInfo;
 	IMG_HANDLE	hKernel3DSigBufferMemInfo;
