@@ -192,9 +192,6 @@ typedef struct _SGXMKIF_CMDTA_SHARED_
 /* in services equivalent for the same client flags*/
 #define SGXMKIF_TQFLAGS_TATQ_SYNC				0x00000004
 #define SGXMKIF_TQFLAGS_3DTQ_SYNC				0x00000008
-#if defined(SGX_FEATURE_FAST_RENDER_CONTEXT_SWITCH)
-#define SGXMKIF_TQFLAGS_CTXSWITCH				0x00000010
-#endif
 /* if set uKernel only updates syncobjects / status values*/
 #define SGXMKIF_TQFLAGS_DUMMYTRANSFER			0x00000020
 
