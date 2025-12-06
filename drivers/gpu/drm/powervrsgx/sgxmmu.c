@@ -1820,28 +1820,6 @@ MMU_Create (MMU_CONTEXT *psMMUContext,
 			ui32ScaleSize = 0;
 			pMMUHeap->ui32PDEPageSizeCtrl = SGX_MMU_PDE_PAGE_SIZE_4K;
 			break;
-#if defined(SGX_FEATURE_VARIABLE_MMU_PAGE_SIZE)
-		case 0x4000:
-			ui32ScaleSize = 2;
-			pMMUHeap->ui32PDEPageSizeCtrl = SGX_MMU_PDE_PAGE_SIZE_16K;
-			break;
-		case 0x10000:
-			ui32ScaleSize = 4;
-			pMMUHeap->ui32PDEPageSizeCtrl = SGX_MMU_PDE_PAGE_SIZE_64K;
-			break;
-		case 0x40000:
-			ui32ScaleSize = 6;
-			pMMUHeap->ui32PDEPageSizeCtrl = SGX_MMU_PDE_PAGE_SIZE_256K;
-			break;
-		case 0x100000:
-			ui32ScaleSize = 8;
-			pMMUHeap->ui32PDEPageSizeCtrl = SGX_MMU_PDE_PAGE_SIZE_1M;
-			break;
-		case 0x400000:
-			ui32ScaleSize = 10;
-			pMMUHeap->ui32PDEPageSizeCtrl = SGX_MMU_PDE_PAGE_SIZE_4M;
-			break;
-#endif /* #if defined(SGX_FEATURE_VARIABLE_MMU_PAGE_SIZE) */
 		default:
 			PVR_DPF((PVR_DBG_ERROR, "MMU_Create: invalid data page size"));
 			goto ErrorFreeHeap;
