@@ -347,8 +347,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceN
 
 PVRSRV_ERROR IMG_CALLCONV PVRSRVDeinitialiseDevice(IMG_UINT32 ui32DevIndex);
 
-#if !defined(USE_CODE)
-
 /*!
 ******************************************************************************
 
@@ -373,8 +371,6 @@ IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PollForValueKM(volatile IMG_UINT32*  pui32L
                                                     IMG_UINT32            ui32Timeoutus,
                                                     IMG_UINT32            ui32PollPeriodus,
                                                     IMG_BOOL              bAllowPreemption);
-
-#endif /* !defined(USE_CODE) */
 
 
 #if defined (USING_ISR_INTERRUPTS)

@@ -175,8 +175,6 @@ IMG_SYS_PHYADDR SysCpuPAddrToSysPAddr (IMG_CPU_PHYADDR cpu_paddr);
 extern SYS_DATA* gpsSysData;
 
 
-#if !defined(USE_CODE)
-
 /*!
 ******************************************************************************
 
@@ -265,7 +263,6 @@ static INLINE IMG_VOID SysDeinitialiseCommon(SYS_DATA *psSysData)
 
 	OSDestroyResource(&psSysData->sPowerStateChangeResource);
 }
-#endif /* !defined(USE_CODE) */
 
 
 /*

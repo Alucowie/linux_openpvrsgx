@@ -414,13 +414,8 @@ typedef struct _PVRSRV_CLIENT_MEM_INFO_
 	IMG_HANDLE							hResItem;
 
 #if defined(SUPPORT_MEMINFO_IDS)
-	#if !defined(USE_CODE)
 	/* Globally unique "stamp" for allocation (not re-used until wrap) */
 	IMG_UINT64							ui64Stamp;
-	#else /* !defined(USE_CODE) */
-	IMG_UINT32							dummy1;
-	IMG_UINT32							dummy2;
-	#endif /* !defined(USE_CODE) */
 #endif /* defined(SUPPORT_MEMINFO_IDS) */
 
 	/*
@@ -1005,17 +1000,15 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpPDDevPAddr(IMG_CONST PVRSRV_CONNECTION *psC
 												IMG_UINT32 ui32Offset,
 												IMG_DEV_PHYADDR sPDDevPAddr);
 
-#if !defined(USE_CODE)
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpMemPages(IMG_CONST PVRSRV_DEV_DATA *psDevData,
 														   IMG_HANDLE			hKernelMemInfo,
 														   IMG_DEV_PHYADDR		*pPages,
 														   IMG_UINT32			ui32NumPages,
-												   		   IMG_DEV_VIRTADDR		sDevVAddr,
+														   IMG_DEV_VIRTADDR		sDevVAddr,
 														   IMG_UINT32			ui32Start,
 														   IMG_UINT32			ui32Length,
 														   IMG_UINT32			ui32Flags);
-#endif
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpSetFrame(IMG_CONST PVRSRV_CONNECTION *psConnection,
@@ -1030,18 +1023,14 @@ IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpCommentf(IMG_CONST PVRSRV_CONNECTION *psConnection,
 											  IMG_BOOL bContinuous,
 											  IMG_CONST IMG_CHAR *pszFormat, ...)
-#if !defined(USE_CODE)
 											  IMG_FORMAT_PRINTF(3, 4)
-#endif
 ;
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpCommentWithFlagsf(IMG_CONST PVRSRV_CONNECTION *psConnection,
 													   IMG_UINT32 ui32Flags,
 													   IMG_CONST IMG_CHAR *pszFormat, ...)
-#if !defined(USE_CODE)
 													   IMG_FORMAT_PRINTF(3, 4)
-#endif
 ;
 
 IMG_IMPORT
@@ -1210,8 +1199,6 @@ typedef	struct  _PVRSRV_SEMAPHORE_OPAQUE_STRUCT_ *PVRSRV_SEMAPHORE_HANDLE;
   	#define IMG_SEMAPHORE_WAIT_INFINITE       ((IMG_UINT64)0xFFFFFFFFFFFFFFFFull)
 
 
-#if !defined(USE_CODE)
-
 static INLINE PVRSRV_ERROR PVRSRVCreateSemaphore(PVRSRV_SEMAPHORE_HANDLE *phSemaphore, IMG_INT iInitialCount)
 {
 	PVR_UNREFERENCED_PARAMETER(iInitialCount);
@@ -1237,8 +1224,6 @@ static INLINE IMG_VOID PVRSRVPostSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphore, I
 	PVR_UNREFERENCED_PARAMETER(hSemaphore);
 	PVR_UNREFERENCED_PARAMETER(iPostCount);
 }
-
-#endif /* !defined(USE_CODE) */
 
 
 /* Non-exported APIs */

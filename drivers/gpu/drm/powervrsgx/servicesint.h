@@ -114,13 +114,8 @@ typedef struct _PVRSRV_KERNEL_MEM_INFO_
 
 
 #if defined(SUPPORT_MEMINFO_IDS)
-	#if !defined(USE_CODE)
 	/* Globally unique "stamp" for allocation (not re-used until wrap) */
 	IMG_UINT64				ui64Stamp;
-	#else /* !defined(USE_CODE) */
-	IMG_UINT32				dummy1;
-	IMG_UINT32				dummy2;
-	#endif /* !defined(USE_CODE) */
 #endif /* defined(SUPPORT_MEMINFO_IDS) */
 
 	/* ptr to associated kernel sync info - NULL if no sync */

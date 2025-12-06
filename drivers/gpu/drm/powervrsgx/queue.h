@@ -72,7 +72,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	IMG_HANDLE					hCallbackData;		/*!< Command complete callback data */
  }COMMAND_COMPLETE_DATA, *PCOMMAND_COMPLETE_DATA;
 
-#if !defined(USE_CODE)
 IMG_VOID QueueDumpDebugInfo(IMG_VOID);
 
 IMG_IMPORT
@@ -122,8 +121,6 @@ PVRSRV_ERROR PVRSRVRegisterCmdProcListKM(IMG_UINT32		ui32DevIndex,
 IMG_IMPORT
 PVRSRV_ERROR PVRSRVRemoveCmdProcListKM(IMG_UINT32	ui32DevIndex,
 									   IMG_UINT32	ui32CmdCount);
-
-#endif /* !defined(USE_CODE) */
 
 #endif /* __QUEUE_H__ */
 
