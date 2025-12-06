@@ -47,12 +47,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	#define SGX_FEATURE_NUM_USE_PIPES						(2)
 	#define SGX_FEATURE_AUTOCLOCKGATING
 
-#if defined(SGX_FEATURE_SLAVE_VDM_CONTEXT_SWITCH) \
-	|| defined(SGX_FEATURE_MASTER_VDM_CONTEXT_SWITCH)
-/* Enable the define so common code for HW VDMCS code is compiled */
-#define SGX_FEATURE_VDM_CONTEXT_SWITCH
-#endif
-
 /*
 	Derive other definitions:
 */
