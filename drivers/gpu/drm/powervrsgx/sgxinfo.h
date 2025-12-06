@@ -103,10 +103,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_
 	IMG_HANDLE	hKernelTASigBufferMemInfo;
 	IMG_HANDLE	hKernel3DSigBufferMemInfo;
 
-#if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
-	IMG_HANDLE	hKernelEDMStatusBufferMemInfo;
-#endif
-
 	IMG_UINT32 ui32EDMTaskReg0;
 	IMG_UINT32 ui32EDMTaskReg1;
 

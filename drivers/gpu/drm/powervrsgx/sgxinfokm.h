@@ -133,9 +133,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	PPVRSRV_KERNEL_MEM_INFO		psKernelHWPerfCBMemInfo;		/*!< Meminfo for hardware performace circular buffer */
 	PPVRSRV_KERNEL_MEM_INFO		psKernelTASigBufferMemInfo;		/*!< Meminfo for TA signature buffer */
 	PPVRSRV_KERNEL_MEM_INFO		psKernel3DSigBufferMemInfo;		/*!< Meminfo for 3D signature buffer */
-#if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
-	PPVRSRV_KERNEL_MEM_INFO	psKernelEDMStatusBufferMemInfo; /*!< Meminfo for EDM status buffer */
-#endif
 	/* Client reference count */
 	IMG_UINT32				ui32ClientRefCount;
 
@@ -296,10 +293,6 @@ typedef struct _SGX_BRIDGE_INIT_INFO_KM_
 	IMG_HANDLE	hKernelHWPerfCBMemInfo;
 	IMG_HANDLE	hKernelTASigBufferMemInfo;
 	IMG_HANDLE	hKernel3DSigBufferMemInfo;
-
-#if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
-	IMG_HANDLE	hKernelEDMStatusBufferMemInfo;
-#endif
 
 	IMG_UINT32 ui32EDMTaskReg0;
 	IMG_UINT32 ui32EDMTaskReg1;

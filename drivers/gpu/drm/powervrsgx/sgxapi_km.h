@@ -236,10 +236,6 @@ typedef struct _PVRSRV_SGX_MISCINFO_FEATURES
 	IMG_UINT32			ui32CoreIdSW;	/*!< software core version (ID), e.g. SGX535, SGX540 */
 	IMG_UINT32			ui32CoreRevSW;	/*!< software core revision */
 	IMG_UINT32			ui32BuildOptions;	/*!< build options bit-field */
-#if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
-	IMG_DEV_VIRTADDR	sDevVAEDMStatusBuffer;	/*!< DevVAddr of the EDM status buffer */
-	IMG_PVOID			pvEDMStatusBuffer;		/*!< CPUVAddr of the EDM status buffer */
-#endif
 } PVRSRV_SGX_MISCINFO_FEATURES;
 
 

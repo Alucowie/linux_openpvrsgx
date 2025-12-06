@@ -65,23 +65,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "lists.h"
 #include "srvkm.h"
 
-#if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
-
-static const IMG_CHAR *SGXUKernelStatusString(IMG_UINT32 code)
-{
-	switch(code)
-	{
-#define MKTC_ST(x) \
-		case x: \
-			return #x;
-#include "sgx_ukernel_status_codes.h"
-		default:
-			return "(Unknown)";
-	}
-}
-
-#endif /* defined(PVRSRV_USSE_EDM_STATUS_DEBUG) */
-
 #define VAR(x) #x
 /* PRQA S 0881 11 */ /* ignore 'order of evaluation' warning */
 #define CHECK_SIZE(NAME) \
@@ -215,9 +198,6 @@ static PVRSRV_ERROR InitDevInfo(PVRSRV_PER_PROCESS_DATA *psPerProc,
 	psDevInfo->psKernelHWPerfCBMemInfo = (PVRSRV_KERNEL_MEM_INFO *)psInitInfo->hKernelHWPerfCBMemInfo;
 	psDevInfo->psKernelTASigBufferMemInfo = psInitInfo->hKernelTASigBufferMemInfo;
 	psDevInfo->psKernel3DSigBufferMemInfo = psInitInfo->hKernel3DSigBufferMemInfo;
-#if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
-	psDevInfo->psKernelEDMStatusBufferMemInfo = (PVRSRV_KERNEL_MEM_INFO *)psInitInfo->hKernelEDMStatusBufferMemInfo;
-#endif
 	/*
 	 * 	Assign client-side build options for later verification
 	 */
@@ -1125,42 +1105,6 @@ IMG_VOID SGXDumpDebugInfo (PVRSRV_SGXDEV_INFO	*psDevInfo,
 					pui32TA3DCtlBuffer[ui32LoopCounter + 2], pui32TA3DCtlBuffer[ui32LoopCounter + 3]));
 		}
 	}
-
-	#if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
-	{
-		IMG_UINT32	*pui32MKTraceBuffer = psDevInfo->psKernelEDMStatusBufferMemInfo->pvLinAddrKM;
-		IMG_UINT32	ui32LastStatusCode, ui32WriteOffset;
-
-		ui32LastStatusCode = *pui32MKTraceBuffer;
-		pui32MKTraceBuffer++;
-		ui32WriteOffset = *pui32MKTraceBuffer;
-		pui32MKTraceBuffer++;
-
-		PVR_LOG(("Last SGX microkernel status code: %08X %s",
-				 ui32LastStatusCode, SGXUKernelStatusString(ui32LastStatusCode)));
-
-		#if defined(PVRSRV_DUMP_MK_TRACE)
-		/*
-			Dump the raw microkernel trace buffer to the log.
-		*/
-		{
-			IMG_UINT32	ui32LoopCounter;
-
-			for (ui32LoopCounter = 0;
-				 ui32LoopCounter < SGXMK_TRACE_BUFFER_SIZE;
-				 ui32LoopCounter++)
-			{
-				IMG_UINT32	*pui32BufPtr;
-				pui32BufPtr = pui32MKTraceBuffer +
-								(((ui32WriteOffset + ui32LoopCounter) % SGXMK_TRACE_BUFFER_SIZE) * 4);
-				PVR_LOG(("\t(MKT-%X) %08X %08X %08X %08X %s", ui32LoopCounter,
-						 pui32BufPtr[2], pui32BufPtr[3], pui32BufPtr[1], pui32BufPtr[0],
-						 SGXUKernelStatusString(pui32BufPtr[0])));
-			}
-		}
-		#endif /* PVRSRV_DUMP_MK_TRACE */
-	}
-	#endif /* PVRSRV_USSE_EDM_STATUS_DEBUG */
 
 	{
 		/*
@@ -2335,12 +2279,6 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 			/* Also report the kernel module build options -- used in SGXConnectionCheck() */
 			psSGXFeatures->ui32BuildOptions = (SGX_BUILD_OPTIONS);
-
-#if defined(PVRSRV_USSE_EDM_STATUS_DEBUG)
-			/* Report the EDM status buffer location in memory */
-			psSGXFeatures->sDevVAEDMStatusBuffer = psDevInfo->psKernelEDMStatusBufferMemInfo->sDevVAddr;
-			psSGXFeatures->pvEDMStatusBuffer = psDevInfo->psKernelEDMStatusBufferMemInfo->pvLinAddrKM;
-#endif
 
 			/* Copy SGX features into misc info struct, to return to client */
 			psMiscInfo->uData.sSGXFeatures = *psSGXFeatures;

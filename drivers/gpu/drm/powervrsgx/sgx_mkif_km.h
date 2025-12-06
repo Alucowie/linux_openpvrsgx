@@ -348,14 +348,6 @@ typedef struct _PVRSRV_SGX_MISCINFO_INFO
 	SGX_MISCINFO_STRUCT_SIZES		sSGXStructSizes;	/*!< internal info: microkernel structure sizes */
 } PVRSRV_SGX_MISCINFO_INFO;
 
-#ifdef PVRSRV_USSE_EDM_STATUS_DEBUG
-/*!
- *****************************************************************************
- * Number of entries in the microkernel status buffer
- *****************************************************************************/
-#define SGXMK_TRACE_BUFFER_SIZE 512
-#endif /* PVRSRV_USSE_EDM_STATUS_DEBUG */
-
 #define SGXMKIF_HWPERF_CB_SIZE					0x100	/* must be 2^n*/
 
 /*!
