@@ -98,14 +98,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 PVRSRV_BRIDGE_DISPATCH_TABLE_ENTRY g_BridgeDispatchTable[BRIDGE_DISPATCH_TABLE_ENTRY_COUNT];
 
-#if defined(DEBUG_BRIDGE_KM)
 PVRSRV_BRIDGE_GLOBAL_STATS g_BridgeGlobalStats;
-#endif
 
 static IMG_BOOL abSharedDeviceMemHeap[PVRSRV_MAX_CLIENT_HEAPS];
 static IMG_BOOL *pbSharedDeviceMemHeap = abSharedDeviceMemHeap;
 
-#if defined(DEBUG_BRIDGE_KM)
 PVRSRV_ERROR
 CopyFromUserWrapper(PVRSRV_PER_PROCESS_DATA *pProcData,
 					IMG_UINT32 ui32BridgeID,
@@ -128,7 +125,6 @@ CopyToUserWrapper(PVRSRV_PER_PROCESS_DATA *pProcData,
 	g_BridgeGlobalStats.ui32TotalCopyToUserBytes+=ui32Size;
 	return OSCopyToUser(pProcData, pvDest, pvSrc, ui32Size);
 }
-#endif
 
 
 static IMG_INT
@@ -3840,15 +3836,9 @@ DummyBW(IMG_UINT32 ui32BridgeID,
 	PVR_UNREFERENCED_PARAMETER(psBridgeOut);
 	PVR_UNREFERENCED_PARAMETER(psPerProc);
 
-#if defined(DEBUG_BRIDGE_KM)
 	PVR_DPF((PVR_DBG_ERROR, "%s: BRIDGE ERROR: BridgeID %u (%s) mapped to "
 			 "Dummy Wrapper (probably not what you want!)",
 			 __FUNCTION__, ui32BridgeID, g_BridgeDispatchTable[ui32BridgeID].pszIOCName));
-#else
-	PVR_DPF((PVR_DBG_ERROR, "%s: BRIDGE ERROR: BridgeID %u mapped to "
-			 "Dummy Wrapper (probably not what you want!)",
-			 __FUNCTION__, ui32BridgeID));
-#endif
 	return -ENOTTY;
 }
 
@@ -3872,9 +3862,6 @@ _SetDispatchTableEntry(IMG_UINT32 ui32Index,
 					   const IMG_CHAR *pszFunctionName)
 {
 	static IMG_UINT32 ui32PrevIndex = ~0UL;		/* -1 */
-#if !defined(DEBUG_BRIDGE_KM_DISPATCH_TABLE) && !defined(DEBUG_BRIDGE_KM)
-	PVR_UNREFERENCED_PARAMETER(pszFunctionName);
-#endif
 
 #if defined(DEBUG_BRIDGE_KM_DISPATCH_TABLE)
 	/* INTEGRATION_POINT: Enable this to dump out the dispatch table entries */
@@ -3889,15 +3876,9 @@ _SetDispatchTableEntry(IMG_UINT32 ui32Index,
 	 */
 	if(g_BridgeDispatchTable[ui32Index].pfFunction)
 	{
-#if defined(DEBUG_BRIDGE_KM)
 		PVR_DPF((PVR_DBG_ERROR,
 				 "%s: BUG!: Adding dispatch table entry for %s clobbers an existing entry for %s",
 				 __FUNCTION__, pszIOCName, g_BridgeDispatchTable[ui32Index].pszIOCName));
-#else
-		PVR_DPF((PVR_DBG_ERROR,
-				 "%s: BUG!: Adding dispatch table entry for %s clobbers an existing entry (index=%u)",
-				 __FUNCTION__, pszIOCName, ui32Index));
-#endif
 		PVR_DPF((PVR_DBG_ERROR, "NOTE: Enabling DEBUG_BRIDGE_KM_DISPATCH_TABLE may help debug this issue."));
 	}
 
@@ -3916,26 +3897,18 @@ _SetDispatchTableEntry(IMG_UINT32 ui32Index,
 	   ((ui32Index >= ui32PrevIndex + DISPATCH_TABLE_GAP_THRESHOLD) ||
 		(ui32Index <= ui32PrevIndex)))
 	{
-#if defined(DEBUG_BRIDGE_KM)
 		PVR_DPF((PVR_DBG_WARNING,
 				 "%s: There is a gap in the dispatch table between indices %u (%s) and %u (%s)",
 				 __FUNCTION__, ui32PrevIndex, g_BridgeDispatchTable[ui32PrevIndex].pszIOCName,
 				 ui32Index, pszIOCName));
-#else
-		PVR_DPF((PVR_DBG_WARNING,
-				 "%s: There is a gap in the dispatch table between indices %u and %u (%s)",
-				 __FUNCTION__, (IMG_UINT)ui32PrevIndex, (IMG_UINT)ui32Index, pszIOCName));
-#endif
 		PVR_DPF((PVR_DBG_ERROR, "NOTE: Enabling DEBUG_BRIDGE_KM_DISPATCH_TABLE may help debug this issue."));
 	}
 
 	g_BridgeDispatchTable[ui32Index].pfFunction = pfFunction;
-#if defined(DEBUG_BRIDGE_KM)
 	g_BridgeDispatchTable[ui32Index].pszIOCName = pszIOCName;
 	g_BridgeDispatchTable[ui32Index].pszFunctionName = pszFunctionName;
 	g_BridgeDispatchTable[ui32Index].ui32CallCount = 0;
 	g_BridgeDispatchTable[ui32Index].ui32CopyFromUserTotalBytes = 0;
-#endif
 
 	ui32PrevIndex = ui32Index;
 }
@@ -5039,13 +5012,11 @@ CommonBridgeInit(IMG_VOID)
 		if(!g_BridgeDispatchTable[i].pfFunction)
 		{
 			g_BridgeDispatchTable[i].pfFunction = &DummyBW;
-#if defined(DEBUG_BRIDGE_KM)
 			g_BridgeDispatchTable[i].pszIOCName = "_PVRSRV_BRIDGE_DUMMY";
 			g_BridgeDispatchTable[i].pszFunctionName = "DummyBW";
 			g_BridgeDispatchTable[i].ui32CallCount = 0;
 			g_BridgeDispatchTable[i].ui32CopyFromUserTotalBytes = 0;
 			g_BridgeDispatchTable[i].ui32CopyToUserTotalBytes = 0;
-#endif
 		}
 	}
 
@@ -5067,10 +5038,8 @@ IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 			 g_BridgeDispatchTable[ui32BridgeID].pszIOCName));
 #endif
 
-#if defined(DEBUG_BRIDGE_KM)
 	g_BridgeDispatchTable[ui32BridgeID].ui32CallCount++;
 	g_BridgeGlobalStats.ui32IOCTLCount++;
-#endif
 
 	if(!psPerProc->bInitProcess)
 	{

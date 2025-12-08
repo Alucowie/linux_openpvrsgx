@@ -65,7 +65,6 @@ extern "C" {
 #define ENOTTY	25
 #endif
 
-#if defined(DEBUG_BRIDGE_KM)
 PVRSRV_ERROR
 CopyFromUserWrapper(PVRSRV_PER_PROCESS_DATA *pProcData,
 					IMG_UINT32 ui32BridgeID,
@@ -78,12 +77,6 @@ CopyToUserWrapper(PVRSRV_PER_PROCESS_DATA *pProcData,
 				  IMG_VOID *pvDest,
 				  IMG_VOID *pvSrc,
 				  IMG_UINT32 ui32Size);
-#else
-#define CopyFromUserWrapper(pProcData, ui32BridgeID, pvDest, pvSrc, ui32Size) \
-	OSCopyFromUser(pProcData, pvDest, pvSrc, ui32Size)
-#define CopyToUserWrapper(pProcData, ui32BridgeID, pvDest, pvSrc, ui32Size) \
-	OSCopyToUser(pProcData, pvDest, pvSrc, ui32Size)
-#endif
 
 
 #define ASSIGN_AND_RETURN_ON_ERROR(error, src, res)		\
@@ -169,7 +162,6 @@ typedef struct _PVRSRV_BRIDGE_DISPATCH_TABLE_ENTRY
 {
 	BridgeWrapperFunction pfFunction; /*!< The wrapper function that validates the ioctl
 										arguments before calling into srvkm proper */
-#if defined(DEBUG_BRIDGE_KM)
 	const IMG_CHAR *pszIOCName; /*!< Name of the ioctl: e.g. "PVRSRV_BRIDGE_CONNECT_SERVICES" */
 	const IMG_CHAR *pszFunctionName; /*!< Name of the wrapper function: e.g. "PVRSRVConnectBW" */
 	IMG_UINT32 ui32CallCount; /*!< The total number of times the ioctl has been called */
@@ -177,7 +169,6 @@ typedef struct _PVRSRV_BRIDGE_DISPATCH_TABLE_ENTRY
 											 userspace within this ioctl */
 	IMG_UINT32 ui32CopyToUserTotalBytes; /*!< The total number of bytes copied from
 										   userspace within this ioctl */
-#endif
 }PVRSRV_BRIDGE_DISPATCH_TABLE_ENTRY;
 
 #if defined(SUPPORT_VGX) || defined(SUPPORT_MSVDX)
@@ -211,7 +202,6 @@ _SetDispatchTableEntry(IMG_UINT32 ui32Index,
 #define PVRSRV_BRIDGE_ASSERT_CMD(X, Y) PVR_ASSERT(X == PVRSRV_GET_BRIDGE_ID(Y))
 
 
-#if defined(DEBUG_BRIDGE_KM)
 typedef struct _PVRSRV_BRIDGE_GLOBAL_STATS
 {
 	IMG_UINT32 ui32IOCTLCount;
@@ -223,8 +213,6 @@ typedef struct _PVRSRV_BRIDGE_GLOBAL_STATS
  * BRIDGE_DISPATCH_TABLE_ENTRYs (E.g. on Linux we report these via a
  * proc entry /proc/pvr/bridge_stats. Ref printLinuxBridgeStats()) */
 extern PVRSRV_BRIDGE_GLOBAL_STATS g_BridgeGlobalStats;
-#endif
-
 
 PVRSRV_ERROR CommonBridgeInit(IMG_VOID);
 

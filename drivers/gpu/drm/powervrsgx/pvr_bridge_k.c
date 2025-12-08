@@ -80,15 +80,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define	PRIVATE_DATA(pFile) ((pFile)->private_data)
 #endif
 
-#if defined(DEBUG_BRIDGE_KM)
-
 static struct proc_dir_entry *g_ProcBridgeStats =0;
 static void* ProcSeqNextBridgeStats(struct seq_file *sfile,void* el,loff_t off);
 static void ProcSeqShowBridgeStats(struct seq_file *sfile,void* el);
 static void* ProcSeqOff2ElementBridgeStats(struct seq_file * sfile, loff_t off);
 static void ProcSeqStartstopBridgeStats(struct seq_file *sfile,IMG_BOOL start);
-
-#endif
 
 extern PVRSRV_LINUX_MUTEX gPVRSRVLock;
 
@@ -99,7 +95,6 @@ static IMG_UINT64 ui64Stamp;
 PVRSRV_ERROR
 LinuxBridgeInit(IMG_VOID)
 {
-#if defined(DEBUG_BRIDGE_KM)
 	{
 		g_ProcBridgeStats = CreateProcReadEntrySeq(
 												  "bridge_stats", 
@@ -114,19 +109,14 @@ LinuxBridgeInit(IMG_VOID)
 			return PVRSRV_ERROR_OUT_OF_MEMORY;
 		}
 	}
-#endif
 	return CommonBridgeInit();
 }
 
 IMG_VOID
 LinuxBridgeDeInit(IMG_VOID)
 {
-#if defined(DEBUG_BRIDGE_KM)
     RemoveProcEntrySeq(g_ProcBridgeStats);
-#endif
 }
-
-#if defined(DEBUG_BRIDGE_KM)
 
 /*
  * Lock MMap regions list (called on page start/stop while reading /proc/mmap)
@@ -229,8 +219,6 @@ static void ProcSeqShowBridgeStats(struct seq_file *sfile,void* el)
 				   psEntry->ui32CopyFromUserTotalBytes,
 				   psEntry->ui32CopyToUserTotalBytes);
 }
-
-#endif /* DEBUG_BRIDGE_KM */
 
 
 #if defined(SUPPORT_DRI_DRM)
