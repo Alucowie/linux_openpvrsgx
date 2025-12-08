@@ -1338,9 +1338,6 @@ BM_CreateHeap (IMG_HANDLE hBMContext,
 	psBMHeap->sDevArena.ui32DataPageSize = psDevMemHeapInfo->ui32DataPageSize;
 	psBMHeap->sDevArena.psDeviceMemoryHeapInfo = psDevMemHeapInfo;
 	psBMHeap->ui32Attribs = psDevMemHeapInfo->ui32Attribs;
-#if defined(SUPPORT_MEMORY_TILING)
-	psBMHeap->ui32XTileStride = psDevMemHeapInfo->ui32XTileStride;
-#endif
 
 	/* tie the heap to the context */
 	psBMHeap->pBMContext = pBMContext;

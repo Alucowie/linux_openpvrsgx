@@ -232,11 +232,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 				psHeapInfo[ui32ClientHeapCount].sDevVAddrBase = psDeviceMemoryHeap[i].sDevVAddrBase;
 				psHeapInfo[ui32ClientHeapCount].ui32HeapByteSize = psDeviceMemoryHeap[i].ui32HeapSize;
 				psHeapInfo[ui32ClientHeapCount].ui32Attribs = psDeviceMemoryHeap[i].ui32Attribs;
-				#if defined(SUPPORT_MEMORY_TILING)
-				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = psDeviceMemoryHeap[i].ui32XTileStride;
-				#else
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = 0;
-				#endif
 				pbShared[ui32ClientHeapCount] = IMG_TRUE;
 				ui32ClientHeapCount++;
 				break;
@@ -264,11 +260,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 				psHeapInfo[ui32ClientHeapCount].sDevVAddrBase = psDeviceMemoryHeap[i].sDevVAddrBase;
 				psHeapInfo[ui32ClientHeapCount].ui32HeapByteSize = psDeviceMemoryHeap[i].ui32HeapSize;
 				psHeapInfo[ui32ClientHeapCount].ui32Attribs = psDeviceMemoryHeap[i].ui32Attribs;
-				#if defined(SUPPORT_MEMORY_TILING)
-				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = psDeviceMemoryHeap[i].ui32XTileStride;
-				#else
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = 0;
-				#endif
 				pbShared[ui32ClientHeapCount] = IMG_FALSE;
 
 				ui32ClientHeapCount++;
@@ -1796,19 +1788,6 @@ static PVRSRV_ERROR UnmapDeviceClassMemoryCallBack(IMG_PVOID  pvParam,
 
 	psMemInfo = psDCMapInfo->psMemInfo;
 
-#if defined(SUPPORT_MEMORY_TILING)
-	if(psDCMapInfo->ui32TilingStride > 0)
-	{
-		PVRSRV_DEVICE_NODE *psDeviceNode = psDCMapInfo->psDeviceNode;
-
-		if (psDeviceNode->pfnFreeMemTilingRange(psDeviceNode,
-												psDCMapInfo->ui32RangeIndex) != PVRSRV_OK)
-		{
-			PVR_DPF((PVR_DBG_ERROR,"UnmapDeviceClassMemoryCallBack: FreeMemTilingRange failed"));
-		}
-	}
-#endif
-
 	(psDCMapInfo->psDeviceClassBuffer->ui32MemMapRefCount)--;
 
 	OSFreeMem(PVRSRV_OS_PAGEABLE_HEAP, sizeof(PVRSRV_DC_MAPINFO), psDCMapInfo, IMG_NULL);
@@ -2017,24 +1996,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceClassMemoryKM(PVRSRV_PER_PROCESS_DATA	*
 	psDCMapInfo->psMemInfo = psMemInfo;
 	psDCMapInfo->psDeviceClassBuffer = psDeviceClassBuffer;
 
-#if defined(SUPPORT_MEMORY_TILING)
-	psDCMapInfo->psDeviceNode = psDeviceNode;
-
-	if(psDCMapInfo->ui32TilingStride > 0)
-	{
-		/* try to acquire a tiling range on this device */
-		eError = psDeviceNode->pfnAllocMemTilingRange(psDeviceNode,
-														psMemInfo,
-														psDCMapInfo->ui32TilingStride,
-														&psDCMapInfo->ui32RangeIndex);
-		if (eError != PVRSRV_OK)
-		{
-			PVR_DPF((PVR_DBG_ERROR,"PVRSRVMapDeviceClassMemoryKM: AllocMemTilingRange failed"));
-			goto ErrorExitPhase3;
-		}
-	}
-#endif
-
 	/* Register Resource */
 	psMemInfo->sMemBlk.hResItem = ResManRegisterRes(psPerProc->hResManContext,
 													RESMAN_TYPE_DEVICECLASSMEM_MAPPING,
@@ -2068,24 +2029,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceClassMemoryKM(PVRSRV_PER_PROCESS_DATA	*
 	}
 #endif
 	return PVRSRV_OK;
-
-#if defined(SUPPORT_MEMORY_TILING)
-ErrorExitPhase3:
-	if(psMemInfo)
-	{
-		if (psMemInfo->psKernelSyncInfo)
-		{
-			PVRSRVKernelSyncInfoDecRef(psMemInfo->psKernelSyncInfo, psMemInfo);
-		}
-
-		FreeDeviceMem(psMemInfo);
-		/*
-			FreeDeviceMem will free the meminfo so set
-			it to NULL to avoid double free below
-		*/
-		psMemInfo = IMG_NULL;
-	}
-#endif
 
 ErrorExitPhase2:
 	if(psMemInfo)
