@@ -149,20 +149,8 @@ static IMG_VOID SGXResetSetupBIFContexts(PVRSRV_SGXDEV_INFO	*psDevInfo)
 ******************************************************************************/
 static IMG_VOID SGXResetSleep(PVRSRV_SGXDEV_INFO	*psDevInfo)
 {
-#if defined(EMULATOR)
-	IMG_UINT32	ui32ReadRegister;
-
-	ui32ReadRegister = EUR_CR_SOFT_RESET;
-#endif
-
 	/* Sleep for 100 SGX clocks */
 	SGXWaitClocks(psDevInfo, 100);
-#if defined(EMULATOR)
-	/*
-		Read a register to make sure we wait long enough on the emulator...
-	*/
-	OSReadHWReg(psDevInfo->pvRegsBaseKM, ui32ReadRegister);
-#endif
 }
 
 

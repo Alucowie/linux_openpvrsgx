@@ -85,11 +85,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define ON_EACH_CPU(func, info, wait) on_each_cpu(func, info, wait)
 
 
-#if defined(EMULATOR)
-#define EVENT_OBJECT_TIMEOUT_MS		(2000)
-#else
 #define EVENT_OBJECT_TIMEOUT_MS		(100)
-#endif /* EMULATOR */
 
 #define PVRSRV_MODNAME "pvrsrvkm"
 
