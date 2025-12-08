@@ -401,20 +401,9 @@ PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	SGXReset(psDevInfo, bHardwareRecovery);
 
 #if defined(EUR_CR_POWER)
-#if defined(SGX531)
-	/*
-		Disable half the pipes.
-		531 has 2 pipes within a 4 pipe framework, so 
-		the 2 redundant pipes must be disabled even
-		though they do not exist.
-	*/
-	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_POWER, 1);
-	PDUMPREG(SGX_PDUMPREG_NAME, EUR_CR_POWER, 1);
-#else
 	/* set the default pipe count (all fully enabled) */
 	OSWriteHWReg(psDevInfo->pvRegsBaseKM, EUR_CR_POWER, 0);
 	PDUMPREG(SGX_PDUMPREG_NAME, EUR_CR_POWER, 0);
-#endif
 #endif
 
 	/* Initialise the kernel CCB event kicker value */

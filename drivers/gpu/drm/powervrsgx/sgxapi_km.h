@@ -79,11 +79,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #define SGX_3DPARAMETERS_HEAP_ID			SGX_PERCONTEXT_3DPARAMETERS_HEAP_ID
 /* Define for number of bytes between consecutive code base registers */
-#if defined(SGX543) || defined(SGX544) || defined(SGX554)
-#define SGX_USE_CODE_SEGMENT_RANGE_BITS		23
-#else
 #define SGX_USE_CODE_SEGMENT_RANGE_BITS		19
-#endif
 
 #define SGX_MAX_TA_STATUS_VALS	32
 #define SGX_MAX_3D_STATUS_VALS	4
