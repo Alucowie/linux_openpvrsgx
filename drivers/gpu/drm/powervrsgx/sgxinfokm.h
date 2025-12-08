@@ -92,19 +92,6 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	/*  Register region size in bytes */
 	IMG_UINT32				ui32RegSize;
 
-#if defined(SUPPORT_EXTERNAL_SYSTEM_CACHE)
-	/* external system cache register region size in bytes */
-	IMG_UINT32				ui32ExtSysCacheRegsSize;
-	/* external system cache register device relative physical address */
-	IMG_DEV_PHYADDR			sExtSysCacheRegsDevPBase;
-	/* ptr to page table  */
-	IMG_UINT32				*pui32ExtSystemCacheRegsPT;
-	/* handle to page table alloc/mapping */
-	IMG_HANDLE				hExtSystemCacheRegsPTPageOSMemHandle;
-	/* sys phys addr of PT */
-	IMG_SYS_PHYADDR			sExtSystemCacheRegsPTSysPAddr;
-#endif
-
 	/*  SGX clock speed */
 	IMG_UINT32				ui32CoreClockSpeed;
 	IMG_UINT32				ui32uKernelTimerClock;
@@ -218,11 +205,6 @@ typedef struct _SGX_DEVICE_MAP_
 	IMG_DEV_PHYADDR			sLocalMemDevPBase;
 	IMG_CPU_PHYADDR			sLocalMemCpuPBase;
 	IMG_UINT32				ui32LocalMemSize;
-
-#if defined(SUPPORT_EXTERNAL_SYSTEM_CACHE)
-	IMG_UINT32				ui32ExtSysCacheRegsSize;
-	IMG_DEV_PHYADDR			sExtSysCacheRegsDevPBase;
-#endif
 
 	/* device interrupt IRQ */
 	IMG_UINT32				ui32IRQ;

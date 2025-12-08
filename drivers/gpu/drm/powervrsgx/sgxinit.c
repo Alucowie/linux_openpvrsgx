@@ -767,18 +767,6 @@ PVRSRV_ERROR DevInitSGXPart2KM (PVRSRV_PER_PROCESS_DATA *psPerProc,
 		return eError;
 	}
 
-#if defined(SUPPORT_EXTERNAL_SYSTEM_CACHE)
-	/* map the external system cache control registers into the SGX MMU */
-	psDevInfo->ui32ExtSysCacheRegsSize = psSGXDeviceMap->ui32ExtSysCacheRegsSize;
-	psDevInfo->sExtSysCacheRegsDevPBase = psSGXDeviceMap->sExtSysCacheRegsDevPBase;
-	eError = MMU_MapExtSystemCacheRegs(psDeviceNode);
-	if (eError != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR,"SGXInitialise : Failed to map external system cache registers"));
-		return eError;
-	}
-#endif /* SUPPORT_EXTERNAL_SYSTEM_CACHE */
-
 	/*
 		Initialise the Kernel CCB
 	*/
@@ -832,16 +820,6 @@ static PVRSRV_ERROR DevDeInitSGX (IMG_VOID *pvDeviceNode)
 		}
 		psDevInfo->hTimer = IMG_NULL;
 	}
-
-#if defined(SUPPORT_EXTERNAL_SYSTEM_CACHE)
-	/* unmap the external system cache control registers  */
-	eError = MMU_UnmapExtSystemCacheRegs(psDeviceNode);
-	if (eError != PVRSRV_OK)
-	{
-		PVR_DPF((PVR_DBG_ERROR,"DevDeInitSGX: Failed to unmap ext system cache registers"));
-		return eError;
-	}
-#endif /* SUPPORT_EXTERNAL_SYSTEM_CACHE */
 
 	MMU_BIFResetPDFree(psDevInfo);
 

@@ -420,30 +420,6 @@ PVRSRV_ERROR MMU_BIFResetPDAlloc(PVRSRV_SGXDEV_INFO *psDevInfo);
 ******************************************************************************/
 IMG_VOID MMU_BIFResetPDFree(PVRSRV_SGXDEV_INFO *psDevInfo);
 
-#if defined(SUPPORT_EXTERNAL_SYSTEM_CACHE)
-/*
-******************************************************************************
-	FUNCTION:   MMU_MapExtSystemCacheRegs
-
-	PURPOSE:    maps external system cache control registers into SGX MMU
-
-	PARAMETERS: In:  psDeviceNode - device node
-	RETURNS:
-******************************************************************************/
-PVRSRV_ERROR MMU_MapExtSystemCacheRegs(PVRSRV_DEVICE_NODE *psDeviceNode);
-
-/*
-******************************************************************************
-	FUNCTION:   MMU_UnmapExtSystemCacheRegs
-
-	PURPOSE:    unmaps external system cache control registers
-
-	PARAMETERS: In:  psDeviceNode - device node
-	RETURNS:
-******************************************************************************/
-PVRSRV_ERROR MMU_UnmapExtSystemCacheRegs(PVRSRV_DEVICE_NODE *psDeviceNode);
-#endif /* #if defined(SUPPORT_EXTERNAL_SYSTEM_CACHE) */
-
 /*
 ******************************************************************************
 	FUNCTION:   MMU_IsHeapShared

@@ -1586,7 +1586,6 @@ MMU_Create (MMU_CONTEXT *psMMUContext,
 	pMMUHeap->ui32PDMask = SGX_MMU_PD_MASK & (SGX_MMU_PD_MASK>>(32-SGX_FEATURE_ADDRESS_SPACE_SIZE));
 
 	/* External system cache violates this rule */
-#if !defined (SUPPORT_EXTERNAL_SYSTEM_CACHE)
 	/*
 		The heap must start on a PT boundary to avoid PT sharing across heaps
 		The only exception is the first heap which can start at any address
@@ -1602,7 +1601,6 @@ MMU_Create (MMU_CONTEXT *psMMUContext,
 						& (pMMUHeap->ui32DataPageMask
 							| pMMUHeap->ui32PTMask)) == 0);
 	}
-#endif
 	/* how many PT entries do we need? */
 	pMMUHeap->ui32PTETotalUsable = pMMUHeap->psDevArena->ui32Size >> pMMUHeap->ui32PTShift;
 
@@ -2787,92 +2785,6 @@ IMG_VOID MMU_CheckFaultAddr(PVRSRV_SGXDEV_INFO *psDevInfo, IMG_UINT32 ui32PDDevP
 		}
 	}
 }
-
-#if defined(SUPPORT_EXTERNAL_SYSTEM_CACHE)
-/*!
-******************************************************************************
-	FUNCTION:   MMU_MapExtSystemCacheRegs
-
-	PURPOSE:    maps external system cache control registers into SGX MMU
-
-	PARAMETERS: In:  psDeviceNode - device node
-	RETURNS:
-******************************************************************************/
-PVRSRV_ERROR MMU_MapExtSystemCacheRegs(PVRSRV_DEVICE_NODE *psDeviceNode)
-{
-	IMG_UINT32 *pui32PT;
-	PVRSRV_SGXDEV_INFO *psDevInfo;
-	IMG_UINT32 ui32PDIndex;
-	IMG_UINT32 ui32PTIndex;
-	PDUMP_MMU_ATTRIB sMMUAttrib;
-
-	psDevInfo = (PVRSRV_SGXDEV_INFO*)psDeviceNode->pvDevice;
-
-	sMMUAttrib = psDevInfo->sMMUAttrib;
-
-	ui32PDIndex = (SGX_EXT_SYSTEM_CACHE_REGS_DEVVADDR_BASE & SGX_MMU_PD_MASK) >> (SGX_MMU_PAGE_SHIFT + SGX_MMU_PT_SHIFT);
-	ui32PTIndex = (SGX_EXT_SYSTEM_CACHE_REGS_DEVVADDR_BASE & SGX_MMU_PT_MASK) >> SGX_MMU_PAGE_SHIFT;
-
-	pui32PT = (IMG_UINT32 *) psDeviceNode->sDevMemoryInfo.pBMKernelContext->psMMUContext->apsPTInfoList[ui32PDIndex]->PTPageCpuVAddr;
-
-	MakeKernelPageReadWrite(pui32PT);
-	/* map the PT to the registers */
-	pui32PT[ui32PTIndex] = (psDevInfo->sExtSysCacheRegsDevPBase.uiAddr>>SGX_MMU_PTE_ADDR_ALIGNSHIFT)
-							| SGX_MMU_PTE_VALID;
-	MakeKernelPageReadOnly(pui32PT);
-	return PVRSRV_OK;
-}
-
-
-/*!
-******************************************************************************
-	FUNCTION:   MMU_UnmapExtSystemCacheRegs
-
-	PURPOSE:    unmaps external system cache control registers
-
-	PARAMETERS: In:  psDeviceNode - device node
-	RETURNS:
-******************************************************************************/
-PVRSRV_ERROR MMU_UnmapExtSystemCacheRegs(PVRSRV_DEVICE_NODE *psDeviceNode)
-{
-	SYS_DATA *psSysData;
-	RA_ARENA *psLocalDevMemArena;
-	PVRSRV_SGXDEV_INFO *psDevInfo;
-	IMG_UINT32 ui32PDIndex;
-	IMG_UINT32 ui32PTIndex;
-	IMG_UINT32 *pui32PT;
-	PDUMP_MMU_ATTRIB sMMUAttrib;
-
-	psDevInfo = (PVRSRV_SGXDEV_INFO*)psDeviceNode->pvDevice;
-
-	sMMUAttrib = psDevInfo->sMMUAttrib;
-
-	SysAcquireData(&psSysData);
-
-	psLocalDevMemArena = psSysData->apsLocalDevMemArena[0];
-
-	/* unmap the MMU page table from the PD */
-	ui32PDIndex = (SGX_EXT_SYSTEM_CACHE_REGS_DEVVADDR_BASE & SGX_MMU_PD_MASK) >> (SGX_MMU_PAGE_SHIFT + SGX_MMU_PT_SHIFT);
-	ui32PTIndex = (SGX_EXT_SYSTEM_CACHE_REGS_DEVVADDR_BASE & SGX_MMU_PT_MASK) >> SGX_MMU_PAGE_SHIFT;
-
-	/* Only unmap it if the PT hasn't already been freed */
-	if (psDeviceNode->sDevMemoryInfo.pBMKernelContext->psMMUContext->apsPTInfoList[ui32PDIndex])
-	{
-		if (psDeviceNode->sDevMemoryInfo.pBMKernelContext->psMMUContext->apsPTInfoList[ui32PDIndex]->PTPageCpuVAddr)
-		{
-			pui32PT = (IMG_UINT32 *) psDeviceNode->sDevMemoryInfo.pBMKernelContext->psMMUContext->apsPTInfoList[ui32PDIndex]->PTPageCpuVAddr;
-		}
-	}
-
-	MakeKernelPageReadWrite(pui32PT);
-	pui32PT[ui32PTIndex] = 0;
-	MakeKernelPageReadOnly(pui32PT);
-
-	PDUMPMEMPTENTRIES(&sMMUAttrib, psDeviceNode->sDevMemoryInfo.pBMKernelContext->psMMUContext->hPDOSMemHandle, &pui32PT[ui32PTIndex], sizeof(IMG_UINT32), 0, IMG_FALSE, PDUMP_PD_UNIQUETAG, PDUMP_PT_UNIQUETAG);
-
-	return PVRSRV_OK;
-}
-#endif
 
 
 #if PAGE_TEST
