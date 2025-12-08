@@ -272,9 +272,6 @@ typedef struct _PVRSRV_DEVICE_NODE_
 												IMG_SIZE_T uSize,
 												IMG_UINT32 ui32MemFlags,
 												IMG_HANDLE hUniqueTag);
-#if defined(SUPPORT_PDUMP_MULTI_PROCESS)
-	IMG_BOOL				(*pfnMMUIsHeapShared)(MMU_HEAP *);
-#endif
 	IMG_DEV_PHYADDR			(*pfnMMUGetPhysPageAddr)(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR sDevVPageAddr);
 	IMG_DEV_PHYADDR			(*pfnMMUGetPDDevPAddr)(MMU_CONTEXT *pMMUContext);
 	IMG_VOID				(*pfnMMUGetCacheFlushRange)(MMU_CONTEXT *pMMUContext, IMG_UINT32 *pui32RangeMask);

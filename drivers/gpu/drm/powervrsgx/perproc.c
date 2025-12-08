@@ -215,14 +215,7 @@ PVRSRV_ERROR PVRSRVPerProcessDataConnect(IMG_UINT32	ui32PID, IMG_UINT32 ui32Flag
 		psPerProc->ui32PID = ui32PID;
 		psPerProc->ui32RefCount = 0;
 
-#if defined(SUPPORT_PDUMP_MULTI_PROCESS)
-		if (ui32Flags == SRV_FLAGS_PDUMP_ACTIVE)
-		{
-			psPerProc->bPDumpActive = IMG_TRUE;
-		}
-#else
 		PVR_UNREFERENCED_PARAMETER(ui32Flags);
-#endif
 
 		/* Call environment specific per process init function */
 		eError = OSPerProcessPrivateDataInit(&psPerProc->hOsPrivateData);

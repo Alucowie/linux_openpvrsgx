@@ -1335,9 +1335,6 @@ PVRSRV_ERROR SGXRegisterDevice (PVRSRV_DEVICE_NODE *psDeviceNode)
 	psDeviceNode->pfnMMUMapScatter = &MMU_MapScatter;
 	psDeviceNode->pfnMMUGetPhysPageAddr = &MMU_GetPhysPageAddr;
 	psDeviceNode->pfnMMUGetPDDevPAddr = &MMU_GetPDDevPAddr;
-#if defined(SUPPORT_PDUMP_MULTI_PROCESS)
-	psDeviceNode->pfnMMUIsHeapShared = &MMU_IsHeapShared;
-#endif
 	psDeviceNode->pfnMMUGetCacheFlushRange = IMG_NULL;
 	psDeviceNode->pfnMMUGetPDPhysAddr = IMG_NULL;
 	psDeviceNode->pfnMMUMapPagesSparse = &MMU_MapPagesSparse;

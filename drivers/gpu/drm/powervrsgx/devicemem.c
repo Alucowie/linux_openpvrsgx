@@ -2011,23 +2011,6 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceClassMemoryKM(PVRSRV_PER_PROCESS_DATA	*
 	/* return the meminfo */
 	*ppsMemInfo = psMemInfo;
 
-#if defined(SUPPORT_PDUMP_MULTI_PROCESS)
-	/* If the 3PDD supplies a kernel virtual address, we can PDUMP it */
-	if(psMemInfo->pvLinAddrKM)
-	{
-		/* FIXME:
-		 *	Initialise the display surface here when it is mapped into Services.
-		 *	Otherwise there is a risk that pdump toolchain will assign previously
-		 *	used physical pages, leading to visual artefacts on the unrendered surface
-		 *	(e.g. during LLS rendering).
-		 *
-		 *	A better method is to pdump the allocation from the DC driver, so the
-		 *	BM_Wrap pdumps only the virtual memory which better represents the driver
-		 *	behaviour.	
-		 */
-		PDUMPMEM(IMG_NULL, psMemInfo, ui32Offset, psMemInfo->uAllocSize, PDUMP_FLAGS_CONTINUOUS, ((BM_BUF*)psMemInfo->sMemBlk.hBuffer)->pMapping);
-	}
-#endif
 	return PVRSRV_OK;
 
 ErrorExitPhase2:

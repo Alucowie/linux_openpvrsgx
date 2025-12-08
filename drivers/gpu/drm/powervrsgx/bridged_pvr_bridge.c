@@ -2760,10 +2760,6 @@ PVRSRVInitSrvDisconnectBW(IMG_UINT32 ui32BridgeID,
 
 	psPerProc->bInitProcess = IMG_FALSE;
 
-#if defined(SUPPORT_PDUMP_MULTI_PROCESS)
-    psPerProc->bPDumpActive = IMG_FALSE;
-#endif
-
 	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RUNNING, IMG_FALSE);
 	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RAN, IMG_TRUE);
 
