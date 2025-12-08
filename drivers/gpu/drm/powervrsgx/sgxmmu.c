@@ -212,64 +212,10 @@ struct _MMU_HEAP_
 static IMG_VOID
 _DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, IMG_BOOL bOSFreePT);
 
-/* This option tests page table memory, for use during device bring-up. */
-#define PAGE_TEST					0
-#if PAGE_TEST
-static IMG_VOID PageTest(IMG_VOID* pMem, IMG_DEV_PHYADDR sDevPAddr);
-#endif
-
-/* This option dumps out the PT if an assert fails */
-#define PT_DUMP 1
-
-/* This option sanity checks page table PTE valid count matches active PTEs */
-#define PT_DEBUG 0
-#if (PT_DEBUG || PT_DUMP) && defined(PVRSRV_NEED_PVR_DPF)
-static IMG_VOID DumpPT(MMU_PT_INFO *psPTInfoList)
-{
-	IMG_UINT32 *p = (IMG_UINT32*)psPTInfoList->PTPageCpuVAddr;
-	IMG_UINT32 i;
-
-	/* 1024 entries in a 4K page table */
-	for(i = 0; i < 1024; i += 8)
-	{
-		PVR_DPF((PVR_DBG_ERROR,
-				 "%08X %08X %08X %08X %08X %08X %08X %08X\n",
-				 p[i + 0], p[i + 1], p[i + 2], p[i + 3],
-				 p[i + 4], p[i + 5], p[i + 6], p[i + 7]));
-	}
-}
-#else /* (PT_DEBUG || PT_DUMP) && defined(PVRSRV_NEED_PVR_DPF) */
-static INLINE IMG_VOID DumpPT(MMU_PT_INFO *psPTInfoList)
-{
-	PVR_UNREFERENCED_PARAMETER(psPTInfoList);
-}
-#endif /* (PT_DEBUG || PT_DUMP) && defined(PVRSRV_NEED_PVR_DPF) */
-
-#if PT_DEBUG
-static IMG_VOID CheckPT(MMU_PT_INFO *psPTInfoList)
-{
-	IMG_UINT32 *p = (IMG_UINT32*) psPTInfoList->PTPageCpuVAddr;
-	IMG_UINT32 i, ui32Count = 0;
-
-	/* 1024 entries in a 4K page table */
-	for(i = 0; i < 1024; i++)
-		if(p[i] & SGX_MMU_PTE_VALID)
-			ui32Count++;
-
-	if(psPTInfoList->ui32ValidPTECount != ui32Count)
-	{
-		PVR_DPF((PVR_DBG_ERROR, "ui32ValidPTECount: %u ui32Count: %u\n",
-				 psPTInfoList->ui32ValidPTECount, ui32Count));
-		DumpPT(psPTInfoList);
-		BUG();
-	}
-}
-#else /* PT_DEBUG */
 static INLINE IMG_VOID CheckPT(MMU_PT_INFO *psPTInfoList)
 {
 	PVR_UNREFERENCED_PARAMETER(psPTInfoList);
 }
-#endif /* PT_DEBUG */
 
 /*
 	Debug functionality that allows us to make the CPU
@@ -637,10 +583,6 @@ _AllocPageTableMemory (MMU_HEAP *pMMUHeap,
 
 		/* translate address to device physical */
 		sDevPAddr = SysCpuPAddrToDevPAddr (PVRSRV_DEVICE_TYPE_SGX, sCpuPAddr);
-
-		#if PAGE_TEST
-		PageTest(psPTInfoList->PTPageCpuVAddr, sDevPAddr);
-		#endif
 	}
 
 	MakeKernelPageReadWrite(psPTInfoList->PTPageCpuVAddr);
@@ -740,14 +682,6 @@ _DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, IMG_BOOL bOS
 	ppsPTInfoList = &pMMUHeap->psMMUContext->apsPTInfoList[ui32PDIndex];
 
 	{
-#if PT_DEBUG
-		if(ppsPTInfoList[ui32PTIndex] && ppsPTInfoList[ui32PTIndex]->ui32ValidPTECount > 0)
-		{
-			DumpPT(ppsPTInfoList[ui32PTIndex]);
-			/* Fall-through, will fail assert */
-		}
-#endif
-
 		/* Assert that all mappings have gone */
 		PVR_ASSERT(ppsPTInfoList[ui32PTIndex] == IMG_NULL || ppsPTInfoList[ui32PTIndex]->ui32ValidPTECount == 0);
 	}
@@ -1102,10 +1036,6 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 			sCpuPAddr = OSMemHandleToCpuPAddr(hPDOSMemHandle, 0);
 		}
 		sPDDevPAddr = SysCpuPAddrToDevPAddr (PVRSRV_DEVICE_TYPE_SGX, sCpuPAddr);
-
-		#if PAGE_TEST
-		PageTest(pvPDCpuVAddr, sPDDevPAddr);
-		#endif
 	}
 	else
 	{
@@ -1139,10 +1069,6 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 			PVR_DPF((PVR_DBG_ERROR, "MMU_Initialise: ERROR failed to map page tables"));
 			return PVRSRV_ERROR_FAILED_TO_MAP_PAGE_TABLE;
 		}
-
-		#if PAGE_TEST
-		PageTest(pvPDCpuVAddr, sPDDevPAddr);
-		#endif
 	}
 
 #ifdef SUPPORT_SGX_MMU_BYPASS
@@ -1927,9 +1853,6 @@ MMU_MapPage (MMU_HEAP *pMMUHeap,
 									ui32Index ));
 			PVR_DPF((PVR_DBG_ERROR, "MMU_MapPage: Page table entry value: 0x%08X", uTmp));
 			PVR_DPF((PVR_DBG_ERROR, "MMU_MapPage: Physical page to map: 0x%08X", DevPAddr.uiAddr));
-#if PT_DUMP
-			DumpPT(ppsPTInfoList[0]);
-#endif
 		}
 		PVR_ASSERT((uTmp & SGX_MMU_PTE_VALID) == 0);
 	}
@@ -2786,71 +2709,6 @@ IMG_VOID MMU_CheckFaultAddr(PVRSRV_SGXDEV_INFO *psDevInfo, IMG_UINT32 ui32PDDevP
 	}
 }
 
-
-#if PAGE_TEST
-/*!
-******************************************************************************
-	FUNCTION:   PageTest
-
-	PURPOSE:    Tests page table memory, for use during device bring-up.
-
-	PARAMETERS: In:  void* pMem - page address (CPU mapped)
-	PARAMETERS: In:  IMG_DEV_PHYADDR sDevPAddr - page device phys address
-	RETURNS:    None, provides debug output and breaks if an error is detected.
-******************************************************************************/
-static IMG_VOID PageTest(IMG_VOID* pMem, IMG_DEV_PHYADDR sDevPAddr)
-{
-	volatile IMG_UINT32 ui32WriteData;
-	volatile IMG_UINT32 ui32ReadData;
-	volatile IMG_UINT32 *pMem32 = (volatile IMG_UINT32 *)pMem;
-	IMG_INT n;
-	IMG_BOOL bOK=IMG_TRUE;
-
-	ui32WriteData = 0xffffffff;
-
-	for (n=0; n<1024; n++)
-	{
-		pMem32[n] = ui32WriteData;
-		ui32ReadData = pMem32[n];
-
-		if (ui32WriteData != ui32ReadData)
-		{
-			// Mem fault
-			PVR_DPF ((PVR_DBG_ERROR, "Error - memory page test failed at device phys address 0x%08X", sDevPAddr.uiAddr + (n<<2) ));
-			PVR_DBG_BREAK;
-			bOK = IMG_FALSE;
-		}
- 	}
-
-	ui32WriteData = 0;
-
-	for (n=0; n<1024; n++)
-	{
-		pMem32[n] = ui32WriteData;
-		ui32ReadData = pMem32[n];
-
-		if (ui32WriteData != ui32ReadData)
-		{
-			// Mem fault
-			PVR_DPF ((PVR_DBG_ERROR, "Error - memory page test failed at device phys address 0x%08X", sDevPAddr.uiAddr + (n<<2) ));
-			PVR_DBG_BREAK;
-			bOK = IMG_FALSE;
-		}
- 	}
-
-	if (bOK)
-	{
-		PVR_DPF ((PVR_DBG_VERBOSE, "MMU Page 0x%08X is OK", sDevPAddr.uiAddr));
-	}
-	else
-	{
-		PVR_DPF ((PVR_DBG_VERBOSE, "MMU Page 0x%08X *** FAILED ***", sDevPAddr.uiAddr));
-	}
-}
-#endif
-
 /******************************************************************************
  End of file (mmu.c)
 ******************************************************************************/
-
-
