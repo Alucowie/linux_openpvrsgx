@@ -304,19 +304,9 @@ typedef struct _SGX_CCB_KICK_KM_
 	/* CCB offset of data structure associated with this kick */
 	IMG_UINT32	ui32CCBOffset;
 
-#if defined(SUPPORT_SGX_GENERALISED_SYNCOBJECTS)
-	/* SRC and DST syncs */
-	IMG_UINT32	ui32NumTASrcSyncs;
-	IMG_HANDLE	ahTASrcKernelSyncInfo[SGX_MAX_TA_SRC_SYNCS];
-	IMG_UINT32	ui32NumTADstSyncs;
-	IMG_HANDLE	ahTADstKernelSyncInfo[SGX_MAX_TA_DST_SYNCS];
-	IMG_UINT32	ui32Num3DSrcSyncs;
-	IMG_HANDLE	ah3DSrcKernelSyncInfo[SGX_MAX_3D_SRC_SYNCS];
-#else
 	/* SRC syncs */
 	IMG_UINT32	ui32NumSrcSyncs;
 	IMG_HANDLE	ahSrcKernelSyncInfo[SGX_MAX_SRC_SYNCS_TA];
-#endif
 
 	/* TA/3D dependency data */
 	IMG_BOOL	bTADependency;

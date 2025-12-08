@@ -84,20 +84,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define SGX_MAX_TA_STATUS_VALS	32
 #define SGX_MAX_3D_STATUS_VALS	4
 
-#if defined(SUPPORT_SGX_GENERALISED_SYNCOBJECTS)
-/* sync info structure array size */
-#define SGX_MAX_TA_DST_SYNCS			1
-#define SGX_MAX_TA_SRC_SYNCS			1
-#define SGX_MAX_3D_SRC_SYNCS			4
-/* note: there is implicitly 1 3D Dst Sync */
-#else
 /* sync info structure array size */
 #define SGX_MAX_SRC_SYNCS_TA				32
 #define SGX_MAX_DST_SYNCS_TA				1
 /* note: there is implicitly 1 3D Dst Sync */
 #define SGX_MAX_SRC_SYNCS_TQ				8
 #define SGX_MAX_DST_SYNCS_TQ				1
-#endif
 
 #define	PVRSRV_SGX_HWPERF_NUM_COUNTERS	9
 #define	PVRSRV_SGX_HWPERF_NUM_MISC_COUNTERS 8

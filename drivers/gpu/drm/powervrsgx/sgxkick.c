@@ -137,51 +137,6 @@ PVRSRV_ERROR SGXDoKickKM(IMG_HANDLE hDevHandle, SGX_CCB_KICK *psCCBKick)
 		}
 	}
 
-
-#if defined(SUPPORT_SGX_GENERALISED_SYNCOBJECTS)
-	/* SRC and DST sync dependencies */
-	psTACmd->ui32NumTASrcSyncs = psCCBKick->ui32NumTASrcSyncs;
-	for (i=0; i<psCCBKick->ui32NumTASrcSyncs; i++)
-	{
-		psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *) psCCBKick->ahTASrcKernelSyncInfo[i];
-
-		psTACmd->asTASrcSyncs[i].sWriteOpsCompleteDevVAddr = psSyncInfo->sWriteOpsCompleteDevVAddr;
-		psTACmd->asTASrcSyncs[i].sReadOpsCompleteDevVAddr = psSyncInfo->sReadOpsCompleteDevVAddr;
-
-		/* Get ui32ReadOpsPending snapshot and copy into the CCB - before incrementing. */
-		psTACmd->asTASrcSyncs[i].ui32ReadOpsPendingVal = psSyncInfo->psSyncData->ui32ReadOpsPending++;
-		/* Copy ui32WriteOpsPending snapshot into the CCB. */
-		psTACmd->asTASrcSyncs[i].ui32WriteOpsPendingVal = psSyncInfo->psSyncData->ui32WriteOpsPending;
-	}
-
-	psTACmd->ui32NumTADstSyncs = psCCBKick->ui32NumTADstSyncs;
-	for (i=0; i<psCCBKick->ui32NumTADstSyncs; i++)
-	{
-		psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *) psCCBKick->ahTADstKernelSyncInfo[i];
-
-		psTACmd->asTADstSyncs[i].sWriteOpsCompleteDevVAddr = psSyncInfo->sWriteOpsCompleteDevVAddr;
-		psTACmd->asTADstSyncs[i].sReadOpsCompleteDevVAddr = psSyncInfo->sReadOpsCompleteDevVAddr;
-
-		/* Get ui32ReadOpsPending snapshot and copy into the CCB */
-		psTACmd->asTADstSyncs[i].ui32ReadOpsPendingVal = psSyncInfo->psSyncData->ui32ReadOpsPending;
-		/* Copy ui32WriteOpsPending snapshot into the CCB - before incrementing */
-		psTACmd->asTADstSyncs[i].ui32WriteOpsPendingVal = psSyncInfo->psSyncData->ui32WriteOpsPending++;
-	}
-
-	psTACmd->ui32Num3DSrcSyncs = psCCBKick->ui32Num3DSrcSyncs;
-	for (i=0; i<psCCBKick->ui32Num3DSrcSyncs; i++)
-	{
-		psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *) psCCBKick->ah3DSrcKernelSyncInfo[i];
-
-		psTACmd->as3DSrcSyncs[i].sWriteOpsCompleteDevVAddr = psSyncInfo->sWriteOpsCompleteDevVAddr;
-		psTACmd->as3DSrcSyncs[i].sReadOpsCompleteDevVAddr = psSyncInfo->sReadOpsCompleteDevVAddr;
-
-		/* Get ui32ReadOpsPending snapshot and copy into the CCB - before incrementing. */
-		psTACmd->as3DSrcSyncs[i].ui32ReadOpsPendingVal = psSyncInfo->psSyncData->ui32ReadOpsPending++;
-		/* Copy ui32WriteOpsPending snapshot into the CCB. */
-		psTACmd->as3DSrcSyncs[i].ui32WriteOpsPendingVal = psSyncInfo->psSyncData->ui32WriteOpsPending;
-	}
-#else /* SUPPORT_SGX_GENERALISED_SYNCOBJECTS */
 	/* texture dependencies */
 	psTACmd->ui32NumSrcSyncs = psCCBKick->ui32NumSrcSyncs;
 	for (i=0; i<psCCBKick->ui32NumSrcSyncs; i++)
@@ -196,7 +151,6 @@ PVRSRV_ERROR SGXDoKickKM(IMG_HANDLE hDevHandle, SGX_CCB_KICK *psCCBKick)
 		/* Copy ui32WriteOpsPending snapshot into the CCB. */
 		psTACmd->asSrcSyncs[i].ui32WriteOpsPendingVal = psSyncInfo->psSyncData->ui32WriteOpsPending;
 	}
-#endif/* SUPPORT_SGX_GENERALISED_SYNCOBJECTS */
 
 	if (psCCBKick->bFirstKickOrResume && psCCBKick->ui32NumDstSyncObjects > 0)
 	{
@@ -263,29 +217,11 @@ PVRSRV_ERROR SGXDoKickKM(IMG_HANDLE hDevHandle, SGX_CCB_KICK *psCCBKick)
 			}
 		}
 
-#if defined(SUPPORT_SGX_GENERALISED_SYNCOBJECTS)
-		for (i=0; i<psCCBKick->ui32NumTASrcSyncs; i++)
-		{
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *) psCCBKick->ahTASrcKernelSyncInfo[i];
-			psSyncInfo->psSyncData->ui32ReadOpsPending--;
-		}
-		for (i=0; i<psCCBKick->ui32NumTADstSyncs; i++)
-		{
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *) psCCBKick->ahTADstKernelSyncInfo[i];
-			psSyncInfo->psSyncData->ui32WriteOpsPending--;
-		}
-		for (i=0; i<psCCBKick->ui32Num3DSrcSyncs; i++)
-		{
-			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *) psCCBKick->ah3DSrcKernelSyncInfo[i];
-			psSyncInfo->psSyncData->ui32ReadOpsPending--;
-		}
-#else/* SUPPORT_SGX_GENERALISED_SYNCOBJECTS */
 		for (i=0; i<psCCBKick->ui32NumSrcSyncs; i++)
 		{
 			psSyncInfo = (PVRSRV_KERNEL_SYNC_INFO *) psCCBKick->ahSrcKernelSyncInfo[i];
 			psSyncInfo->psSyncData->ui32ReadOpsPending--;
 		}
-#endif/* SUPPORT_SGX_GENERALISED_SYNCOBJECTS */
 
 		if (psCCBKick->hTA3DSyncInfo)
 		{

@@ -158,19 +158,9 @@ typedef struct _SGXMKIF_CMDTA_SHARED_
 	/* sync criteria used for TA/3D dependency synchronisation */
 	PVRSRV_DEVICE_SYNC_OBJECT	sTA3DDependency;
 
-#if defined(SUPPORT_SGX_GENERALISED_SYNCOBJECTS)
-	/* SRC and DST syncs */
-	IMG_UINT32					ui32NumTASrcSyncs;
-	PVRSRV_DEVICE_SYNC_OBJECT	asTASrcSyncs[SGX_MAX_TA_SRC_SYNCS];
-	IMG_UINT32					ui32NumTADstSyncs;
-	PVRSRV_DEVICE_SYNC_OBJECT	asTADstSyncs[SGX_MAX_TA_DST_SYNCS];
-	IMG_UINT32					ui32Num3DSrcSyncs;
-	PVRSRV_DEVICE_SYNC_OBJECT	as3DSrcSyncs[SGX_MAX_3D_SRC_SYNCS];
-#else
 	/* source dependency details */
 	IMG_UINT32			ui32NumSrcSyncs;
 	PVRSRV_DEVICE_SYNC_OBJECT	asSrcSyncs[SGX_MAX_SRC_SYNCS_TA];
-#endif
 
 	CTL_STATUS			sCtlTAStatusInfo[SGX_MAX_TA_STATUS_VALS];
 	CTL_STATUS			sCtl3DStatusInfo[SGX_MAX_3D_STATUS_VALS];
