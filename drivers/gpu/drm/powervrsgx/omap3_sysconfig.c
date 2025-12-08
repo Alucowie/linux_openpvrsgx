@@ -46,10 +46,6 @@ static PVRSRV_DEVICE_NODE *gpsSGXDevNode;
 
 #define DEVICE_SGX_INTERRUPT (1 << 0)
 
-#if defined(SGX_OCP_REGS_ENABLED)
-static IMG_CPU_VIRTADDR gsSGXRegsCPUVAddr;
-#endif
-
 #if defined(PVR_LINUX_DYNAMIC_SGX_RESOURCE_INFO)
 extern struct platform_device *gpsPVRLDMDev;
 #endif
@@ -61,32 +57,10 @@ IMG_UINT32 PVRSRV_BridgeDispatchKM(IMG_UINT32	Ioctl,
 								   IMG_UINT32	OutBufLen,
 								   IMG_UINT32	*pdwBytesTransferred);
 
-#if defined(SGX_OCP_REGS_ENABLED)
-
-static IMG_CPU_VIRTADDR gpvOCPRegsLinAddr;
-
-static PVRSRV_ERROR EnableSGXClocksWrap(SYS_DATA *psSysData)
-{
-	PVRSRV_ERROR eError = EnableSGXClocks(psSysData);
-
-#if !defined(SGX_OCP_NO_INT_BYPASS)
-	if(eError == PVRSRV_OK)
-	{
-		OSWriteHWReg(gpvOCPRegsLinAddr, EUR_CR_OCP_SYSCONFIG, 0x14);
-		OSWriteHWReg(gpvOCPRegsLinAddr, EUR_CR_OCP_DEBUG_CONFIG, EUR_CR_OCP_DEBUG_CONFIG_THALIA_INT_BYPASS_MASK);
-	}
-#endif
-	return eError;
-}
-
-#else 
-
 static INLINE PVRSRV_ERROR EnableSGXClocksWrap(SYS_DATA *psSysData)
 {
 	return EnableSGXClocks(psSysData);
 }
-
-#endif 
 
 static INLINE PVRSRV_ERROR EnableSystemClocksWrap(SYS_DATA *psSysData)
 {
@@ -140,23 +114,6 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 	gsSGXDeviceMap.ui32IRQ = SYS_OMAP3430_SGX_IRQ;
 
 #endif	
-#if defined(SGX_OCP_REGS_ENABLED)
-	gsSGXRegsCPUVAddr = OSMapPhysToLin(gsSGXDeviceMap.sRegsCpuPBase,
-	gsSGXDeviceMap.ui32RegsSize,
-											 PVRSRV_HAP_UNCACHED|PVRSRV_HAP_KERNEL_ONLY,
-											 IMG_NULL);
-
-	if (gsSGXRegsCPUVAddr == IMG_NULL)
-	{
-		PVR_DPF((PVR_DBG_ERROR,"SysLocateDevices: Failed to map SGX registers"));
-		return PVRSRV_ERROR_BAD_MAPPING;
-	}
-
-	
-	gsSGXDeviceMap.pvRegsCpuVBase = gsSGXRegsCPUVAddr;
-	gpvOCPRegsLinAddr = gsSGXRegsCPUVAddr;
-#endif
-
 	return PVRSRV_OK;
 }
 
@@ -513,23 +470,6 @@ PVRSRV_ERROR SysDeinitialise (SYS_DATA *psSysData)
 
 	SysDeinitialiseCommon(gpsSysData);
 
-#if defined(SGX_OCP_REGS_ENABLED)
-	if(gsSGXRegsCPUVAddr != IMG_NULL)
-	{
-#if defined(SGX_OCP_REGS_ENABLED)
-		OSUnMapPhysToLin(gsSGXRegsCPUVAddr,
-		gsSGXDeviceMap.ui32RegsSize,
-												 PVRSRV_HAP_UNCACHED|PVRSRV_HAP_KERNEL_ONLY,
-												 IMG_NULL);
-
-		gpvOCPRegsLinAddr = IMG_NULL;
-#endif
-		gsSGXRegsCPUVAddr = IMG_NULL;
-		gsSGXDeviceMap.pvRegsCpuVBase = gsSGXRegsCPUVAddr;
-	}
-#endif	
-
-	
 	gpsSysSpecificData->ui32SysSpecificData = 0;
 	gpsSysSpecificData->bSGXInitComplete = IMG_FALSE;
 

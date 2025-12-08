@@ -51,10 +51,6 @@
 //#define PVR_OMAP_TIMER_BASE_IN_SYS_SPEC_DATA
 #endif
 
-#if defined(SGX_OCP_REGS_ENABLED)
-/*#define SGX_OCP_NO_INT_BYPASS*/
-#endif
-
 IMG_VOID DisableSystemClocks(SYS_DATA *psSysData);
 PVRSRV_ERROR EnableSystemClocks(SYS_DATA *psSysData);
 
@@ -75,9 +71,6 @@ PVRSRV_ERROR EnableSGXClocks(SYS_DATA *psSysData);
 #define	SYS_SPECIFIC_DATA_PM_DISABLE_SYSCLOCKS	0x00000400
 #define SYS_SPECIFIC_DATA_ENABLE_OCPREGS	0x00000800
 #define SYS_SPECIFIC_DATA_ENABLE_PM_RUNTIME	0x00001000
-#if defined(SGX_OCP_REGS_ENABLED) && defined(SGX_OCP_NO_INT_BYPASS)
-#define SYS_SPECIFIC_DATA_IRQ_ENABLED		0x00002000
-#endif
 
 #define	SYS_SPECIFIC_DATA_SET(psSysSpecData, flag) ((IMG_VOID)((psSysSpecData)->ui32SysSpecificData |= (flag)))
 
@@ -110,13 +103,8 @@ typedef struct _SYS_SPECIFIC_DATA_TAG_
 
 extern SYS_SPECIFIC_DATA *gpsSysSpecificData;
 
-#if defined(SGX_OCP_REGS_ENABLED) && defined(SGX_OCP_NO_INT_BYPASS)
-IMG_VOID SysEnableSGXInterrupts(SYS_DATA* psSysData);
-IMG_VOID SysDisableSGXInterrupts(SYS_DATA* psSysData);
-#else
 #define	SysEnableSGXInterrupts(psSysData)
 #define SysDisableSGXInterrupts(psSysData)
-#endif
 
 IMG_BOOL WrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
 IMG_VOID UnwrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
