@@ -2672,11 +2672,6 @@ _SetDispatchTableEntry(IMG_UINT32 ui32Index,
 {
 	static IMG_UINT32 ui32PrevIndex = ~0UL;		/* -1 */
 
-#if defined(DEBUG_BRIDGE_KM_DISPATCH_TABLE)
-	/* INTEGRATION_POINT: Enable this to dump out the dispatch table entries */
-	PVR_DPF((PVR_DBG_WARNING, "%s: %d %s %s", __FUNCTION__, ui32Index, pszIOCName, pszFunctionName));
-#endif
-
 	/* We should never be over-writing a previous entry.
 	 * If we are, tell the world about it.
 	 * NOTE: This shouldn't be debug only since switching from debug->release
