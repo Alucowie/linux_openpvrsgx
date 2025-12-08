@@ -356,36 +356,6 @@ MMU_GetPhysPageAddr(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR sDevVPageAddr);
 IMG_DEV_PHYADDR
 MMU_GetPDDevPAddr(MMU_CONTEXT *pMMUContext);
 
-
-#ifdef SUPPORT_SGX_MMU_BYPASS
-/*
-******************************************************************************
-    FUNCTION:   EnableHostAccess
-
-    PURPOSE:    Enables Host accesses to device memory, by passing the device 
-    			MMU address translation
-
-    PARAMETERS: In: psMMUContext
-    RETURNS:    None
-******************************************************************************/
-IMG_VOID
-EnableHostAccess (MMU_CONTEXT *psMMUContext);
-
-
-/*
-******************************************************************************
-    FUNCTION:   DisableHostAccess
-
-    PURPOSE:    Disables Host accesses to device memory, by passing the device 
-    			MMU address translation
-
-    PARAMETERS: In: psMMUContext
-    RETURNS:    None
-******************************************************************************/
-IMG_VOID
-DisableHostAccess (MMU_CONTEXT *psMMUContext);
-#endif
-
 /*
 ******************************************************************************
     FUNCTION:   MMU_InvalidateDirectoryCache

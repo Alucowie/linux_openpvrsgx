@@ -392,65 +392,6 @@ IMG_BOOL MMU_IsHeapShared(MMU_HEAP* pMMUHeap)
 	}
 }
 
-#ifdef SUPPORT_SGX_MMU_BYPASS
-/*!
-******************************************************************************
-	FUNCTION:   EnableHostAccess
-
-	PURPOSE:    Enables Host accesses to device memory, by passing the device
-				MMU address translation
-
-	PARAMETERS: In: psMMUContext
-	RETURNS:    None
-******************************************************************************/
-IMG_VOID
-EnableHostAccess (MMU_CONTEXT *psMMUContext)
-{
-	IMG_UINT32 ui32RegVal;
-	IMG_VOID *pvRegsBaseKM = psMMUContext->psDevInfo->pvRegsBaseKM;
-
-	/*
-		bypass the MMU for the host port requestor,
-		conserving bypass state of other requestors
-	*/
-	ui32RegVal = OSReadHWReg(pvRegsBaseKM, EUR_CR_BIF_CTRL);
-
-	OSWriteHWReg(pvRegsBaseKM,
-				EUR_CR_BIF_CTRL,
-				ui32RegVal | EUR_CR_BIF_CTRL_MMU_BYPASS_HOST_MASK);
-	/* assume we're not wiping-out any other bits */
-	PDUMPREG(SGX_PDUMPREG_NAME, EUR_CR_BIF_CTRL, EUR_CR_BIF_CTRL_MMU_BYPASS_HOST_MASK);
-}
-
-/*!
-******************************************************************************
-	FUNCTION:   DisableHostAccess
-
-	PURPOSE:    Disables Host accesses to device memory, by passing the device
-				MMU address translation
-
-	PARAMETERS: In: psMMUContext
-	RETURNS:    None
-******************************************************************************/
-IMG_VOID
-DisableHostAccess (MMU_CONTEXT *psMMUContext)
-{
-	IMG_UINT32 ui32RegVal;
-	IMG_VOID *pvRegsBaseKM = psMMUContext->psDevInfo->pvRegsBaseKM;
-
-	/*
-		disable MMU-bypass for the host port requestor,
-		conserving bypass state of other requestors
-		and flushing all caches/tlbs
-	*/
-	OSWriteHWReg(pvRegsBaseKM,
-				EUR_CR_BIF_CTRL,
-				ui32RegVal & ~EUR_CR_BIF_CTRL_MMU_BYPASS_HOST_MASK);
-	/* assume we're not wiping-out any other bits */
-	PDUMPREG(SGX_PDUMPREG_NAME, EUR_CR_BIF_CTRL, 0);
-}
-#endif
-
 
 /*!
 ******************************************************************************
@@ -1071,10 +1012,6 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 		}
 	}
 
-#ifdef SUPPORT_SGX_MMU_BYPASS
-	EnableHostAccess(psMMUContext);
-#endif
-
 	if (pvPDCpuVAddr)
 	{
 		pui32Tmp = (IMG_UINT32 *)pvPDCpuVAddr;
@@ -1114,10 +1051,6 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 	/* add the new MMU context onto the list of MMU contexts */
 	psMMUContext->psNext = (MMU_CONTEXT*)psDevInfo->pvMMUContextList;
 	psDevInfo->pvMMUContextList = (IMG_VOID*)psMMUContext;
-
-#ifdef SUPPORT_SGX_MMU_BYPASS
-	DisableHostAccess(psMMUContext);
-#endif
 
 	return PVRSRV_OK;
 }
@@ -1233,10 +1166,6 @@ MMU_InsertHeap(MMU_CONTEXT *psMMUContext, MMU_HEAP *psMMUHeap)
 		update the PD range relating to the heap's
 		device virtual address range
 	*/
-#ifdef SUPPORT_SGX_MMU_BYPASS
-	EnableHostAccess(psMMUContext);
-#endif
-
 	for (ui32PDEntry = 0; ui32PDEntry < psMMUHeap->ui32PageTableCount; ui32PDEntry++)
 	{
 		/* check we have invalidated target PDEs */
@@ -1259,10 +1188,6 @@ MMU_InsertHeap(MMU_CONTEXT *psMMUContext, MMU_HEAP *psMMUHeap)
 			bInvalidateDirectoryCache = IMG_TRUE;
 		}
 	}
-
-#ifdef SUPPORT_SGX_MMU_BYPASS
-	DisableHostAccess(psMMUContext);
-#endif
 
 	if (bInvalidateDirectoryCache)
 	{
@@ -1597,13 +1522,7 @@ MMU_Delete (MMU_HEAP *pMMUHeap)
 			RA_Delete (pMMUHeap->psVMArena);
 		}
 
-#ifdef SUPPORT_SGX_MMU_BYPASS
-		EnableHostAccess(pMMUHeap->psMMUContext);
-#endif
 		_DeferredFreePageTables (pMMUHeap);
-#ifdef SUPPORT_SGX_MMU_BYPASS
-		DisableHostAccess(pMMUHeap->psMMUContext);
-#endif
 
 		OSFreeMem (PVRSRV_OS_PAGEABLE_HEAP, sizeof(MMU_HEAP), pMMUHeap, IMG_NULL);
 		/*not nulling pointer, copy on stack*/
@@ -1666,16 +1585,8 @@ MMU_Alloc (MMU_HEAP *pMMUHeap,
 		psDevVAddr->uiAddr = IMG_CAST_TO_DEVVADDR_UINT(uiAddr);
 	}
 
-	#ifdef SUPPORT_SGX_MMU_BYPASS
-	EnableHostAccess(pMMUHeap->psMMUContext);
-	#endif
-
 	/* allocate page tables to cover allocation as required */
 	bStatus = _DeferredAllocPagetables(pMMUHeap, *psDevVAddr, (IMG_UINT32)uSize);
-
-	#ifdef SUPPORT_SGX_MMU_BYPASS
-	DisableHostAccess(pMMUHeap->psMMUContext);
-	#endif
 
 	if (!bStatus)
 	{

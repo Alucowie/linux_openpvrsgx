@@ -2031,10 +2031,6 @@ DevMemoryAlloc (BM_CONTEXT *pBMContext,
 		return IMG_FALSE;
 	}
 
-#ifdef SUPPORT_SGX_MMU_BYPASS
-	EnableHostAccess(pBMContext->psMMUContext);
-#endif
-
 	switch (pMapping->eCpuMemoryOrigin)
 	{
 		case hm_wrapped:
@@ -2117,10 +2113,6 @@ DevMemoryAlloc (BM_CONTEXT *pBMContext,
 				pMapping->eCpuMemoryOrigin));
 			return IMG_FALSE;
 	}
-
-#ifdef SUPPORT_SGX_MMU_BYPASS
-	DisableHostAccess(pBMContext->psMMUContext);
-#endif
 
 	return IMG_TRUE;
 }
