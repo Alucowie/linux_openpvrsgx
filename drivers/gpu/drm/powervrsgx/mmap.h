@@ -110,10 +110,8 @@ typedef struct KV_OFFSET_STRUCT_TAG
     IMG_UINT32			ui32UserVAddr;
 
     /* Extra entries to support proc filesystem debug info */
-#if defined(DEBUG_LINUX_MMAP_AREAS)
     const IMG_CHAR		*pszName;
-#endif
-    
+
    /* List entry field for MMap list */
    struct list_head		sMMapItem;
 

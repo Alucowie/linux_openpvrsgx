@@ -364,7 +364,7 @@ else alias to level 1 wrapper, else the wrapper function will be used*/
  
 /*If level 1 wrapper is enabled declare the functions with extra parameters
 else alias to level 0 and declare the functions without the extra debugging parameters*/
-#if (defined(__linux__) || defined(__QNXNTO__)) && defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
+#if (defined(__linux__) || defined(__QNXNTO__))
 	PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_SIZE_T ui32Size, IMG_PVOID *ppvLinAddr, IMG_HANDLE *phBlockAlloc, IMG_CHAR *pszFilename, IMG_UINT32 ui32Line);
 	PVRSRV_ERROR OSFreeMem_Impl(IMG_UINT32 ui32Flags, IMG_SIZE_T ui32Size, IMG_PVOID pvLinAddr, IMG_HANDLE hBlockAlloc, IMG_CHAR *pszFilename, IMG_UINT32 ui32Line);
 	

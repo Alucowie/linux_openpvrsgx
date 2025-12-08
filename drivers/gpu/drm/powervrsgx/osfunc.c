@@ -130,11 +130,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define EVENT_OBJECT_TIMEOUT_MS		(100)
 #endif /* EMULATOR */
 
-#if !defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
-PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOID *ppvCpuVAddr, IMG_HANDLE *phBlockAlloc)
-#else
 PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOID *ppvCpuVAddr, IMG_HANDLE *phBlockAlloc, IMG_CHAR *pszFilename, IMG_UINT32 ui32Line)
-#endif
 {
     PVR_UNREFERENCED_PARAMETER(ui32Flags);
     PVR_UNREFERENCED_PARAMETER(phBlockAlloc);
@@ -142,22 +138,14 @@ PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOI
     if (ui32Size > PAGE_SIZE)
     {
         /* Try to allocate the memory using vmalloc */
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
         *ppvCpuVAddr = _VMallocWrapper(ui32Size, PVRSRV_HAP_CACHED, pszFilename, ui32Line);
-#else
-        *ppvCpuVAddr = VMallocWrapper(ui32Size, PVRSRV_HAP_CACHED);
-#endif
         if (*ppvCpuVAddr)
         {
             return PVRSRV_OK;
         }
     }
 
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
     *ppvCpuVAddr = _KMallocWrapper(ui32Size, GFP_KERNEL | __GFP_NOWARN, pszFilename, ui32Line);
-#else
-    *ppvCpuVAddr = KMallocWrapper(ui32Size, GFP_KERNEL | __GFP_NOWARN);
-#endif
     if (!*ppvCpuVAddr)
     {
         return PVRSRV_ERROR_OUT_OF_MEMORY;
@@ -176,31 +164,19 @@ static inline int is_vmalloc_addr(const void *pvCpuVAddr)
 
 #endif /* (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,24)) */
 
-#if !defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
-PVRSRV_ERROR OSFreeMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOID pvCpuVAddr, IMG_HANDLE hBlockAlloc)
-#else
 PVRSRV_ERROR OSFreeMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOID pvCpuVAddr, IMG_HANDLE hBlockAlloc, IMG_CHAR *pszFilename, IMG_UINT32 ui32Line)
-#endif
-{	
+{
     PVR_UNREFERENCED_PARAMETER(ui32Flags);
     PVR_UNREFERENCED_PARAMETER(ui32Size);
     PVR_UNREFERENCED_PARAMETER(hBlockAlloc);
 
     if (is_vmalloc_addr(pvCpuVAddr))
     {
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
         _VFreeWrapper(pvCpuVAddr, pszFilename, ui32Line);
-#else
-        VFreeWrapper(pvCpuVAddr);
-#endif
     }
     else
     {
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
         _KFreeWrapper(pvCpuVAddr, pszFilename, ui32Line);
-#else
-        KFreeWrapper(pvCpuVAddr);
-#endif
     }
 
     return PVRSRV_OK;
@@ -2050,11 +2026,7 @@ PVRSRV_ERROR OSBaseAllocContigMemory(IMG_UINT32 ui32Size, IMG_CPU_VIRTADDR *pvLi
  */
     IMG_VOID *pvKernLinAddr;
 
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
     pvKernLinAddr = _KMallocWrapper(ui32Size, GFP_KERNEL, __FILE__, __LINE__);
-#else
-    pvKernLinAddr = KMallocWrapper(ui32Size, GFP_KERNEL);
-#endif
     if (!pvKernLinAddr)
     {
     return PVRSRV_ERROR_OUT_OF_MEMORY;

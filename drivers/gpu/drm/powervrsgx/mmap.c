@@ -107,15 +107,11 @@ PVRSRV_LINUX_MUTEX g_sMMapMutex;
 static LinuxKMemCache *g_psMemmapCache = NULL;
 static LIST_HEAD(g_sMMapAreaList);
 static LIST_HEAD(g_sMMapOffsetStructList);
-#if defined(DEBUG_LINUX_MMAP_AREAS)
 static IMG_UINT32 g_ui32RegisteredAreas = 0;
 static IMG_UINT32 g_ui32TotalByteSize = 0;
-#endif
 
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
 static struct proc_dir_entry *g_ProcMMap;
-#endif /* defined(DEBUG_LINUX_MMAP_AREAS) */
 
 #if !defined(PVR_MAKE_ALL_PFNS_SPECIAL)
 /*
@@ -296,10 +292,8 @@ CreateOffsetStruct(LinuxMemArea *psLinuxMemArea, IMG_UINT32 ui32Offset, IMG_UINT
 #endif
     psOffsetStruct->ui32PID = OSGetCurrentProcessIDKM();
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
     /* Extra entries to support proc filesystem debug info */
     psOffsetStruct->pszName = pszName;
-#endif
 
     list_add_tail(&psOffsetStruct->sAreaItem, &psLinuxMemArea->sMMapOffsetStructList);
 
@@ -830,8 +824,6 @@ MMapVOpenNoLock(struct vm_area_struct* ps_vma)
         PVR_ASSERT((ps_vma->vm_flags & VM_DONTCOPY) == 0);
     }
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
-
     PVR_DPF((PVR_DBG_MESSAGE,
              "%s: psLinuxMemArea 0x%p, KVAddress 0x%p MMapOffset %d, ui32Mapped %d",
              __FUNCTION__,
@@ -839,7 +831,6 @@ MMapVOpenNoLock(struct vm_area_struct* ps_vma)
              LinuxMemAreaToCpuVAddr(psOffsetStruct->psLinuxMemArea),
              psOffsetStruct->ui32MMapOffset,
              psOffsetStruct->ui32Mapped));
-#endif
 }
 
 
@@ -863,7 +854,6 @@ MMapVCloseNoLock(struct vm_area_struct* ps_vma)
     PKV_OFFSET_STRUCT psOffsetStruct = (PKV_OFFSET_STRUCT)ps_vma->vm_private_data;
     PVR_ASSERT(psOffsetStruct != IMG_NULL);
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
     PVR_DPF((PVR_DBG_MESSAGE,
              "%s: psLinuxMemArea %p, CpuVAddr %p ui32MMapOffset %d, ui32Mapped %d",
              __FUNCTION__,
@@ -871,7 +861,6 @@ MMapVCloseNoLock(struct vm_area_struct* ps_vma)
              LinuxMemAreaToCpuVAddr(psOffsetStruct->psLinuxMemArea),
              psOffsetStruct->ui32MMapOffset,
              psOffsetStruct->ui32Mapped));
-#endif
 
     PVR_ASSERT(!psOffsetStruct->bOnMMapList);
     PVRSRVOffsetStructDecMapped(psOffsetStruct);
@@ -1159,8 +1148,6 @@ unlock_and_return:
 }
 
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
-
 /*
  * Lock MMap regions list (called on page start/stop while reading /proc/mmap)
 
@@ -1308,8 +1295,6 @@ static void ProcSeqShowMMapRegistrations(struct seq_file *sfile, void *el)
                         HAPFlagsToString(psLinuxMemArea->ui32AreaFlags));
 }
 
-#endif
-
 
 /*!
  *******************************************************************************
@@ -1352,7 +1337,6 @@ PVRMMapRegisterArea(LinuxMemArea *psLinuxMemArea)
 
     psLinuxMemArea->bMMapRegistered = IMG_TRUE;
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
     g_ui32RegisteredAreas++;
     /*
      * Sub memory areas are excluded from g_ui32TotalByteSize so that we
@@ -1363,7 +1347,6 @@ PVRMMapRegisterArea(LinuxMemArea *psLinuxMemArea)
     {
         g_ui32TotalByteSize += psLinuxMemArea->ui32ByteSize;
     }
-#endif
 
     eError = PVRSRV_OK;
 
@@ -1428,13 +1411,11 @@ PVRMMapRemoveRegisteredArea(LinuxMemArea *psLinuxMemArea)
 
     psLinuxMemArea->bMMapRegistered = IMG_FALSE;
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
     g_ui32RegisteredAreas--;
     if (psLinuxMemArea->eAreaType != LINUX_MEM_AREA_SUB_ALLOC)
     {
         g_ui32TotalByteSize -= psLinuxMemArea->ui32ByteSize;
     }
-#endif
 
     eError = PVRSRV_OK;
 
@@ -1560,14 +1541,12 @@ PVRMMapInit(IMG_VOID)
 	goto error;
     }
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
 	g_ProcMMap = CreateProcReadEntrySeq("mmap", NULL, 
 						  ProcSeqNextMMapRegistrations,
 						  ProcSeqShowMMapRegistrations,
 						  ProcSeqOff2ElementMMapRegistrations,
 						  ProcSeqStartstopMMapRegistations
 						 );
-#endif  /* defined(DEBUG_LINUX_MMAP_AREAS) */
     return;
 
 error:
@@ -1612,9 +1591,7 @@ PVRMMapCleanup(IMG_VOID)
     }
     PVR_ASSERT(list_empty((&g_sMMapAreaList)));
 
-#if defined(DEBUG_LINUX_MMAP_AREAS)
     RemoveProcEntrySeq(g_ProcMMap);
-#endif /* defined(DEBUG_LINUX_MMAP_AREAS) */
 
     if(g_psMemmapCache)
     {

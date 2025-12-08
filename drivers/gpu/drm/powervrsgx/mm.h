@@ -243,11 +243,7 @@ IMG_VOID LinuxMMCleanup(IMG_VOID);
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
 #define KMallocWrapper(ui32ByteSize, uFlags) _KMallocWrapper(ui32ByteSize, uFlags, __FILE__, __LINE__)
-#else
-#define KMallocWrapper(ui32ByteSize, uFlags) _KMallocWrapper(ui32ByteSize, uFlags, NULL, 0)
-#endif
 IMG_VOID *_KMallocWrapper(IMG_UINT32 ui32ByteSize, gfp_t uFlags, IMG_CHAR *szFileName, IMG_UINT32 ui32Line);
 
 
@@ -259,11 +255,7 @@ IMG_VOID *_KMallocWrapper(IMG_UINT32 ui32ByteSize, gfp_t uFlags, IMG_CHAR *szFil
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
 #define KFreeWrapper(pvCpuVAddr) _KFreeWrapper(pvCpuVAddr, __FILE__, __LINE__)
-#else
-#define KFreeWrapper(pvCpuVAddr) _KFreeWrapper(pvCpuVAddr, NULL, 0)
-#endif
 IMG_VOID _KFreeWrapper(IMG_VOID *pvCpuVAddr, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
 
 
@@ -276,11 +268,7 @@ IMG_VOID _KFreeWrapper(IMG_VOID *pvCpuVAddr, IMG_CHAR *pszFileName, IMG_UINT32 u
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
 #define VMallocWrapper(ui32Bytes, ui32AllocFlags) _VMallocWrapper(ui32Bytes, ui32AllocFlags, __FILE__, __LINE__)
-#else
-#define VMallocWrapper(ui32Bytes, ui32AllocFlags) _VMallocWrapper(ui32Bytes, ui32AllocFlags, NULL, 0)
-#endif
 IMG_VOID *_VMallocWrapper(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AllocFlags, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
 
 
@@ -292,11 +280,7 @@ IMG_VOID *_VMallocWrapper(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AllocFlags, IMG_C
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
 #define VFreeWrapper(pvCpuVAddr) _VFreeWrapper(pvCpuVAddr, __FILE__, __LINE__)
-#else
-#define VFreeWrapper(pvCpuVAddr) _VFreeWrapper(pvCpuVAddr, NULL, 0)
-#endif
 IMG_VOID _VFreeWrapper(IMG_VOID *pvCpuVAddr, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
 
 
@@ -332,13 +316,8 @@ IMG_VOID FreeVMallocLinuxMemArea(LinuxMemArea *psLinuxMemArea);
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
 #define IORemapWrapper(BasePAddr, ui32Bytes, ui32MappingFlags) \
     _IORemapWrapper(BasePAddr, ui32Bytes, ui32MappingFlags, __FILE__, __LINE__)
-#else
-#define IORemapWrapper(BasePAddr, ui32Bytes, ui32MappingFlags) \
-    _IORemapWrapper(BasePAddr, ui32Bytes, ui32MappingFlags, NULL, 0)
-#endif
 IMG_VOID *_IORemapWrapper(IMG_CPU_PHYADDR BasePAddr,
                           IMG_UINT32 ui32Bytes,
                           IMG_UINT32 ui32MappingFlags,
@@ -403,13 +382,8 @@ IMG_VOID FreeExternalKVLinuxMemArea(LinuxMemArea *psLinuxMemArea);
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
 #define IOUnmapWrapper(pvIORemapCookie) \
     _IOUnmapWrapper(pvIORemapCookie, __FILE__, __LINE__)
-#else
-#define IOUnmapWrapper(pvIORemapCookie) \
-    _IOUnmapWrapper(pvIORemapCookie, NULL, 0)
-#endif
 IMG_VOID _IOUnmapWrapper(IMG_VOID *pvIORemapCookie, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
 
 
@@ -459,11 +433,7 @@ IMG_VOID KMemCacheDestroyWrapper(LinuxKMemCache *psCache);
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
 #define KMemCacheAllocWrapper(psCache, Flags) _KMemCacheAllocWrapper(psCache, Flags, __FILE__, __LINE__)
-#else
-#define KMemCacheAllocWrapper(psCache, Flags) _KMemCacheAllocWrapper(psCache, Flags, NULL, 0)
-#endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14))
 IMG_VOID *_KMemCacheAllocWrapper(LinuxKMemCache *psCache, gfp_t Flags, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
@@ -480,11 +450,7 @@ IMG_VOID *_KMemCacheAllocWrapper(LinuxKMemCache *psCache, int Flags, IMG_CHAR *p
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
 #define KMemCacheFreeWrapper(psCache, pvObject) _KMemCacheFreeWrapper(psCache, pvObject, __FILE__, __LINE__)
-#else
-#define KMemCacheFreeWrapper(psCache, pvObject) _KMemCacheFreeWrapper(psCache, pvObject, NULL, 0)
-#endif
 IMG_VOID _KMemCacheFreeWrapper(LinuxKMemCache *psCache, IMG_VOID *pvObject, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
 
 
