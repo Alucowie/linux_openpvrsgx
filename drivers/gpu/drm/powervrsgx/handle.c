@@ -59,11 +59,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "services_headers.h"
 #include "handle.h"
 
-#ifdef	DEBUG
 #define	HANDLE_BLOCK_SHIFT	2
-#else
-#define	HANDLE_BLOCK_SHIFT	8
-#endif
 
 #define	DIVIDE_BY_BLOCK_SIZE(i)		(((IMG_UINT32)(i)) >> HANDLE_BLOCK_SHIFT)
 #define	MULTIPLY_BY_BLOCK_SIZE(i)	(((IMG_UINT32)(i)) << HANDLE_BLOCK_SHIFT)
@@ -400,19 +396,16 @@ IMG_BOOL HandleListIsEmpty(IMG_UINT32 ui32Index, struct sHandleList *psList)
 
 	bIsEmpty = (IMG_BOOL)(psList->ui32Next == ui32Index);
 
-#ifdef	DEBUG
 	{
 		IMG_BOOL bIsEmpty2;
 
 		bIsEmpty2 = (IMG_BOOL)(psList->ui32Prev == ui32Index);
 		PVR_ASSERT(bIsEmpty == bIsEmpty2);
 	}
-#endif
 
 	return bIsEmpty;
 }
 
-#ifdef DEBUG
 /*!
 ******************************************************************************
 
@@ -466,7 +459,6 @@ IMG_BOOL NoParent(struct sHandle *psHandle)
 	}
 	return IMG_FALSE;
 }
-#endif /*DEBUG*/
 /*!
 ******************************************************************************
 
@@ -1198,7 +1190,6 @@ static PVRSRV_ERROR FreeHandle(PVRSRV_HANDLE_BASE *psBase, struct sHandle *psHan
 
 	PVR_ASSERT(INDEX_TO_FREE_HAND_BLOCK_COUNT(psBase, ui32Index)<= HANDLE_BLOCK_SIZE);
 
-#ifdef DEBUG
 	{
 		IMG_UINT32 ui32BlockedIndex;
 		IMG_UINT32 ui32FreeHandCount = 0;
@@ -1210,7 +1201,6 @@ static PVRSRV_ERROR FreeHandle(PVRSRV_HANDLE_BASE *psBase, struct sHandle *psHan
 
 		PVR_ASSERT(ui32FreeHandCount == psBase->ui32FreeHandCount);
 	}
-#endif
 
 	return PVRSRV_OK;
 }
@@ -1615,14 +1605,10 @@ static PVRSRV_ERROR AllocHandle(PVRSRV_HANDLE_BASE *psBase, IMG_HANDLE *phHandle
 	psNewHandle->eFlag = eFlag;
 
 	InitParentList(psNewHandle);
-#if defined(DEBUG)
 	PVR_ASSERT(NoChildren(psNewHandle));
-#endif
 
 	InitChildEntry(psNewHandle);
-#if defined(DEBUG)
 	PVR_ASSERT(NoParent(psNewHandle));
-#endif
 
 	if (HANDLES_BATCHED(psBase))
 	{
@@ -2309,7 +2295,6 @@ static PVRSRV_ERROR PVRSRVHandleBatchCommitOrRelease(PVRSRV_HANDLE_BASE *psBase,
 		ui32IndexPlusOne = ui32NextIndexPlusOne;
 	}
 
-#ifdef DEBUG
 	if (psBase->ui32TotalHandCountPreBatch != psBase->ui32TotalHandCount)
 	{
 		IMG_UINT32 ui32Delta = psBase->ui32TotalHandCount - psBase->ui32TotalHandCountPreBatch;
@@ -2319,7 +2304,6 @@ static PVRSRV_ERROR PVRSRVHandleBatchCommitOrRelease(PVRSRV_HANDLE_BASE *psBase,
 		PVR_DPF((PVR_DBG_WARNING, "PVRSRVHandleBatchCommitOrRelease: The batch size was too small.  Batch size was %u, but needs to be %u", psBase->ui32HandBatchSize,  psBase->ui32HandBatchSize + ui32Delta));
 
 	}
-#endif
 
 	psBase->ui32HandBatchSize = 0;
 	psBase->ui32FirstBatchIndexPlusOne = 0;

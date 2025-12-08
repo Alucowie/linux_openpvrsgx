@@ -1842,7 +1842,6 @@ PVRSRV_ERROR SGX2DQueryBlitsCompleteKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	/* Timed out */
 	PVR_DPF((PVR_DBG_ERROR,"SGX2DQueryBlitsCompleteKM: Timed out. Ops pending."));
 
-#if defined(DEBUG)
 	{
 		PVRSRV_SYNC_DATA *psSyncData = psSyncInfo->psSyncData;
 
@@ -1853,7 +1852,6 @@ PVRSRV_ERROR SGX2DQueryBlitsCompleteKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 		PVR_TRACE(("SGX2DQueryBlitsCompleteKM: Write ops complete: %d, Write ops pending: %d", psSyncData->ui32WriteOpsComplete, psSyncData->ui32WriteOpsPending));
 
 	}
-#endif
 
 	return PVRSRV_ERROR_TIMEOUT;
 }

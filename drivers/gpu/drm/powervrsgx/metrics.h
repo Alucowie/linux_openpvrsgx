@@ -48,9 +48,6 @@ extern "C" {
 #endif
 
 
-#if defined(DEBUG) || defined(TIMING)
-
-
 typedef struct 
 {
 	IMG_UINT32 ui32Start;
@@ -114,25 +111,6 @@ extern IMG_VOID   PVRSRVOutputMetricTotals(IMG_VOID);
 #define TIMER_DIVISOR  4
 
 #endif /* defined(__sh__) */
-
-
-
-#else /* defined(DEBUG) || defined(TIMING) */
-
-
-
-#define PVRSRV_TIME_START(X)
-#define PVRSRV_TIME_SUSPEND(X)
-#define PVRSRV_TIME_RESUME(X)
-#define PVRSRV_TIME_STOP(X)
-#define PVRSRV_TIME_RESET(X)
-
-#define PVRSRVSetupMetricTimers(X)
-#define PVRSRVOutputMetricTotals()
-
-
-
-#endif /* defined(DEBUG) || defined(TIMING) */
 
 #if defined(__cplusplus)
 }

@@ -202,13 +202,10 @@ PVRSRV_ERROR EnableSGXClocks(SYS_DATA *psSysData)
                 }
         }
 
-#if defined(DEBUG)
         {
                 IMG_UINT32 rate = clk_get_rate(psSysSpecData->psSGX_FCK);
                 PVR_DPF((PVR_DBG_MESSAGE, "EnableSGXClocks: SGX Functional Clock is %dMhz", HZ_TO_MHZ(rate)));
         }
-#endif
-
 
 
 #if defined(LDM_PLATFORM) && !defined(PVR_DRI_DRM_NOT_PCI)
@@ -269,7 +266,7 @@ IMG_VOID DisableSGXClocks(SYS_DATA *psSysData)
 #endif	
 }
 
-#if (defined(DEBUG) || defined(TIMING)) && !defined(PVR_NO_OMAP_TIMER)
+#if !defined(PVR_NO_OMAP_TIMER)
 #if defined(PVR_OMAP_USE_DM_TIMER_API)
 #define	GPTIMER_TO_USE 11
 static PVRSRV_ERROR AcquireGPTimer(SYS_SPECIFIC_DATA *psSysSpecData)

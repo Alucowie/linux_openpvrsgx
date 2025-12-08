@@ -726,9 +726,7 @@ const IMG_CHAR *LinuxMemAreaTypeToString(LINUX_MEM_AREA_TYPE eMemAreaType);
  *
  * @return 
  ******************************************************************************/
-#if defined(DEBUG) || defined(DEBUG_LINUX_MEM_AREAS)
 const IMG_CHAR *HAPFlagsToString(IMG_UINT32 ui32Flags);
-#endif
 
 #endif /* __IMG_LINUX_MM_H__ */
 

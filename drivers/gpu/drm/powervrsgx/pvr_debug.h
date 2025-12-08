@@ -64,7 +64,7 @@ extern "C" {
 
 #define DBGPRIV_DBGLEVEL_COUNT	8
 
-#if !defined(PVRSRV_NEED_PVR_ASSERT) && defined(DEBUG)
+#if !defined(PVRSRV_NEED_PVR_ASSERT)
 #define PVRSRV_NEED_PVR_ASSERT
 #endif
 
@@ -72,7 +72,7 @@ extern "C" {
 #define PVRSRV_NEED_PVR_DPF
 #endif
 
-#if !defined(PVRSRV_NEED_PVR_TRACE) && (defined(DEBUG) || defined(TIMING))
+#if !defined(PVRSRV_NEED_PVR_TRACE)
 #define PVRSRV_NEED_PVR_TRACE
 #endif
 
@@ -124,30 +124,17 @@ extern "C" {
 	#define __PVR_DPF_0x02UL(x...) PVRSRVDebugPrintf(DBGPRIV_ERROR, x)
 
 	/* Some are compiled out completely in release builds */
-#if defined(DEBUG)
 	#define __PVR_DPF_0x04UL(x...) PVRSRVDebugPrintf(DBGPRIV_WARNING, x)
 	#define __PVR_DPF_0x08UL(x...) PVRSRVDebugPrintf(DBGPRIV_MESSAGE, x)
 	#define __PVR_DPF_0x10UL(x...) PVRSRVDebugPrintf(DBGPRIV_VERBOSE, x)
 	#define __PVR_DPF_0x20UL(x...) PVRSRVDebugPrintf(DBGPRIV_CALLTRACE, x)
 	#define __PVR_DPF_0x40UL(x...) PVRSRVDebugPrintf(DBGPRIV_ALLOC, x)
 	#define __PVR_DPF_0x80UL(x...) PVRSRVDebugPrintf(DBGPRIV_DBGDRV_MESSAGE, x)
-#else
-	#define __PVR_DPF_0x04UL(x...)
-	#define __PVR_DPF_0x08UL(x...)
-	#define __PVR_DPF_0x10UL(x...)
-	#define __PVR_DPF_0x20UL(x...)
-	#define __PVR_DPF_0x40UL(x...)
-	#define __PVR_DPF_0x80UL(x...)
-#endif
 
 	/* Translate the different log levels to separate macros
 	 * so they can each be compiled out.
 	 */
-#if defined(DEBUG)
 	#define __PVR_DPF(lvl, x...) __PVR_DPF_ ## lvl (__FILE__, __LINE__, x)
-#else
-	#define __PVR_DPF(lvl, x...) __PVR_DPF_ ## lvl ("", 0, x)
-#endif
 
 	/* Get rid of the double bracketing */
 	#define PVR_DPF(x) __PVR_DPF x

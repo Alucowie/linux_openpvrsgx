@@ -3298,11 +3298,9 @@ typedef struct _sWrapMemInfo_
     struct page **ppsPages;
     IMG_SYS_PHYADDR *psPhysAddr;
     IMG_INT iPageOffset;
-#if defined(DEBUG)
     IMG_UINT32 ulStartAddr;
     IMG_UINT32 ulBeyondEndAddr;
     struct vm_area_struct *psVMArea;
-#endif
 } sWrapMemInfo;
 
 
@@ -3603,10 +3601,8 @@ PVRSRV_ERROR OSAcquirePhysPageAddr(IMG_VOID *pvCPUVAddr,
     }
     memset(psInfo, 0, sizeof(*psInfo));
 
-#if defined(DEBUG)
     psInfo->ulStartAddr = ulStartAddrOrig;
     psInfo->ulBeyondEndAddr = ulBeyondEndAddrOrig;
-#endif
 
     psInfo->iNumPages = (IMG_INT)(ulAddrRange >> PAGE_SHIFT);
     psInfo->iPageOffset = (IMG_INT)(ulStartAddrOrig & ~PAGE_MASK);
@@ -3701,9 +3697,7 @@ PVRSRV_ERROR OSAcquirePhysPageAddr(IMG_VOID *pvCPUVAddr,
         
         goto error;
     }
-#if defined(DEBUG)
     psInfo->psVMArea = psVMArea;
-#endif
 
     /*
      * find_vma locates a region with an end point past a given

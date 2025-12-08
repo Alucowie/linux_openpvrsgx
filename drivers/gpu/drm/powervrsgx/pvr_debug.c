@@ -476,8 +476,6 @@ IMG_VOID PVRSRVDebugPrintf	(
 
 #endif /* PVRSRV_NEED_PVR_DPF */
 
-#if defined(DEBUG)
-
 IMG_INT PVRDebugProcSetLevel(struct file *file, const IMG_CHAR *buffer, IMG_UINT32 count, IMG_VOID *data)
 {
 #define	_PROC_SET_BUFFER_SZ		6
@@ -504,5 +502,3 @@ void ProcSeqShowDebugLevel(struct seq_file *sfile,void* el)
 {
 	seq_printf(sfile, "%u\n", gPVRDebugLevel);
 }
-
-#endif /* defined(DEBUG) */

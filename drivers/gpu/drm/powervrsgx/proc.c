@@ -138,9 +138,7 @@ static struct proc_dir_entry* g_pProcQueue;
 static struct proc_dir_entry* g_pProcVersion;
 static struct proc_dir_entry* g_pProcSysNodes;
 
-#ifdef DEBUG
 static struct proc_dir_entry* g_pProcDebugLevel;
-#endif
 
 #ifdef PVR_MANUAL_POWER_CONTROL
 static struct proc_dir_entry* g_pProcPowerLevel;
@@ -1031,8 +1029,6 @@ IMG_INT CreateProcEntries(IMG_VOID)
     }
 
 
-#ifdef DEBUG
-
 	g_pProcDebugLevel = CreateProcEntrySeq("debug_level", NULL, NULL,
 											ProcSeqShowDebugLevel,
 											ProcSeq1ElementOff2Element, NULL,
@@ -1055,7 +1051,6 @@ IMG_INT CreateProcEntries(IMG_VOID)
 
         return -ENOMEM;
     }
-#endif
 #endif
 
     return 0;

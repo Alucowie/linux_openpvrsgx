@@ -50,8 +50,7 @@
 //#include <linux/platform_device.h>
 #endif
 
-#if ((defined(DEBUG) || defined(TIMING)) && \
-    (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,32))) && \
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,32)) && \
     !defined(PVR_NO_OMAP_TIMER)
 #define	PVR_OMAP3_TIMING_PRCM
 #endif
@@ -133,10 +132,8 @@ typedef struct _SYS_SPECIFIC_DATA_TAG_
         struct clk      *psSGX_FCK;
         struct clk      *psSGX_ICK;
 
-#if defined(DEBUG) || defined(TIMING)
 	struct clk	*psGPT11_FCK;
 	struct clk	*psGPT11_ICK;
-#endif
 #if defined(PVR_OMAP_USE_DM_TIMER_API)
 	struct omap_dm_timer *psGPTimer;
 #endif

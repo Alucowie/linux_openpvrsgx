@@ -88,9 +88,7 @@ typedef struct PVRSRV_LINUX_EVENT_OBJECT_TAG
 {
    	atomic_t	sTimeStamp;
    	IMG_UINT32  ui32TimeStampPrevious;
-#if defined(DEBUG)
 	IMG_UINT	ui32Stats;
-#endif
     wait_queue_head_t sWait;	
 	struct list_head        sList;
 	IMG_HANDLE		hResItem;				
@@ -196,9 +194,7 @@ PVRSRV_ERROR LinuxEventObjectDelete(IMG_HANDLE hOSEventObjectList, IMG_HANDLE hO
 		if(hOSEventObject)
 		{
 			PVRSRV_LINUX_EVENT_OBJECT *psLinuxEventObject = (PVRSRV_LINUX_EVENT_OBJECT *)hOSEventObject; 
-#if defined(DEBUG)
 			PVR_DPF((PVR_DBG_MESSAGE, "LinuxEventObjectListDelete: Event object waits: %u", psLinuxEventObject->ui32Stats));
-#endif
 			if(ResManFreeResByPtr(psLinuxEventObject->hResItem, CLEANUP_WITH_POLL) != PVRSRV_OK)
 			{
 				return PVRSRV_ERROR_UNABLE_TO_DESTROY_EVENT;
@@ -238,9 +234,7 @@ static PVRSRV_ERROR LinuxEventObjectDeleteCallback(IMG_PVOID pvParam, IMG_UINT32
 	list_del(&psLinuxEventObject->sList);
 	write_unlock_irqrestore(&psLinuxEventObjectList->sLock, ulLockFlags);
 
-#if defined(DEBUG)
 	PVR_DPF((PVR_DBG_MESSAGE, "LinuxEventObjectDeleteCallback: Event object waits: %u", psLinuxEventObject->ui32Stats));
-#endif	
 
 	OSFreeMem(PVRSRV_OS_NON_PAGEABLE_HEAP, sizeof(PVRSRV_LINUX_EVENT_OBJECT), psLinuxEventObject, IMG_NULL);
 	/*not nulling pointer, copy on stack*/
@@ -291,9 +285,7 @@ PVRSRV_ERROR LinuxEventObjectAdd(IMG_HANDLE hOSEventObjectList, IMG_HANDLE *phOS
 	atomic_set(&psLinuxEventObject->sTimeStamp, 0);
 	psLinuxEventObject->ui32TimeStampPrevious = 0;
 
-#if defined(DEBUG)
 	psLinuxEventObject->ui32Stats = 0;
-#endif
     init_waitqueue_head(&psLinuxEventObject->sWait);
 
 	psLinuxEventObject->psLinuxEventObjectList = psLinuxEventObjectList;
@@ -394,11 +386,7 @@ PVRSRV_ERROR LinuxEventObjectWait(IMG_HANDLE hOSEventObject, IMG_UINT32 ui32MSTi
 		ui32TimeOutJiffies = (IMG_UINT32)schedule_timeout((IMG_INT32)ui32TimeOutJiffies);
 		
 		LinuxLockMutex(&gPVRSRVLock);
-#if defined(DEBUG)
 		psLinuxEventObject->ui32Stats++;
-#endif			
-
-		
 	} while (ui32TimeOutJiffies);
 
 	finish_wait(&psLinuxEventObject->sWait, &sWait);	

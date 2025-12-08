@@ -3842,9 +3842,6 @@ DummyBW(IMG_UINT32 ui32BridgeID,
 		IMG_VOID *psBridgeOut,
 		PVRSRV_PER_PROCESS_DATA *psPerProc)
 {
-#if !defined(DEBUG)
-	PVR_UNREFERENCED_PARAMETER(ui32BridgeID);
-#endif
 	PVR_UNREFERENCED_PARAMETER(psBridgeIn);
 	PVR_UNREFERENCED_PARAMETER(psBridgeOut);
 	PVR_UNREFERENCED_PARAMETER(psPerProc);
@@ -3881,9 +3878,6 @@ _SetDispatchTableEntry(IMG_UINT32 ui32Index,
 					   const IMG_CHAR *pszFunctionName)
 {
 	static IMG_UINT32 ui32PrevIndex = ~0UL;		/* -1 */
-#if !defined(DEBUG)
-	PVR_UNREFERENCED_PARAMETER(pszIOCName);
-#endif
 #if !defined(DEBUG_BRIDGE_KM_DISPATCH_TABLE) && !defined(DEBUG_BRIDGE_KM)
 	PVR_UNREFERENCED_PARAMETER(pszFunctionName);
 #endif

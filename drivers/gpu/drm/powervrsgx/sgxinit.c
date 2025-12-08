@@ -3351,7 +3351,6 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			return PVRSRV_OK;
 		}
 
-#if defined(DEBUG)
 		/* Don't allow user-mode to reboot the device in production drivers */
 		case SGX_MISC_INFO_PANIC:
 		{
@@ -3361,7 +3360,6 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 			return PVRSRV_OK;
 		}
-#endif
 
 		default:
 		{

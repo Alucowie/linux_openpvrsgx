@@ -103,9 +103,7 @@ static DECLARE_MUTEX(lock);
 /* resman item structure */
 typedef struct _RESMAN_ITEM_
 {
-#ifdef DEBUG
 	IMG_UINT32				ui32Signature;
-#endif
 	struct _RESMAN_ITEM_	**ppsThis;	/*!< list navigation */
 	struct _RESMAN_ITEM_	*psNext;	/*!< list navigation */
 
@@ -122,9 +120,7 @@ typedef struct _RESMAN_ITEM_
 /* resman context structure */
 typedef struct _RESMAN_CONTEXT_
 {
-#ifdef DEBUG
 	IMG_UINT32					ui32Signature;
-#endif
 	struct	_RESMAN_CONTEXT_	**ppsThis;/*!< list navigation */
 	struct	_RESMAN_CONTEXT_	*psNext;/*!< list navigation */
 
@@ -171,12 +167,8 @@ static PVRSRV_ERROR FreeResourceByCriteria(PRESMAN_CONTEXT	psContext,
 										   IMG_BOOL			bExecuteCallback);
 
 
-#ifdef DEBUG
 	static IMG_VOID ValidateResList(PRESMAN_LIST psResList);
 	#define VALIDATERESLIST() ValidateResList(gpsResList)
-#else
-	#define VALIDATERESLIST()
-#endif
 
 
 
@@ -279,9 +271,7 @@ PVRSRV_ERROR PVRSRVResManConnect(IMG_HANDLE			hPerProc,
 		return eError;
 	}
 
-#ifdef DEBUG
 	psResManContext->ui32Signature = RESMAN_SIGNATURE;
-#endif /* DEBUG */
 	psResManContext->psResItemList	= IMG_NULL;
 	psResManContext->psPerProc = hPerProc;
 
@@ -460,9 +450,7 @@ PRESMAN_ITEM ResManRegisterRes(PRESMAN_CONTEXT	psResManContext,
 	}
 
 	/* Fill in details about this resource */
-#ifdef DEBUG
 	psNewResItem->ui32Signature		= RESMAN_SIGNATURE;
-#endif /* DEBUG */
 	psNewResItem->ui32ResType		= ui32ResType;
 	psNewResItem->pvParam			= pvParam;
 	psNewResItem->ui32Param			= ui32Param;
@@ -602,9 +590,7 @@ PVRSRV_ERROR ResManDissociateRes(RESMAN_ITEM		*psResItem,
 		return PVRSRV_ERROR_INVALID_PARAMS;
 	}
 
-#ifdef DEBUG /* QAC fix */
 	PVR_ASSERT(psResItem->ui32Signature == RESMAN_SIGNATURE);
-#endif
 
 	if (psNewResManContext != IMG_NULL)
 	{
@@ -680,9 +666,7 @@ IMG_INTERNAL PVRSRV_ERROR ResManFindResourceByPtr(PRESMAN_CONTEXT	psResManContex
 		return PVRSRV_ERROR_INVALID_PARAMS;
 	}
 
-#ifdef DEBUG	/* QAC fix */
 	PVR_ASSERT(psItem->ui32Signature == RESMAN_SIGNATURE);
-#endif
 
 	/* Acquire resource list sync object */
 	ACQUIRE_SYNC_OBJ;
@@ -749,9 +733,7 @@ static PVRSRV_ERROR FreeResourceByPtr(RESMAN_ITEM	*psItem,
 		return PVRSRV_ERROR_INVALID_PARAMS;
 	}
 
-#ifdef DEBUG	/* QAC fix */
 	PVR_ASSERT(psItem->ui32Signature == RESMAN_SIGNATURE);
-#endif
 
 	PVR_DPF((PVR_DBG_MESSAGE,
 			"FreeResourceByPtr: psItem=%08X, psItem->psNext=%08X",
@@ -906,7 +888,6 @@ static PVRSRV_ERROR FreeResourceByCriteria(PRESMAN_CONTEXT	psResManContext,
 }
 
 
-#ifdef DEBUG
 /*!
 ******************************************************************************
  @Function	 	ValidateResList
@@ -977,7 +958,6 @@ static IMG_VOID ValidateResList(PRESMAN_LIST psResList)
 		psCurContext = psCurContext->psNext;
 	}
 }
-#endif /* DEBUG */
 
 
 /******************************************************************************

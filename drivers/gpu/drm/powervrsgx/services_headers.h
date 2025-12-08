@@ -45,11 +45,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef SERVICES_HEADERS_H
 #define SERVICES_HEADERS_H
 
-#ifdef DEBUG_RELEASE_BUILD
-#pragma optimize( "", off )
-#define DEBUG		1
-#endif
-
 #include "img_defs.h"
 #include "services.h"
 #include "servicesint.h"

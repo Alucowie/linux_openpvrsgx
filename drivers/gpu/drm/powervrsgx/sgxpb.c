@@ -249,12 +249,8 @@ static PVRSRV_ERROR SGXCleanupSharedPBDescCallback(IMG_PVOID pvParam, IMG_UINT32
 
 static PVRSRV_ERROR SGXCleanupSharedPBDescCreateLockCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, IMG_BOOL bDummy)
 {
-#ifdef DEBUG
 	PVRSRV_PER_PROCESS_DATA *psPerProc = (PVRSRV_PER_PROCESS_DATA *)pvParam;
 	PVR_ASSERT(psPerProc == psPerProcCreateSharedPB);
-#else
-	PVR_UNREFERENCED_PARAMETER(pvParam);
-#endif
 
 	PVR_UNREFERENCED_PARAMETER(ui32Param);
 	PVR_UNREFERENCED_PARAMETER(bDummy);

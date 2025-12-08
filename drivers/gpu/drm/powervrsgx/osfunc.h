@@ -39,11 +39,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */ /**************************************************************************/
-#ifdef DEBUG_RELEASE_BUILD
-#pragma optimize( "", off )
-#define DEBUG		1
-#endif
-
 #ifndef __OSFUNC_H__
 #define __OSFUNC_H__
 

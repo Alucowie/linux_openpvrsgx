@@ -123,7 +123,6 @@ PVRLinuxX86PATProbe(IMG_VOID)
 		g_write_combining_available = (IMG_BOOL)(pat_entry == PAT_LINUX_X86_WC);
 #endif
 	}
-#if defined(DEBUG)
 #if defined(SUPPORT_LINUX_X86_WRITECOMBINE)
 	if (g_write_combining_available)
 	{
@@ -136,7 +135,6 @@ PVRLinuxX86PATProbe(IMG_VOID)
 #else	/* defined(SUPPORT_LINUX_X86_WRITECOMBINE) */
 	PVR_TRACE(("%s: Write combining disabled in driver build", __FUNCTION__));
 #endif	/* defined(SUPPORT_LINUX_X86_WRITECOMBINE) */
-#endif	/* DEBUG */
 }
 
 pgprot_t

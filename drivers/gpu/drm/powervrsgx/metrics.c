@@ -52,8 +52,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "sgxapi_km.h"
 #endif
 
-#if defined(DEBUG) || defined(TIMING)
-
 static volatile IMG_UINT32 *pui32TimerRegister = 0;
 
 #define PVRSRV_TIMER_TOTAL_IN_TICKS(X)	asTimers[X].ui32Total
@@ -200,8 +198,6 @@ IMG_VOID PVRSRVOutputMetricTotals(IMG_VOID)
 	PVR_DPF((PVR_DBG_ERROR," Timer(%u): Count = %u",PVRSRV_TIMER_EXAMPLE_1, PVRSRV_TIMER_COUNT(PVRSRV_TIMER_EXAMPLE_1)));
 #endif
 }
-
-#endif /* defined(DEBUG) || defined(TIMING) */
 
 /******************************************************************************
  End of file (metrics.c)

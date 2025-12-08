@@ -104,7 +104,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/device.h>
 #endif /* PVR_LDM_DEVICE_CLASS */
 #include <linux/clk.h>
-#if defined(DEBUG) && defined(PVR_MANUAL_POWER_CONTROL)
+#if defined(PVR_MANUAL_POWER_CONTROL)
 #include <asm/uaccess.h>
 #endif
 
@@ -213,7 +213,7 @@ PVRSRV_LINUX_MUTEX gPVRSRVLock;
 /* PID of process being released */
 IMG_UINT32 gui32ReleasePID;
 
-#if defined(DEBUG) && defined(PVR_MANUAL_POWER_CONTROL)
+#if defined(PVR_MANUAL_POWER_CONTROL)
 static IMG_UINT32 gPVRPowerLevel;
 #endif
 
@@ -422,8 +422,8 @@ static void __devexit PVRSRVDriverRemove(LDM_DEV *pDevice)
 #endif
 
 	SysAcquireData(&psSysData);
-	
-#if defined(DEBUG) && defined(PVR_MANUAL_POWER_CONTROL)
+
+#if defined(PVR_MANUAL_POWER_CONTROL)
 	if (gPVRPowerLevel != 0)
 	{
 		if (PVRSRVSetPowerStateKM(PVRSRV_SYS_POWER_STATE_D0) == PVRSRV_OK)
@@ -554,7 +554,7 @@ PVR_MOD_STATIC int PVRSRVDriverSuspend(LDM_DEV *pDevice, pm_message_t state)
 #endif
 {
 	int res = 0;
-#if !(defined(DEBUG) && defined(PVR_MANUAL_POWER_CONTROL) && !defined(SUPPORT_DRI_DRM))
+#if !(defined(PVR_MANUAL_POWER_CONTROL) && !defined(SUPPORT_DRI_DRM))
 	PVR_TRACE(( "PVRSRVDriverSuspend(pDevice=%p)", pDevice));
 
 	LinuxLockMutex(&gsPMMutex);
@@ -611,7 +611,7 @@ PVR_MOD_STATIC int PVRSRVDriverResume(LDM_DEV *pDevice)
 #endif
 {
 	int res = 0;
-#if !(defined(DEBUG) && defined(PVR_MANUAL_POWER_CONTROL) && !defined(SUPPORT_DRI_DRM))
+#if !(defined(PVR_MANUAL_POWER_CONTROL) && !defined(SUPPORT_DRI_DRM))
 	PVR_TRACE(("PVRSRVDriverResume(pDevice=%p)", pDevice));
 
 	LinuxLockMutex(&gsPMMutex);
@@ -637,7 +637,7 @@ PVR_MOD_STATIC int PVRSRVDriverResume(LDM_DEV *pDevice)
 #endif /* defined(PVR_LDM_MODULE) || defined(SUPPORT_DRI_DRM) */
 
 
-#if defined(DEBUG) && defined(PVR_MANUAL_POWER_CONTROL) && !defined(SUPPORT_DRI_DRM)
+#if defined(PVR_MANUAL_POWER_CONTROL) && !defined(SUPPORT_DRI_DRM)
 /*
  * If PVR_LDM_PCI_MODULE is defined (and PVR_MANUAL_POWER_CONTROL is *NOT* defined),
  * the device can be suspended and resumed without suspending/resuming the
@@ -1203,7 +1203,7 @@ static void __exit PVRCore_Cleanup(void)
 #endif
 
 #else /* defined(PVR_LDM_MODULE) */
-#if defined(DEBUG) && defined(PVR_MANUAL_POWER_CONTROL)
+#if defined(PVR_MANUAL_POWER_CONTROL)
 	if (gPVRPowerLevel != 0)
 	{
 		if (PVRSRVSetPowerStateKM(PVRSRV_SYS_POWER_STATE_D0) == PVRSRV_OK)
