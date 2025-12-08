@@ -53,11 +53,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define SGX_KERNEL_DATA_HEAP_OFFSET		0x00000000
 
 	#define SGX_GENERAL_HEAP_BASE				 0x00001000
-#if defined(SUPPORT_LARGE_GENERAL_HEAP)
-	#define SGX_GENERAL_HEAP_SIZE				(0x0B800000-0x00001000-0x00001000)
-#else
 	#define SGX_GENERAL_HEAP_SIZE				(0x08800000-0x00001000-0x00001000)
-#endif
 
 	/*
 	 * For hybrid PB we have to split virtual PB range between the shared
@@ -69,11 +65,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * If hybrid PB is not enabled then we still create both heaps (helps keep
 	 * the code clean) and define the size of the unused one to 0
 	 */
-#if defined(SUPPORT_LARGE_GENERAL_HEAP)
-	#define SGX_3DPARAMETERS_HEAP_SIZE			0x01000000
-#else
 	#define SGX_3DPARAMETERS_HEAP_SIZE			0x04000000
-#endif
 
 	/* By default we split the PB 50/50 */
 #if !defined(HYBRID_SHARED_PB_SIZE)
@@ -94,11 +86,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 #endif
 
-#if defined(SUPPORT_LARGE_GENERAL_HEAP)
-	#define SGX_SHARED_3DPARAMETERS_HEAP_BASE		 0x0B800000
-#else
 	#define SGX_SHARED_3DPARAMETERS_HEAP_BASE		 0x08800000
-#endif
 
 	/* Size is defined above */
 
