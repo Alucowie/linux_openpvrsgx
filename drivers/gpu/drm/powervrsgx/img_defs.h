@@ -121,11 +121,7 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
 #define  CLEANUP_WITH_POLL		IMG_FALSE
 #define  FORCE_CLEANUP			IMG_TRUE
 
-#if defined (_WIN64)
-#define IMG_UNDEF	(~0ULL)
-#else
 #define IMG_UNDEF	(~0UL)
-#endif
 
 #endif /* __IMG_DEFS_H__ */
 /*****************************************************************************

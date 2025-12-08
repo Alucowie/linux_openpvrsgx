@@ -88,14 +88,8 @@ typedef void            IMG_VOID, *IMG_PVOID;
 
 typedef IMG_INT32       IMG_RESULT;
 
-#if defined(_WIN64)
-	typedef unsigned __int64	IMG_UINTPTR_T;
-	typedef signed __int64		IMG_PTRDIFF_T;
-	typedef IMG_UINT64			IMG_SIZE_T;
-#else
 	typedef unsigned int	IMG_UINTPTR_T;
 	typedef IMG_UINT32		IMG_SIZE_T;
-#endif
 
 typedef IMG_PVOID       IMG_HANDLE;
 
