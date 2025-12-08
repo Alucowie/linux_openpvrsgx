@@ -1535,10 +1535,8 @@ PVRSRV_ERROR SGXRegisterDevice (PVRSRV_DEVICE_NODE *psDeviceNode)
 	psDeviceMemoryHeap->DevMemHeapType = DEVICE_MEMORY_HEAP_PERCONTEXT;
 	/* set the default (4k). System can override these as required */
 	psDeviceMemoryHeap->ui32DataPageSize = SGX_MMU_PAGE_SIZE;
-#if !defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
 	/* specify the mapping heap ID for this device */
 	psDevMemoryInfo->ui32MappingHeapID = (IMG_UINT32)(psDeviceMemoryHeap - psDevMemoryInfo->psDeviceMemoryHeap);
-#endif
 	psDeviceMemoryHeap++;/* advance to the next heap */
 
 #if defined(SUPPORT_MEMORY_TILING)
@@ -1719,26 +1717,6 @@ PVRSRV_ERROR SGXRegisterDevice (PVRSRV_DEVICE_NODE *psDeviceNode)
 	/* set the default (4k). System can override these as required */
 	psDeviceMemoryHeap->ui32DataPageSize = SGX_MMU_PAGE_SIZE;
 	psDeviceMemoryHeap++;/* advance to the next heap */
-
-
-#if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP)
-	/************* General Mapping ***************/
-	psDeviceMemoryHeap->ui32HeapID = HEAP_ID( PVRSRV_DEVICE_TYPE_SGX, SGX_GENERAL_MAPPING_HEAP_ID);
-	psDeviceMemoryHeap->sDevVAddrBase.uiAddr = SGX_GENERAL_MAPPING_HEAP_BASE;
-	psDeviceMemoryHeap->ui32HeapSize = SGX_GENERAL_MAPPING_HEAP_SIZE;
-	psDeviceMemoryHeap->ui32Attribs = PVRSRV_HAP_WRITECOMBINE
-														| PVRSRV_MEM_RAM_BACKED_ALLOCATION
-														| PVRSRV_HAP_MULTI_PROCESS;
-	psDeviceMemoryHeap->pszName = "GeneralMapping";
-	psDeviceMemoryHeap->pszBSName = "GeneralMapping BS";
-		psDeviceMemoryHeap->DevMemHeapType = DEVICE_MEMORY_HEAP_PERCONTEXT;
-
-	/* set the default (4k). System can override these as required */
-	psDeviceMemoryHeap->ui32DataPageSize = SGX_MMU_PAGE_SIZE;
-	/* specify the mapping heap ID for this device */
-	psDevMemoryInfo->ui32MappingHeapID = (IMG_UINT32)(psDeviceMemoryHeap - psDevMemoryInfo->psDeviceMemoryHeap);
-	psDeviceMemoryHeap++;/* advance to the next heap */
-#endif /* #if defined(SUPPORT_SGX_GENERAL_MAPPING_HEAP) */
 
 
 	/* set the heap count */
