@@ -121,7 +121,8 @@ endif	# CONFIG_SOC_DRA7XX
 else # pvr_drv
 # kept here for compatibility with omap-pvr tree
 	@$(kecho) "  MAKE    $(obj): omap3"
-	$(Q)TI_PLATFORM=omap3 OMAPES=3.x BUILD=debug $(MAKE) $(build)=$(SOURCE)
+	$(Q)TI_PLATFORM=omap3 OMAPES=3.x BUILD=debug SOC_VENDOR=ti SOC_FAMILY=omap SOC=omap3 SGX=sgx530 SGX_FLAG=SGX530 SGX_REV=121 AM_VERSION=3 TARGET_TYPE=y $(MAKE) $(build)=$(SOURCE)
+	#$(Q)TI_PLATFORM=omap3 OMAPES=3.x BUILD=debug $(MAKE) $(build)=$(SOURCE)
 	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
 #	@$(kecho) "  MAKE    $(obj): omap3630"
 #	$(Q)TI_PLATFORM=omap3630 $(MAKE) $(build)=$(SOURCE)
@@ -164,8 +165,10 @@ endif # CONFIG_SGX_SUNXI
 
 ifneq ($(CONFIG_SGX_GENERIC),)
 	@$(kecho) "  MAKE    $(obj): generic"
+	#$(Q)TI_PLATFORM=omap3 OMAPES=3.x $(MAKE) $(build)=$(SOURCE)
+	$(Q)SOC_VENDOR=ti SOC_FAMILY=omap SOC=omap3 SGX=sgx530 SGX_FLAG=SGX530 SGX_REV=121 AM_VERSION=3 TARGET_TYPE=y $(MAKE) $(build)=$(SOURCE)
 # Fix versions
-	$(Q)SOC_VENDOR=generic SOC_FAMILY=any SGX=any SGX_FLAG=any SGX_REV=any $(MAKE) TARGET_TYPE=$(CONFIG_SGX_GENERIC) $(build)=$(SOURCE)
+	#$(Q)SOC_VENDOR=generic SOC_FAMILY=any SGX=any SGX_FLAG=any SGX_REV=any $(MAKE) TARGET_TYPE=$(CONFIG_SGX_GENERIC) $(build)=$(SOURCE)
 	$(Q)if [ -r $(SOURCE)/modules.order ]; then cat $(SOURCE)/modules.order >>$(obj)/modules.order; fi
 endif # CONFIG_SGX_GENERIC
 

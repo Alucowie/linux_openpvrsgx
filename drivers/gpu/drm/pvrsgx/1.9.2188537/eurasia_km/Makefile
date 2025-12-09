@@ -1,4 +1,4 @@
-export KERNELDIR = /opt/oe/stuff/build/tmp/work/beagleboard-angstrom-linux-gnueabi/linux-omap-2.6.29-r44/git/
+export KERNELDIR = /home/alicator/sources/linux_openpvrsgx.git
 
 export KERNEL_PATH=$(KERNELDIR)
 export KERNEL_SRC=$(KERNELDIR)
