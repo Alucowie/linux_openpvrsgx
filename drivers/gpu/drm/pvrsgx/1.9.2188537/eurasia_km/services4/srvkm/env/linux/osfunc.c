@@ -4476,18 +4476,21 @@ static void pvr_dmac_clean_range(const void *pvStart, const void *pvEnd)
 
 static void pvr_flush_range(phys_addr_t pStart, phys_addr_t pEnd)
 {
-	arm_dma_ops.sync_single_for_device(NULL, pStart, pEnd - pStart, DMA_TO_DEVICE);
-	arm_dma_ops.sync_single_for_cpu(NULL, pStart, pEnd - pStart, DMA_FROM_DEVICE);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, pStart, pEnd - pStart, DMA_TO_DEVICE);
+	dma_sync_single_for_cpu(dev, pStart, pEnd - pStart, DMA_FROM_DEVICE);
 }
 
 static void pvr_clean_range(phys_addr_t pStart, phys_addr_t pEnd)
 {
-	arm_dma_ops.sync_single_for_device(NULL, pStart, pEnd - pStart, DMA_TO_DEVICE);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, pStart, pEnd - pStart, DMA_TO_DEVICE);
 }
 
 static void pvr_invalidate_range(phys_addr_t pStart, phys_addr_t pEnd)
 {
-	arm_dma_ops.sync_single_for_cpu(NULL, pStart, pEnd - pStart, DMA_FROM_DEVICE);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_cpu(dev, pStart, pEnd - pStart, DMA_FROM_DEVICE);
 }
 
 #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
@@ -4588,17 +4591,23 @@ static inline IMG_UINT32 pvr_dma_range_len(const void *pvStart, const void *pvEn
 
 static void pvr_dma_cache_wback_inv(const void *pvStart, const void *pvEnd)
 {
-	dma_cache_wback_inv((IMG_UINTPTR_T)pvStart, pvr_dma_range_len(pvStart, pvEnd));	
+	size_t uLength = pvr_dma_range_len(pvStart, pvEnd);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, (dma_addr_t)pvStart, uLength, DMA_BIDIRECTIONAL);
 }
 
 static void pvr_dma_cache_wback(const void *pvStart, const void *pvEnd)
 {
-	dma_cache_wback((IMG_UINTPTR_T)pvStart, pvr_dma_range_len(pvStart, pvEnd));
+	size_t uLength = pvr_dma_range_len(pvStart, pvEnd);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, (dma_addr_t)pvStart, uLength, DMA_TO_DEVICE);
 }
 
 static void pvr_dma_cache_inv(const void *pvStart, const void *pvEnd)
 {
-	dma_cache_inv((IMG_UINTPTR_T)pvStart, pvr_dma_range_len(pvStart, pvEnd));
+	size_t uLength = pvr_dma_range_len(pvStart, pvEnd);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, (dma_addr_t)pvStart, uLength, DMA_FROM_DEVICE);
 }
 
 IMG_BOOL OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,

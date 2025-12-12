@@ -450,6 +450,16 @@ static void __devexit PVRSRVDriverRemove(LDM_DEV *pDevice)
 }
 #endif /* defined(PVR_LDM_MODULE) */
 
+#if !defined(SUPPORT_DRI_DRM)
+struct device *PVRLDMGetDevice(void)
+{
+#if defined(PVR_LDM_MODULE)
+    return &gpsPVRLDMDev->dev;
+#else
+    return NULL;
+#endif
+}
+#endif
 
 #if defined(PVR_LDM_MODULE) || defined(SUPPORT_DRI_DRM)
 static PVRSRV_LINUX_MUTEX gsPMMutex;
