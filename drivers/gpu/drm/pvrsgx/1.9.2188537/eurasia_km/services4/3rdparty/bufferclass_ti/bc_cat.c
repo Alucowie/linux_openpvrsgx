@@ -689,7 +689,7 @@ static int __init bc_cat_init(void)
         goto ExitDisable;
     }
 
-    bc_class = class_create(THIS_MODULE, DEVNAME);
+    bc_class = class_create(DEVNAME);
 
     if (IS_ERR(bc_class)) {
        printk(KERN_ERR DRVNAME ": upable to create device class\n");
