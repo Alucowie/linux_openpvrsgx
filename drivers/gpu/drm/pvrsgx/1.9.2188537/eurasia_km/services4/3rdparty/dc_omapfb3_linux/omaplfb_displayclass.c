@@ -104,6 +104,8 @@ extern struct ion_client *gpsIONClient;
 
 #endif /* defined(CONFIG_DSSCOMP) */
 
+extern struct fb_info *registered_fb[FB_MAX];
+
 #define OMAPLFB_COMMAND_COUNT		1
 
 #define	OMAPLFB_VSYNC_SETTLE_COUNT	5
