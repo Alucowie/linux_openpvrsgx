@@ -3394,7 +3394,7 @@ static IMG_BOOL CPUVAddrToPFN(struct vm_area_struct *psVMArea, IMG_UINT32 ulCPUV
     if (!(psVMArea->vm_flags & (VM_IO | VM_PFNMAP)))
         return IMG_FALSE;
 
-    ret = follow_pte(psVMArea->vm_mm, ulCPUVAddr, &ptep, &ptl);
+    ret = follow_pte(psVMArea, ulCPUVAddr, &ptep, &ptl);
     if (ret < 0)
         return IMG_FALSE;
 
