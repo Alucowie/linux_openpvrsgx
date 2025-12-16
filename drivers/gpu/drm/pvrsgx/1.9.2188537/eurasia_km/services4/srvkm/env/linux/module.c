@@ -229,7 +229,7 @@ static IMG_UINT32 gPVRPowerLevel;
  * This is the driver interface we support.  
  */
 #if defined(PVR_LDM_PLATFORM_MODULE)
-static int PVRSRVDriverRemove(LDM_DEV *device);
+static void PVRSRVDriverRemove(LDM_DEV *device);
 static int PVRSRVDriverProbe(LDM_DEV *device);
 #endif
 #if defined(PVR_LDM_PCI_MODULE)
@@ -403,7 +403,7 @@ EXPORT_SYMBOL(__bad_xchg);
 
 *****************************************************************************/
 #if defined (PVR_LDM_PLATFORM_MODULE)
-static int PVRSRVDriverRemove(LDM_DEV *pDevice)
+static void PVRSRVDriverRemove(LDM_DEV *pDevice)
 #endif
 #if defined(PVR_LDM_PCI_MODULE)
 static void __devexit PVRSRVDriverRemove(LDM_DEV *pDevice)
@@ -441,12 +441,7 @@ static void __devexit PVRSRVDriverRemove(LDM_DEV *pDevice)
 	}
 #endif
 
-#if defined (PVR_LDM_PLATFORM_MODULE)
-	return 0;
-#endif
-#if defined (PVR_LDM_PCI_MODULE)
 	return;
-#endif
 }
 #endif /* defined(PVR_LDM_MODULE) */
 
