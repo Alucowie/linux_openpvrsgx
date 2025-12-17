@@ -86,6 +86,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_drm.h"
 #endif
 
+#if !defined(PVR_SECURE_HANDLES) && !defined (SUPPORT_SID_INTERFACE)
+#error "The mmap code requires PVR_SECURE_HANDLES"
+#endif
+
 /* WARNING:
  * The mmap code has its own mutex, to prevent a possible deadlock,
  * when using gPVRSRVLock.
@@ -1064,7 +1068,7 @@ PVRMMap(struct file* pFile, struct vm_area_struct* ps_vma)
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0))
     ps_vma->vm_flags |= VM_RESERVED;
 #else
-    vm_flags_set(ps_vma, VM_DONTDUMP);
+    vm_flags_set(ps_vma, VM_DONTEXPAND | VM_DONTDUMP); /* Don't swap */
 #endif
 
     vm_flags_set(ps_vma, VM_IO);
@@ -1073,12 +1077,12 @@ PVRMMap(struct file* pFile, struct vm_area_struct* ps_vma)
      * Disable mremap because our nopage handler assumes all
      * page requests have already been validated.
      */
-/* NOTE: probably deprecated - nowhere used in the kernel any more! */
+    /* NOTE: probably deprecated - nowhere used in the kernel any more! */
     vm_flags_set(ps_vma, VM_DONTEXPAND);
-    
+
     /* Don't allow mapping to be inherited across a process fork */
-/* NOTE: probably deprecated - nowhere used in the kernel any more! */
-    vm_flags_set(ps_vma, VM_DONTCOPY);
+    /* NOTE: probably deprecated - nowhere used in the kernel any more! */
+    vm_flags_set(ps_vma, VM_DONTDUMP);
 
     ps_vma->vm_private_data = (void *)psOffsetStruct;
     

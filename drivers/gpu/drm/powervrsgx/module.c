@@ -55,10 +55,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * support is required, besides indicating the exact support
 	 * required (e.g. platform, or PCI device).
 	 */
+	#if defined(LDM_PLATFORM)
 		#define	PVR_LDM_PLATFORM_MODULE
 		#define PVR_LDM_DEVICE_CLASS
 		#define	PVR_LDM_MODULE
-	#if 0
+	#else
 		#if defined(LDM_PCI)
 			#define PVR_LDM_DEVICE_CLASS
 			#define PVR_LDM_PCI_MODULE
@@ -141,9 +142,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #if defined(PVR_LDM_MODULE)
 //#define	DRVNAME		PVR_LDM_DRIVER_REGISTRATION_NAME
-#define	DRVNAME		"pvrsrvkm"
+#define	DRVNAME		PVRSRV_MODNAME	
 #endif
-#define DEVNAME		"pvrsrvkm"
+#define DEVNAME		PVRSRV_MODNAME
 
 #if defined(SUPPORT_DRI_DRM)
 #define PRIVATE_DATA(pFile) ((pFile)->driver_priv)
@@ -375,7 +376,6 @@ static int __devinit PVRSRVDriverProbe(LDM_DEV *pDevice, const struct pci_device
 	return 0;
 }
 
-#if 0
 void
 __bad_xchg(volatile void *ptr, int size)
 {
@@ -384,7 +384,6 @@ __bad_xchg(volatile void *ptr, int size)
     BUG();
 }
 EXPORT_SYMBOL(__bad_xchg);
-#endif
 
 
 /*!
@@ -449,6 +448,16 @@ static void __devexit PVRSRVDriverRemove(LDM_DEV *pDevice)
 }
 #endif /* defined(PVR_LDM_MODULE) */
 
+#if !defined(SUPPORT_DRI_DRM)
+struct device *PVRLDMGetDevice(void)
+{
+#if defined(PVR_LDM_MODULE)
+    return &gpsPVRLDMDev->dev;
+#else
+    return NULL;
+#endif
+}
+#endif
 
 #if defined(PVR_LDM_MODULE) || defined(SUPPORT_DRI_DRM)
 static PVRSRV_LINUX_MUTEX gsPMMutex;

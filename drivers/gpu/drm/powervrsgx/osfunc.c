@@ -74,7 +74,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/capability.h>
 #include <asm/uaccess.h>
 #include <linux/spinlock.h>
+#if defined(PVR_LINUX_MISR_USING_WORKQUEUE) || \
+	defined(PVR_LINUX_MISR_USING_PRIVATE_WORKQUEUE) || \
+	defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || \
+	defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE) || \
+	defined(PVR_LINUX_USING_WORKQUEUES)
 #include <linux/workqueue.h>
+#endif
 
 #include "img_types.h"
 #include "services_headers.h"
@@ -89,12 +95,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_uaccess.h"
 #include "lock.h"
 
+#include <../arch/arm/mm/dma.h>
 
 #if defined (SUPPORT_ION)
 #include "ion.h"
 #endif
-
-#define PVRSRV_MODNAME "pvrsrvkm"
 
 #if defined (CONFIG_X86_PAE)
 #error Physical Address Extension not supported with the driver
@@ -107,7 +112,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 #if 0
-#if !defined(CONFIG_PREEMPT)
+#if defined(PVR_LINUX_USING_WORKQUEUES) && !defined(CONFIG_PREEMPT)
 /* 
  * Services spins at certain points waiting for events (e.g. swap
  * chain destrucion).  If those events rely on workqueues running,
@@ -1576,6 +1581,20 @@ IMG_BOOL OSIsResourceLocked (PVRSRV_RESOURCE *psResource, IMG_UINT32 ui32ID)
             ?	IMG_TRUE
             :	IMG_FALSE;
 }
+
+
+#if !defined(SYS_CUSTOM_POWERLOCK_WRAP)
+PVRSRV_ERROR OSPowerLockWrap(IMG_BOOL bTryLock)
+{
+	PVR_UNREFERENCED_PARAMETER(bTryLock);	
+
+	return PVRSRV_OK;
+}
+
+IMG_VOID OSPowerLockUnwrap (IMG_VOID)
+{
+}
+#endif /* SYS_CUSTOM_POWERLOCK_WRAP */
 
 
 IMG_CPU_PHYADDR OSMapLinToCPUPhys(IMG_HANDLE hOSMemHandle,
@@ -3367,27 +3386,27 @@ static IMG_BOOL CPUVAddrToPFN(struct vm_area_struct *psVMArea, IMG_UINT32 ulCPUV
 #else
     return IMG_FALSE;
 #endif
-#else	/* #if (LINUX_VERSION_CODE < KERNEL_VERSION(6,6,0)) */
-	spinlock_t *ptl;
-	pte_t *ptep;
-	int ret;
+#else  /* #if (LINUX_VERSION_CODE < KERNEL_VERSION(6,6,0)) */
+    spinlock_t *ptl;
+    pte_t *ptep;
+    int ret;
 
-	if (!(psVMArea->vm_flags & (VM_IO | VM_PFNMAP)))
-		return IMG_FALSE;
+    if (!(psVMArea->vm_flags & (VM_IO | VM_PFNMAP)))
+        return IMG_FALSE;
 
-	ret = follow_pte(psVMArea, ulCPUVAddr, &ptep, &ptl);
-	if (ret < 0)
-		return IMG_FALSE;
+    ret = follow_pte(psVMArea, ulCPUVAddr, &ptep, &ptl);
+    if (ret < 0)
+        return IMG_FALSE;
 
-	*pulPFN = pte_pfn(ptep_get(ptep));
-	if (!pfn_valid(*pulPFN))
-		return IMG_FALSE;
+    *pulPFN = pte_pfn(ptep_get(ptep));
+    if (!pfn_valid(*pulPFN))
+        return IMG_FALSE;
 
-	*ppsPage = pfn_to_page(*pulPFN);
-	get_page(*ppsPage);
-	pte_unmap_unlock(ptep, ptl);
+    *ppsPage = pfn_to_page(*pulPFN);
+    get_page(*ppsPage);
+    pte_unmap_unlock(ptep, ptl);
 
-	return IMG_TRUE;
+    return IMG_TRUE;
 #endif
 }
 
@@ -3619,7 +3638,7 @@ PVRSRV_ERROR OSAcquirePhysPageAddr(IMG_VOID *pvCPUVAddr,
     psInfo->eType = WRAP_TYPE_GET_USER_PAGES;
 
     /* Lock down user memory */
-    down_read(&current->mm->mmap_lock);
+    down_read(&current->mm->mmap_sem);
     bMMapSemHeld = IMG_TRUE;
 
     /* Get page list */
@@ -3810,7 +3829,7 @@ PVRSRV_ERROR OSAcquirePhysPageAddr(IMG_VOID *pvCPUVAddr,
 
 exit:
     PVR_ASSERT(bMMapSemHeld);
-    up_read(&current->mm->mmap_lock);
+    up_read(&current->mm->mmap_sem);
 
     /* Return the cookie */
     *phOSWrapMem = (IMG_HANDLE)psInfo;
@@ -3828,7 +3847,7 @@ exit:
 error:
     if (bMMapSemHeld)
     {
-        up_read(&current->mm->mmap_lock);
+        up_read(&current->mm->mmap_sem);
     }
     OSReleasePhysPageAddr((IMG_HANDLE)psInfo);
 
@@ -3845,6 +3864,7 @@ typedef void (*OuterCacheOp_t)(phys_addr_t uStart, phys_addr_t uEnd);
 typedef void (*OuterCacheOp_t)(unsigned long ulStart, unsigned long ulEnd);
 #endif
 
+#if 0
 #if defined(CONFIG_OUTER_CACHE)
 
 typedef IMG_BOOL (*MemAreaToPhys_t)(LinuxMemArea *psLinuxMemArea,
@@ -3925,6 +3945,7 @@ static IMG_BOOL IONAreaToPhys(LinuxMemArea *psLinuxMemArea,
 }
 
 #endif /* defined(CONFIG_OUTER_CACHE) */
+#endif
 
 /* g_sMMapMutex must be held while this function is called */
 
@@ -4153,7 +4174,7 @@ static
 IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 							 IMG_UINT32 ui32ByteOffset,
 							 IMG_VOID *pvVirtRangeStart,
-							 IMG_SIZE_T uiLength
+							 IMG_SIZE_T ui32Length
 #if defined(USE_VIRTUAL_CACHE_OP)
                              , VirtualCacheOp_t pfnVirtualCacheOp
 #endif
@@ -4184,7 +4205,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 	*/
 	if (!psLinuxMemArea->hBMHandle)
 	{
-		PVR_ASSERT(uiLength <= psLinuxMemArea->ui32ByteSize);
+		PVR_ASSERT(ui32Length <= psLinuxMemArea->ui32ByteSize);
 	}
 
 	if(psLinuxMemArea->eAreaType == LINUX_MEM_AREA_SUB_ALLOC)
@@ -4216,7 +4237,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 				 */
 
 				pvMinVAddr = FindMMapBaseVAddr(psMMapOffsetStructList,
-				                               pvVirtRangeStart, uiLength);
+				                               pvVirtRangeStart, ui32Length);
 				if(!pvMinVAddr)
 					goto err_blocked;
 
@@ -4257,7 +4278,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 			}
 
 			pvMinVAddr = FindMMapBaseVAddr(psMMapOffsetStructList,
-			                               pvVirtRangeStart, uiLength);
+			                               pvVirtRangeStart, ui32Length);
 			if(!pvMinVAddr)
 				goto err_blocked;
 
@@ -4267,7 +4288,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 		case LINUX_MEM_AREA_ALLOC_PAGES:
 		{
 			pvMinVAddr = FindMMapBaseVAddr(psMMapOffsetStructList,
-			                               pvVirtRangeStart, uiLength);
+			                               pvVirtRangeStart, ui32Length);
 			if(!pvMinVAddr)
 				goto err_blocked;
 
@@ -4327,7 +4348,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 
 	DoPhysicalCacheOp(psLinuxMemArea,
 	                  pvPhysRangeStart,
-	                  uiLength,
+	                  ui32Length,
 	                  uPageNumOffset,
 	                  pfnMemAreaToPhys,
 	                  pfnPhysicalCacheOp);
@@ -4338,7 +4359,7 @@ IMG_BOOL CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 err_blocked:
 	PVR_DPF((PVR_DBG_WARNING, "%s: Blocked cache op on virtual range "
 							  "%p-%p (type %d)", __func__,
-			 pvVirtRangeStart, pvVirtRangeStart + uiLength,
+			 pvVirtRangeStart, pvVirtRangeStart + ui32Length,
 			 psLinuxMemArea->eAreaType));
 	LinuxUnLockMutex(&g_sMMapMutex);
 	return IMG_FALSE;
@@ -4388,14 +4409,8 @@ IMG_BOOL OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32Length)
 {
 	/* Write-back and invalidate */
-	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length
-#if defined(USE_VIRTUAL_CACHE_OP)
-			, x86_flush_cache_range
-#endif
-#if defined(USE_PHYSICAL_CACHE_OP)
-			, IMG_NULL
-#endif
-			);
+	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length,
+							   x86_flush_cache_range, IMG_NULL);
 }
 
 IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4404,14 +4419,8 @@ IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32Length)
 {
 	/* No clean feature on x86 */
-	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length
-#if defined(USE_VIRTUAL_CACHE_OP)
-			, x86_flush_cache_range
-#endif
-#if defined(USE_PHYSICAL_CACHE_OP)
-			, IMG_NULL
-#endif
-			);
+	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length,
+							   x86_flush_cache_range, IMG_NULL);
 }
 
 IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4420,14 +4429,8 @@ IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 									 IMG_UINT32 ui32Length)
 {
 	/* No invalidate-only support */
-	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length
-#if defined(USE_VIRTUAL_CACHE_OP)
-			, x86_flush_cache_range
-#endif
-#if defined(USE_PHYSICAL_CACHE_OP)
-			, IMG_NULL
-#endif
-			);
+	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset, pvRangeAddrStart, ui32Length,
+							   x86_flush_cache_range, IMG_NULL);
 }
 
 #else /* defined(__i386__) */
@@ -4496,18 +4499,21 @@ static void pvr_dmac_clean_range(const void *pvStart, const void *pvEnd)
 
 static void pvr_flush_range(phys_addr_t pStart, phys_addr_t pEnd)
 {
-	dma_sync_single_for_device(NULL, pStart, pEnd - pStart, DMA_TO_DEVICE);
-	dma_sync_single_for_cpu(NULL, pStart, pEnd - pStart, DMA_FROM_DEVICE);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, pStart, pEnd - pStart, DMA_TO_DEVICE);
+	dma_sync_single_for_cpu(dev, pStart, pEnd - pStart, DMA_FROM_DEVICE);
 }
 
 static void pvr_clean_range(phys_addr_t pStart, phys_addr_t pEnd)
 {
-	dma_sync_single_for_device(NULL, pStart, pEnd - pStart, DMA_TO_DEVICE);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, pStart, pEnd - pStart, DMA_TO_DEVICE);
 }
 
 static void pvr_invalidate_range(phys_addr_t pStart, phys_addr_t pEnd)
 {
-	dma_sync_single_for_cpu(NULL, pStart, pEnd - pStart, DMA_FROM_DEVICE);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_cpu(dev, pStart, pEnd - pStart, DMA_FROM_DEVICE);
 }
 
 #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
@@ -4608,17 +4614,23 @@ static inline IMG_UINT32 pvr_dma_range_len(const void *pvStart, const void *pvEn
 
 static void pvr_dma_cache_wback_inv(const void *pvStart, const void *pvEnd)
 {
-	dma_cache_wback_inv((IMG_UINTPTR_T)pvStart, pvr_dma_range_len(pvStart, pvEnd));	
+	size_t uLength = pvr_dma_range_len(pvStart, pvEnd);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, (dma_addr_t)pvStart, uLength, DMA_BIDIRECTIONAL);
 }
 
 static void pvr_dma_cache_wback(const void *pvStart, const void *pvEnd)
 {
-	dma_cache_wback((IMG_UINTPTR_T)pvStart, pvr_dma_range_len(pvStart, pvEnd));
+	size_t uLength = pvr_dma_range_len(pvStart, pvEnd);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, (dma_addr_t)pvStart, uLength, DMA_TO_DEVICE);
 }
 
 static void pvr_dma_cache_inv(const void *pvStart, const void *pvEnd)
 {
-	dma_cache_inv((IMG_UINTPTR_T)pvStart, pvr_dma_range_len(pvStart, pvEnd));
+	size_t uLength = pvr_dma_range_len(pvStart, pvEnd);
+	struct device *dev = PVRLDMGetDevice();
+	dma_sync_single_for_device(dev, (dma_addr_t)pvStart, uLength, DMA_FROM_DEVICE);
 }
 
 IMG_BOOL OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4627,14 +4639,8 @@ IMG_BOOL OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32Length)
 {
 	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset,
-			pvRangeAddrStart, ui32Length
-#if defined(USE_VIRTUAL_CACHE_OP)
-			, pvr_dma_cache_wback_inv
-#endif
-#if defined(USE_PHYSICAL_CACHE_OP)
-			, IMG_NULL
-#endif
-			);
+							   pvRangeAddrStart, ui32Length,
+							   pvr_dma_cache_wback_inv, IMG_NULL);
 }
 
 IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4643,14 +4649,8 @@ IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32Length)
 {
 	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset,
-			pvRangeAddrStart, ui32Length
-#if defined(USE_VIRTUAL_CACHE_OP)
-			, pvr_dma_cache_wback
-#endif
-#if defined(USE_PHYSICAL_CACHE_OP)
-			, IMG_NULL
-#endif
-			);
+							   pvRangeAddrStart, ui32Length,
+							   pvr_dma_cache_wback, IMG_NULL);
 }
 
 IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
@@ -4659,14 +4659,8 @@ IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 									 IMG_UINT32 ui32Length)
 {
 	return CheckExecuteCacheOp(hOSMemHandle, ui32ByteOffset,
-			pvRangeAddrStart, ui32Length
-#if defined(USE_VIRTUAL_CACHE_OP)
-			, pvr_dma_cache_inv
-#endif
-#if defined(USE_PHYSICAL_CACHE_OP)
-			, IMG_NULL
-#endif
-			);
+							   pvRangeAddrStart, ui32Length,
+							   pvr_dma_cache_inv, IMG_NULL);
 }
 
 #else /* defined(__mips__) */

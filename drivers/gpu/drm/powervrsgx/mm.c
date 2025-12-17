@@ -440,17 +440,66 @@ DebugMemAllocRecordTypeToString(DEBUG_MEM_ALLOC_TYPE eAllocType)
 #endif
 
 
+static IMG_BOOL
+AllocFlagsToPGProt(pgprot_t *pPGProtFlags, IMG_UINT32 ui32AllocFlags)
+{
+    pgprot_t PGProtFlags;
+
+    switch (ui32AllocFlags & PVRSRV_HAP_CACHETYPE_MASK)
+    {
+        case PVRSRV_HAP_CACHED:
+            PGProtFlags = PAGE_KERNEL;
+            break;
+        case PVRSRV_HAP_WRITECOMBINE:
+            PGProtFlags = PGPROT_WC(PAGE_KERNEL);
+            break;
+        case PVRSRV_HAP_UNCACHED:
+            PGProtFlags = PGPROT_UC(PAGE_KERNEL);
+            break;
+        default:
+            PVR_DPF((PVR_DBG_ERROR,
+                     "%s: Unknown mapping flags=0x%08x",
+                     __FUNCTION__, ui32AllocFlags));
+            dump_stack();
+            return IMG_FALSE;
+    }
+
+    *pPGProtFlags = PGProtFlags;
+
+    return IMG_TRUE;
+}
+
+static void *__old_vmalloc_node(unsigned long size, unsigned long align,
+			    gfp_t gfp_mask, pgprot_t prot,
+			    int node, const void *caller)
+{
+	return __vmalloc_node_range(size, align, VMALLOC_START, VMALLOC_END,
+				    gfp_mask, prot, 0, node, caller);
+}
+
+static void *__old_vmalloc(unsigned long size, gfp_t gfp_mask, pgprot_t prot)
+{
+	return __old_vmalloc_node(size, 1, gfp_mask, prot, NUMA_NO_NODE,
+				__builtin_return_address(0));
+}
+
 IMG_VOID *
 _VMallocWrapper(IMG_UINT32 ui32Bytes,
                 IMG_UINT32 ui32AllocFlags,
                 IMG_CHAR *pszFileName,
                 IMG_UINT32 ui32Line)
 {
+    pgprot_t PGProtFlags;
     IMG_VOID *pvRet;
     
+    if (!AllocFlagsToPGProt(&PGProtFlags, ui32AllocFlags))
+    {
+            return NULL;
+    }
+
 	/* Allocate virtually contiguous pages */
-    pvRet = __vmalloc(ui32Bytes, GFP_KERNEL | __GFP_HIGHMEM);
-    
+    pvRet = __old_vmalloc(ui32Bytes, GFP_KERNEL | __GFP_HIGHMEM, PGProtFlags);
+
 #if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
     if (pvRet)
     {
@@ -490,9 +539,15 @@ _VFreeWrapper(IMG_VOID *pvCpuVAddr, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line)
 static IMG_VOID *
 _VMapWrapper(struct page **ppsPageList, IMG_UINT32 ui32NumPages, IMG_UINT32 ui32AllocFlags, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line)
 {
+    pgprot_t PGProtFlags;
     IMG_VOID *pvRet;
 
-    pvRet = vmap(ppsPageList, ui32NumPages, GFP_KERNEL | __GFP_HIGHMEM);
+    if (!AllocFlagsToPGProt(&PGProtFlags, ui32AllocFlags))
+    {
+            return NULL;
+    }
+
+    pvRet = vmap(ppsPageList, ui32NumPages, GFP_KERNEL | __GFP_HIGHMEM, PGProtFlags);
 
 #if defined(DEBUG_LINUX_MEMORY_ALLOCATIONS)
     if (pvRet)

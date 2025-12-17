@@ -111,11 +111,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			#endif
 		#endif
 	#else
-		#define IOREMAP_WC(pa, bytes)	ioremap_uc(pa, bytes)
+		#define IOREMAP_WC(pa, bytes)	ioremap_nocache(pa, bytes)
 	#endif
 #endif
 
-#define	IOREMAP_UC(pa, bytes)	ioremap_uc(pa, bytes)
+#define	IOREMAP_UC(pa, bytes)	ioremap_nocache(pa, bytes)
 
 IMG_VOID PVRLinuxMUtilsInit(IMG_VOID);
 
