@@ -74,13 +74,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/capability.h>
 #include <asm/uaccess.h>
 #include <linux/spinlock.h>
-#if defined(PVR_LINUX_MISR_USING_WORKQUEUE) || \
-	defined(PVR_LINUX_MISR_USING_PRIVATE_WORKQUEUE) || \
-	defined(PVR_LINUX_TIMERS_USING_WORKQUEUES) || \
-	defined(PVR_LINUX_TIMERS_USING_SHARED_WORKQUEUE) || \
-	defined(PVR_LINUX_USING_WORKQUEUES)
 #include <linux/workqueue.h>
-#endif
 
 #include "img_types.h"
 #include "services_headers.h"
@@ -111,18 +105,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define ON_EACH_CPU(func, info, wait) on_each_cpu(func, info, 0, wait)
 #endif
 
-#if 0
-#if defined(PVR_LINUX_USING_WORKQUEUES) && !defined(CONFIG_PREEMPT)
-/* 
- * Services spins at certain points waiting for events (e.g. swap
- * chain destrucion).  If those events rely on workqueues running,
- * it needs to be possible to preempt the waiting thread.
- * Removing the need for CONFIG_PREEMPT will require adding preemption
- * points at various points in Services.
- */
-#error "A preemptible Linux kernel is required when using workqueues"
-#endif
-#endif
 
 #if defined(EMULATOR)
 #define EVENT_OBJECT_TIMEOUT_MS		(2000)
