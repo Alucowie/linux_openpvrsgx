@@ -1298,20 +1298,6 @@ IMG_BOOL OSIsResourceLocked (PVRSRV_RESOURCE *psResource, IMG_UINT32 ui32ID)
 }
 
 
-#if !defined(SYS_CUSTOM_POWERLOCK_WRAP)
-PVRSRV_ERROR OSPowerLockWrap(IMG_BOOL bTryLock)
-{
-	PVR_UNREFERENCED_PARAMETER(bTryLock);	
-
-	return PVRSRV_OK;
-}
-
-IMG_VOID OSPowerLockUnwrap (IMG_VOID)
-{
-}
-#endif /* SYS_CUSTOM_POWERLOCK_WRAP */
-
-
 IMG_CPU_PHYADDR OSMapLinToCPUPhys(IMG_HANDLE hOSMemHandle,
 								  IMG_VOID *pvLinAddr)
 {
