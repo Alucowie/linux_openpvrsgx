@@ -88,7 +88,7 @@ PVRSRV_ERROR OSUninstallMISR(IMG_VOID *pvSysData);
 IMG_CPU_PHYADDR OSMapLinToCPUPhys(IMG_HANDLE, IMG_VOID* pvLinAddr);
 IMG_VOID OSMemCopy(IMG_VOID *pvDst, IMG_VOID *pvSrc, IMG_SIZE_T ui32Size);
 IMG_VOID *OSMapPhysToLin(IMG_CPU_PHYADDR BasePAddr, IMG_SIZE_T ui32Bytes, IMG_UINT32 ui32Flags, IMG_HANDLE *phOSMemHandle);
-IMG_BOOL OSUnMapPhysToLin(IMG_VOID *pvLinAddr, IMG_SIZE_T ui32Bytes, IMG_UINT32 ui32Flags, IMG_HANDLE hOSMemHandle);
+bool OSUnMapPhysToLin(IMG_VOID *pvLinAddr, IMG_SIZE_T ui32Bytes, IMG_UINT32 ui32Flags, IMG_HANDLE hOSMemHandle);
 
 PVRSRV_ERROR OSReservePhys(IMG_CPU_PHYADDR BasePAddr, IMG_SIZE_T ui32Bytes, IMG_UINT32 ui32Flags, IMG_HANDLE hBMHandle, IMG_VOID **ppvCpuVAddr, IMG_HANDLE *phOSMemHandle);
 PVRSRV_ERROR OSUnReservePhys(IMG_VOID *pvCpuVAddr, IMG_SIZE_T ui32Bytes, IMG_UINT32 ui32Flags, IMG_HANDLE hOSMemHandle);
@@ -104,15 +104,15 @@ IMG_VOID OSFlushCPUCacheKM(IMG_VOID);
 
 IMG_VOID OSCleanCPUCacheKM(IMG_VOID);
 
-IMG_BOOL OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
+bool OSFlushCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32ByteOffset,
 								IMG_VOID *pvRangeAddrStart,
 								IMG_UINT32 ui32Length);
-IMG_BOOL OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
+bool OSCleanCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 								IMG_UINT32 ui32ByteOffset,
 								IMG_VOID *pvRangeAddrStart,
 								IMG_UINT32 ui32Length);
-IMG_BOOL OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
+bool OSInvalidateCPUCacheRangeKM(IMG_HANDLE hOSMemHandle,
 									 IMG_UINT32 ui32ByteOffset,
 									 IMG_VOID *pvRangeAddrStart,
 									 IMG_UINT32 ui32Length);
@@ -256,7 +256,7 @@ else alias to level 0 and declare the functions without the extra debugging para
 
 IMG_CPU_PHYADDR OSMemHandleToCpuPAddr(IMG_VOID *hOSMemHandle, IMG_SIZE_T ui32ByteOffset);
 
-IMG_BOOL OSMemHandleIsPhysContig(IMG_VOID *hOSMemHandle);
+bool OSMemHandleIsPhysContig(IMG_VOID *hOSMemHandle);
 
 PVRSRV_ERROR OSInitEnvData(IMG_PVOID *ppvEnvSpecificData);
 PVRSRV_ERROR OSDeInitEnvData(IMG_PVOID pvEnvSpecificData);
@@ -295,7 +295,7 @@ PVRSRV_ERROR OSUnmapPhysToUserSpace(IMG_HANDLE hDevCookie,
 
 PVRSRV_ERROR OSLockResource(PVRSRV_RESOURCE *psResource, IMG_UINT32 ui32ID);
 PVRSRV_ERROR OSUnlockResource(PVRSRV_RESOURCE *psResource, IMG_UINT32 ui32ID);
-IMG_BOOL OSIsResourceLocked(PVRSRV_RESOURCE *psResource, IMG_UINT32 ui32ID);
+bool OSIsResourceLocked(PVRSRV_RESOURCE *psResource, IMG_UINT32 ui32ID);
 PVRSRV_ERROR OSCreateResource(PVRSRV_RESOURCE *psResource);
 PVRSRV_ERROR OSDestroyResource(PVRSRV_RESOURCE *psResource);
 IMG_VOID OSBreakResourceLock(PVRSRV_RESOURCE *psResource, IMG_UINT32 ui32ID);
@@ -402,7 +402,7 @@ PVRSRV_ERROR OSScheduleMISR(IMG_VOID *pvSysData);
 ******************************************************************************/
 IMG_VOID OSPanic(IMG_VOID);
 
-IMG_BOOL OSProcHasPrivSrvInit(IMG_VOID);
+bool OSProcHasPrivSrvInit(IMG_VOID);
 
 typedef enum _img_verify_test
 {
@@ -410,7 +410,7 @@ typedef enum _img_verify_test
 	PVR_VERIFY_READ
 } IMG_VERIFY_TEST;
 
-IMG_BOOL OSAccessOK(IMG_VERIFY_TEST eVerification, IMG_VOID *pvUserPtr, IMG_SIZE_T ui32Bytes);
+bool OSAccessOK(IMG_VERIFY_TEST eVerification, IMG_VOID *pvUserPtr, IMG_SIZE_T ui32Bytes);
 
 PVRSRV_ERROR OSCopyToUser(IMG_PVOID pvProcess, IMG_VOID *pvDest, IMG_VOID *pvSrc, IMG_SIZE_T ui32Bytes);
 PVRSRV_ERROR OSCopyFromUser(IMG_PVOID pvProcess, IMG_VOID *pvDest, IMG_VOID *pvSrc, IMG_SIZE_T ui32Bytes);
@@ -423,10 +423,10 @@ PVRSRV_ERROR OSReleasePhysPageAddr(IMG_HANDLE hOSWrapMem);
 
 #define	OS_SUPPORTS_IN_LISR
 
-static inline IMG_BOOL OSInLISR(IMG_VOID unref__ *pvSysData)
+static inline bool OSInLISR(IMG_VOID unref__ *pvSysData)
 {
 	PVR_UNREFERENCED_PARAMETER(pvSysData);
-	return (in_irq()) ? IMG_TRUE : IMG_FALSE;
+	return (in_irq()) ? true : false;
 }
 
 static inline IMG_VOID OSWriteMemoryBarrier(IMG_VOID)
@@ -443,11 +443,11 @@ static inline IMG_VOID OSMemoryBarrier(IMG_VOID)
 PVRSRV_ERROR OSAtomicAlloc(IMG_PVOID *ppvRefCount);
 IMG_VOID OSAtomicFree(IMG_PVOID pvRefCount);
 IMG_VOID OSAtomicInc(IMG_PVOID pvRefCount);
-IMG_BOOL OSAtomicDecAndTest(IMG_PVOID pvRefCount);
+bool OSAtomicDecAndTest(IMG_PVOID pvRefCount);
 IMG_UINT32 OSAtomicRead(IMG_PVOID pvRefCount);
 
 PVRSRV_ERROR OSTimeCreateWithUSOffset(IMG_PVOID *pvRet, IMG_UINT32 ui32MSOffset);
-IMG_BOOL OSTimeHasTimePassed(IMG_PVOID pvData);
+bool OSTimeHasTimePassed(IMG_PVOID pvData);
 IMG_VOID OSTimeDestroy(IMG_PVOID pvData);
 
 IMG_VOID OSReleaseBridgeLock(IMG_VOID);

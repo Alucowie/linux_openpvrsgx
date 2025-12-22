@@ -423,7 +423,7 @@ typedef struct PVRSRV_BRIDGE_IN_ALLOCDEVICEMEM_TAG
 	IMG_UINT32			ui32ChunkSize;
 	IMG_UINT32			ui32NumVirtChunks;
 	IMG_UINT32			ui32NumPhysChunks;
-	IMG_BOOL			*pabMapChunk;
+	bool			*pabMapChunk;
 }PVRSRV_BRIDGE_IN_ALLOCDEVICEMEM;
 
 /******************************************************************************
@@ -691,8 +691,8 @@ typedef struct PVRSRV_BRIDGE_IN_PDUMP_SYNCPOL_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
 	PVRSRV_KERNEL_SYNC_INFO	*psKernelSyncInfo;
-	IMG_BOOL   bIsRead;
-	IMG_BOOL   bUseLastOpDumpVal;
+	bool   bIsRead;
+	bool   bUseLastOpDumpVal;
 	IMG_UINT32 ui32Value;
 	IMG_UINT32 ui32Mask;
 
@@ -852,7 +852,7 @@ typedef struct PVRSRV_BRIDGE_IN_PDUMP_DRIVERINFO_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
 	IMG_CHAR szString[PVRSRV_PDUMP_MAX_COMMENT_SIZE];
-	IMG_BOOL bContinuous;
+	bool bContinuous;
 
 }PVRSRV_BRIDGE_IN_PDUMP_DRIVERINFO;
 
@@ -872,7 +872,7 @@ typedef struct PVRSRV_BRIDGE_PDUM_IN_CYCLE_COUNT_REG_READ_TAG
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
 	IMG_HANDLE hDevCookie;
 	IMG_UINT32 ui32RegOffset;
-	IMG_BOOL bLastFrame;
+	bool bLastFrame;
 }PVRSRV_BRIDGE_IN_PDUMP_CYCLE_COUNT_REG_READ;
 
 /*****************************************************************************
@@ -945,7 +945,7 @@ typedef struct PVRSRV_BRIDGE_IN_WRAP_EXT_MEMORY_TAG
 	IMG_VOID				*pvLinAddr;
 	IMG_SIZE_T              ui32ByteSize;
 	IMG_SIZE_T              ui32PageOffset;
-	IMG_BOOL                bPhysContig;
+	bool                bPhysContig;
 	IMG_UINT32				ui32NumPageTableEntries;
 	IMG_SYS_PHYADDR         *psSysPAddr;
 	IMG_UINT32				ui32Flags;
@@ -1343,7 +1343,7 @@ typedef struct PVRSRV_BRIDGE_OUT_RELEASE_MMAP_DATA_TAG
     PVRSRV_ERROR		eError;
 
     /* Flag that indicates whether the mapping should be destroyed */
-    IMG_BOOL			bMUnmap;
+    bool			bMUnmap;
 
     /* User mode address associated with mapping */
     IMG_UINT32			ui32UserVAddr;
@@ -1404,7 +1404,7 @@ typedef struct PVRSRV_BRIDGE_OUT_RELEASE_MISC_INFO_TAG
 typedef struct PVRSRV_BRIDGE_OUT_PDUMP_ISCAPTURING_TAG
 {
 	PVRSRV_ERROR eError;
-	IMG_BOOL bIsCapturing;
+	bool bIsCapturing;
 
 } PVRSRV_BRIDGE_OUT_PDUMP_ISCAPTURING;
 
@@ -1525,7 +1525,7 @@ typedef struct PVRSRV_BRIDGE_IN_PROCESS_SIMISR_EVENT_TAG
 typedef struct PVRSRV_BRIDGE_IN_INITSRV_DISCONNECT_TAG
 {
 	IMG_UINT32			ui32BridgeFlags; /* Must be first member of structure */
-	IMG_BOOL			bInitSuccesful;
+	bool			bInitSuccesful;
 } PVRSRV_BRIDGE_IN_INITSRV_DISCONNECT;
 
 

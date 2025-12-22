@@ -81,9 +81,9 @@ typedef struct PVRSRV_BC_BUFFER2SRV_KMJTABLE_TAG
 } PVRSRV_BC_BUFFER2SRV_KMJTABLE, *PPVRSRV_BC_BUFFER2SRV_KMJTABLE;
 
 /* function to retrieve kernel services function table from kernel services */
-typedef IMG_BOOL (*PFN_BC_GET_PVRJTABLE) (PPVRSRV_BC_BUFFER2SRV_KMJTABLE); 
+typedef bool (*PFN_BC_GET_PVRJTABLE) (PPVRSRV_BC_BUFFER2SRV_KMJTABLE); 
 
 /* Prototype for platforms that access the JTable via linkage */
-IMG_IMPORT IMG_BOOL PVRGetBufferClassJTable(PVRSRV_BC_BUFFER2SRV_KMJTABLE *psJTable);
+IMG_IMPORT bool PVRGetBufferClassJTable(PVRSRV_BC_BUFFER2SRV_KMJTABLE *psJTable);
 
 #endif/* __KERNELBUFFER_H__ */

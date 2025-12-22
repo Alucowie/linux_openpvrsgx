@@ -96,7 +96,7 @@ NewHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc,
 
 	if (eError == PVRSRV_OK)
 	{
-		psPerProc->bHandlesBatched = IMG_TRUE;
+		psPerProc->bHandlesBatched = true;
 	}
 
 	return eError;
@@ -110,7 +110,7 @@ CommitHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc)
 {
 	PVR_ASSERT(psPerProc->bHandlesBatched);
 
-	psPerProc->bHandlesBatched = IMG_FALSE;
+	psPerProc->bHandlesBatched = false;
 
 	return PVRSRVCommitHandleBatch(psPerProc->psHandleBase);
 }
@@ -124,7 +124,7 @@ ReleaseHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc)
 {
 	if (psPerProc->bHandlesBatched)
 	{
-		psPerProc->bHandlesBatched = IMG_FALSE;
+		psPerProc->bHandlesBatched = false;
 
 		PVRSRVReleaseHandleBatch(psPerProc->psHandleBase);
 	}

@@ -104,7 +104,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define	SET_FLAG(v, f) ((IMG_VOID)((v) |= (f)))
 #define	CLEAR_FLAG(v, f) ((IMG_VOID)((v) &= ~(f)))
-#define	TEST_FLAG(v, f) ((IMG_BOOL)(((v) & (f)) != 0))
+#define	TEST_FLAG(v, f) ((bool)(((v) & (f)) != 0))
 
 #define	TEST_ALLOC_FLAG(psHandle, f) TEST_FLAG((psHandle)->eFlag, f)
 
@@ -267,7 +267,7 @@ struct _PVRSRV_HANDLE_BASE_
 	 * handle is found by a linear search from the start of the table,
 	 * and so no free handle list management is done.
 	 */
-	IMG_BOOL bPurgingEnabled;
+	bool bPurgingEnabled;
 };
 
 /*
@@ -360,20 +360,20 @@ IMG_VOID InitChildEntry(struct sHandle *psHandle)
  @Input		ui32Index - index of the handle containing the list head
 		psList - pointer to the list head
 
- @Return	IMG_TRUE if the list is empty, IMG_FALSE if it isn't.
+ @Return	true if the list is empty, false if it isn't.
 
 ******************************************************************************/
 static INLINE
-IMG_BOOL HandleListIsEmpty(IMG_UINT32 ui32Index, struct sHandleList *psList)
+bool HandleListIsEmpty(IMG_UINT32 ui32Index, struct sHandleList *psList)
 {
-	IMG_BOOL bIsEmpty;
+	bool bIsEmpty;
 
-	bIsEmpty = (IMG_BOOL)(psList->ui32Next == ui32Index);
+	bIsEmpty = (bool)(psList->ui32Next == ui32Index);
 
 	{
-		IMG_BOOL bIsEmpty2;
+		bool bIsEmpty2;
 
-		bIsEmpty2 = (IMG_BOOL)(psList->ui32Prev == ui32Index);
+		bIsEmpty2 = (bool)(psList->ui32Prev == ui32Index);
 		PVR_ASSERT(bIsEmpty == bIsEmpty2);
 	}
 
@@ -389,11 +389,11 @@ IMG_BOOL HandleListIsEmpty(IMG_UINT32 ui32Index, struct sHandleList *psList)
 
  @Input		psHandle - pointer to handle structure
 
- @Return	IMG_TRUE if the handle has no subhandles, IMG_FALSE if it does.
+ @Return	true if the handle has no subhandles, false if it does.
 
 ******************************************************************************/
 static INLINE
-IMG_BOOL NoChildren(struct sHandle *psHandle)
+bool NoChildren(struct sHandle *psHandle)
 {
 	PVR_ASSERT(psHandle->sChildren.hParent == HANDLE_PTR_TO_HANDLE(psHandle));
 
@@ -409,23 +409,23 @@ IMG_BOOL NoChildren(struct sHandle *psHandle)
 
  @Input		psHandle - pointer to handle structure
 
- @Return	IMG_TRUE if the handle is not a subhandle, IMG_FALSE if it is.
+ @Return	true if the handle is not a subhandle, false if it is.
 
 ******************************************************************************/
 static INLINE
-IMG_BOOL NoParent(struct sHandle *psHandle)
+bool NoParent(struct sHandle *psHandle)
 {
 	if (HandleListIsEmpty(HANDLE_PTR_TO_INDEX(psHandle), &psHandle->sSiblings))
 	{
 		PVR_ASSERT(psHandle->sSiblings.hParent == IMG_NULL);
 
-		return IMG_TRUE;
+		return true;
 	}
 	else
 	{
 		PVR_ASSERT(psHandle->sSiblings.hParent != IMG_NULL);
 	}
-	return IMG_FALSE;
+	return false;
 }
 /*!
 ******************************************************************************
@@ -2028,11 +2028,11 @@ PVRSRV_ERROR PVRSRVNewHandleBatch(PVRSRV_HANDLE_BASE *psBase, IMG_UINT32 ui32Bat
  @Return	none
 
 ******************************************************************************/
-static PVRSRV_ERROR PVRSRVHandleBatchCommitOrRelease(PVRSRV_HANDLE_BASE *psBase, IMG_BOOL bCommit)
+static PVRSRV_ERROR PVRSRVHandleBatchCommitOrRelease(PVRSRV_HANDLE_BASE *psBase, bool bCommit)
 {
 
 	IMG_UINT32 ui32IndexPlusOne;
-	IMG_BOOL bCommitBatch = bCommit;
+	bool bCommitBatch = bCommit;
 
 	if (!HANDLES_BATCHED(psBase))
 	{
@@ -2047,7 +2047,7 @@ static PVRSRV_ERROR PVRSRVHandleBatchCommitOrRelease(PVRSRV_HANDLE_BASE *psBase,
 		{
 			PVR_DPF((PVR_DBG_ERROR, "PVRSRVHandleBatchCommitOrRelease: Attempting to commit batch with handle allocation failures."));
 		}
-		bCommitBatch = IMG_FALSE;
+		bCommitBatch = false;
 	}
 	/*
 	 * The whole point of batched handles is to avoid handle allocation
@@ -2134,7 +2134,7 @@ static PVRSRV_ERROR PVRSRVHandleBatchCommitOrRelease(PVRSRV_HANDLE_BASE *psBase,
 ******************************************************************************/
 PVRSRV_ERROR PVRSRVCommitHandleBatch(PVRSRV_HANDLE_BASE *psBase)
 {
-	return PVRSRVHandleBatchCommitOrRelease(psBase, IMG_TRUE);
+	return PVRSRVHandleBatchCommitOrRelease(psBase, true);
 }
 
 /*!
@@ -2151,7 +2151,7 @@ PVRSRV_ERROR PVRSRVCommitHandleBatch(PVRSRV_HANDLE_BASE *psBase)
 ******************************************************************************/
 IMG_VOID PVRSRVReleaseHandleBatch(PVRSRV_HANDLE_BASE *psBase)
 {
-	(IMG_VOID) PVRSRVHandleBatchCommitOrRelease(psBase, IMG_FALSE);
+	(IMG_VOID) PVRSRVHandleBatchCommitOrRelease(psBase, false);
 }
 
 /*!
@@ -2258,7 +2258,7 @@ PVRSRV_ERROR PVRSRVEnableHandlePurging(PVRSRV_HANDLE_BASE *psBase)
 		return PVRSRV_ERROR_INVALID_PARAMS;
 	}
 
-	psBase->bPurgingEnabled = IMG_TRUE;
+	psBase->bPurgingEnabled = true;
 
 	return PVRSRV_OK;
 }

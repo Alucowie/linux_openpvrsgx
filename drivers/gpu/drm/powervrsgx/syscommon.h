@@ -63,7 +63,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 typedef struct _SYS_DEVICE_ID_TAG
 {
 	IMG_UINT32	uiID;
-	IMG_BOOL	bInUse;
+	bool	bInUse;
 
 } SYS_DEVICE_ID;
 
@@ -153,10 +153,10 @@ PVRSRV_ERROR SysDevicePostPowerState(IMG_UINT32 ui32DeviceIndex,
 									 PVRSRV_DEV_POWER_STATE eCurrentPowerState);
 
 #if defined(SYS_SUPPORTS_SGX_IDLE_CALLBACK)
-IMG_VOID SysSGXIdleTransition(IMG_BOOL bSGXIdle);
+IMG_VOID SysSGXIdleTransition(bool bSGXIdle);
 #endif /* SYS_SUPPORTS_SGX_IDLE_CALLBACK */
 
-PVRSRV_ERROR SysPowerLockWrap(IMG_BOOL bTryLock);
+PVRSRV_ERROR SysPowerLockWrap(bool bTryLock);
 IMG_VOID SysPowerLockUnwrap(IMG_VOID);
 
 PVRSRV_ERROR SysOEMFunction (	IMG_UINT32	ui32ID,

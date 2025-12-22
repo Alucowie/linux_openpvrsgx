@@ -47,7 +47,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 static PVRSRV_ERROR
 FreeSharedSysMemCallBack(IMG_PVOID  pvParam,
 						 IMG_UINT32 ui32Param,
-						 IMG_BOOL   bDummy)
+						 bool   bDummy)
 {
 	PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo = pvParam;
 

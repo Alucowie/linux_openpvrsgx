@@ -52,7 +52,7 @@
 extern struct platform_device *gpsPVRLDMDev;
 
 
-static PVRSRV_ERROR PowerLockWrap(SYS_SPECIFIC_DATA *psSysSpecData, IMG_BOOL bTryLock)
+static PVRSRV_ERROR PowerLockWrap(SYS_SPECIFIC_DATA *psSysSpecData, bool bTryLock)
 {
         if (!in_interrupt())
         {
@@ -81,7 +81,7 @@ static IMG_VOID PowerLockUnwrap(SYS_SPECIFIC_DATA *psSysSpecData)
         }
 }
 
-PVRSRV_ERROR SysPowerLockWrap(IMG_BOOL bTryLock)
+PVRSRV_ERROR SysPowerLockWrap(bool bTryLock)
 {
         SYS_DATA        *psSysData;
 
@@ -102,9 +102,9 @@ IMG_VOID SysPowerLockUnwrap(IMG_VOID)
 
 
 
-IMG_BOOL WrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData)
+bool WrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData)
 {
-	return IMG_TRUE;
+	return true;
 }
 
 IMG_VOID UnwrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData)
@@ -140,7 +140,7 @@ IMG_VOID SysGetSGXTimingInformation(SGX_TIMING_INFORMATION *psTimingInfo)
 	psTimingInfo->ui32CoreClockSpeed = rate;
 	psTimingInfo->ui32HWRecoveryFreq = scale_prop_to_SGX_clock(SYS_SGX_HWRECOVERY_TIMEOUT_FREQ, rate);
 	psTimingInfo->ui32uKernelFreq = scale_prop_to_SGX_clock(SYS_SGX_PDS_TIMER_FREQ, rate);
-	psTimingInfo->bEnableActivePM = IMG_TRUE;
+	psTimingInfo->bEnableActivePM = true;
 	psTimingInfo->ui32ActivePowManLatencyms = SYS_SGX_ACTIVE_POWER_LATENCY_MS;
 }
 
@@ -529,7 +529,7 @@ PVRSRV_ERROR EnableSystemClocks(SYS_DATA *psSysData)
 #endif
 
 
-		psSysSpecData->bSysClocksOneTimeInit = IMG_TRUE;
+		psSysSpecData->bSysClocksOneTimeInit = true;
 	}
 
 	return AcquireGPTimer(psSysSpecData);

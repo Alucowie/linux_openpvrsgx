@@ -500,7 +500,7 @@ typedef struct _PVRSRV_MISC_INFO_
 	struct
 	{
 		/*!< Defer the CPU cache op to the next HW op to be submitted (else flush now) */
-		IMG_BOOL bDeferOp;
+		bool bDeferOp;
 
 		/*!< Type of cache operation to perform */
 		PVRSRV_MISC_INFO_CPUCACHEOP_TYPE eCacheOpType;
@@ -707,7 +707,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVWrapExtMemory(IMG_CONST PVRSRV_DEV_DATA *psDevDa
 												IMG_HANDLE				hDevMemContext,
 												IMG_SIZE_T 				ui32ByteSize,
 												IMG_SIZE_T				ui32PageOffset,
-												IMG_BOOL				bPhysContig,
+												bool				bPhysContig,
 												IMG_SYS_PHYADDR	 		*psSysPAddr,
 												IMG_VOID 				*pvLinAddr,
 												IMG_UINT32				ui32Flags,
@@ -761,7 +761,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVAllocDeviceMemSparse(const PVRSRV_DEV_DATA *psDe
 													IMG_UINT32 ui32ChunkSize,
 													IMG_UINT32 ui32NumVirtChunks,
 													IMG_UINT32 ui32NumPhysChunks,
-													IMG_BOOL *pabMapChunk,
+													bool *pabMapChunk,
 													PVRSRV_CLIENT_MEM_INFO **ppsMemInfo);
 
 /******************************************************************************
@@ -770,8 +770,8 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVAllocDeviceMemSparse(const PVRSRV_DEV_DATA *psDe
 
 typedef enum _PVRSRV_SYNCVAL_MODE_
 {
-	PVRSRV_SYNCVAL_READ				= IMG_TRUE,
-	PVRSRV_SYNCVAL_WRITE			= IMG_FALSE,
+	PVRSRV_SYNCVAL_READ				= true,
+	PVRSRV_SYNCVAL_WRITE			= false,
 
 } PVRSRV_SYNCVAL_MODE, *PPVRSRV_SYNCVAL_MODE;
 
@@ -783,16 +783,16 @@ IMG_IMPORT PVRSRV_ERROR PVRSRVWaitForOpsComplete(PPVRSRV_CLIENT_MEM_INFO psMemIn
 IMG_IMPORT PVRSRV_ERROR PVRSRVWaitForAllOpsComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
 	PVRSRV_SYNCVAL_MODE eMode);
 
-IMG_IMPORT IMG_BOOL PVRSRVTestOpsComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
+IMG_IMPORT bool PVRSRVTestOpsComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
 	PVRSRV_SYNCVAL_MODE eMode, PVRSRV_SYNCVAL OpRequired);
 
-IMG_IMPORT IMG_BOOL PVRSRVTestAllOpsComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
+IMG_IMPORT bool PVRSRVTestAllOpsComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
 	PVRSRV_SYNCVAL_MODE eMode);
 
-IMG_IMPORT IMG_BOOL PVRSRVTestOpsNotComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
+IMG_IMPORT bool PVRSRVTestOpsNotComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
 	PVRSRV_SYNCVAL_MODE eMode, PVRSRV_SYNCVAL OpRequired);
 
-IMG_IMPORT IMG_BOOL PVRSRVTestAllOpsNotComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
+IMG_IMPORT bool PVRSRVTestAllOpsNotComplete(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
 	PVRSRV_SYNCVAL_MODE eMode);
 
 IMG_IMPORT PVRSRV_SYNCVAL PVRSRVGetPendingOpSyncVal(PPVRSRV_CLIENT_MEM_INFO psMemInfo,
@@ -945,14 +945,14 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpMemPol(IMG_CONST PVRSRV_CONNECTION *psConne
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpSyncPol(IMG_CONST PVRSRV_CONNECTION *psConnection,
 											 PVRSRV_CLIENT_SYNC_INFO *psClientSyncInfo,
-											 IMG_BOOL   bIsRead,
+											 bool   bIsRead,
 											 IMG_UINT32 ui32Value,
 											 IMG_UINT32 ui32Mask);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpSyncPol2(IMG_CONST PVRSRV_CONNECTION *psConnection,
 											 PVRSRV_CLIENT_SYNC_INFO *psClientSyncInfo,
-											 IMG_BOOL bIsRead);
+											 bool bIsRead);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpMem(IMG_CONST PVRSRV_CONNECTION *psConnection,
@@ -1017,11 +1017,11 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpSetFrame(IMG_CONST PVRSRV_CONNECTION *psCon
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpComment(IMG_CONST PVRSRV_CONNECTION *psConnection,
 											 IMG_CONST IMG_CHAR *pszComment,
-											 IMG_BOOL bContinuous);
+											 bool bContinuous);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpCommentf(IMG_CONST PVRSRV_CONNECTION *psConnection,
-											  IMG_BOOL bContinuous,
+											  bool bContinuous,
 											  IMG_CONST IMG_CHAR *pszFormat, ...)
 											  IMG_FORMAT_PRINTF(3, 4)
 ;
@@ -1036,11 +1036,11 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpCommentWithFlagsf(IMG_CONST PVRSRV_CONNECTI
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpDriverInfo(IMG_CONST PVRSRV_CONNECTION *psConnection,
 								 				IMG_CHAR *pszString,
-												IMG_BOOL bContinuous);
+												bool bContinuous);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpIsCapturing(IMG_CONST PVRSRV_CONNECTION *psConnection,
-								 				IMG_BOOL *pbIsCapturing);
+								 				bool *pbIsCapturing);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpBitmap(IMG_CONST PVRSRV_DEV_DATA *psDevData,
@@ -1067,12 +1067,12 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpRegRead(IMG_CONST PVRSRV_DEV_DATA *psDevDat
 
 
 IMG_IMPORT
-IMG_BOOL IMG_CALLCONV PVRSRVPDumpIsCapturingTest(IMG_CONST PVRSRV_CONNECTION *psConnection);
+bool IMG_CALLCONV PVRSRVPDumpIsCapturingTest(IMG_CONST PVRSRV_CONNECTION *psConnection);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpCycleCountRegRead(IMG_CONST PVRSRV_DEV_DATA *psDevData,
 														IMG_UINT32 ui32RegOffset,
-														IMG_BOOL bLastFrame);
+														bool bLastFrame);
 
 IMG_IMPORT IMG_HANDLE	PVRSRVLoadLibrary(const IMG_CHAR *pszLibraryName);
 IMG_IMPORT PVRSRV_ERROR	PVRSRVUnloadLibrary(IMG_HANDLE hExtDrv);
@@ -1094,7 +1094,7 @@ IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVCreateAppHintState(IMG_MODULE_ID eModuleI
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVFreeAppHintState(IMG_MODULE_ID eModuleID,
 										 IMG_VOID *pvHintState);
 
-IMG_IMPORT IMG_BOOL IMG_CALLCONV PVRSRVGetAppHint(IMG_VOID			*pvHintState,
+IMG_IMPORT bool IMG_CALLCONV PVRSRVGetAppHint(IMG_VOID			*pvHintState,
 												  const IMG_CHAR	*pszHintName,
 												  IMG_DATA_TYPE		eDataType,
 												  const IMG_VOID	*pvDefault,
@@ -1363,7 +1363,7 @@ IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVSyncOpsFlushToToken(const PVRSRV_CONNECTION *psConnection,
 													const PVRSRV_CLIENT_SYNC_INFO *psSyncInfo,
 													const PVRSRV_SYNC_TOKEN *psSyncToken,
-													IMG_BOOL bWait);
+													bool bWait);
 /*!
  ******************************************************************************
 
@@ -1385,7 +1385,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVSyncOpsFlushToToken(const PVRSRV_CONNECTION *psC
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVSyncOpsFlushToModObj(const PVRSRV_CONNECTION *psConnection,
 													 IMG_HANDLE hKernelSyncInfoModObj,
-													 IMG_BOOL bWait);
+													 bool bWait);
 
 /*!
  ******************************************************************************
@@ -1404,7 +1404,7 @@ IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVSyncOpsFlushToDelta(const PVRSRV_CONNECTION *psConnection,
 													PVRSRV_CLIENT_SYNC_INFO *psClientSyncInfo,
 													IMG_UINT32 ui32Delta,
-													IMG_BOOL bWait);
+													bool bWait);
 
 /*!
  ******************************************************************************

@@ -63,15 +63,15 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 	PVRSRV_ERROR				eError;
 	IMG_UINT32					loop;
 	IMG_HANDLE					hDevMemContext = IMG_NULL;
-	IMG_BOOL					abSrcSyncEnable[SGX_MAX_TRANSFER_SYNC_OPS];
+	bool					abSrcSyncEnable[SGX_MAX_TRANSFER_SYNC_OPS];
 	IMG_UINT32					ui32RealSrcSyncNum = 0;
-	IMG_BOOL					abDstSyncEnable[SGX_MAX_TRANSFER_SYNC_OPS];
+	bool					abDstSyncEnable[SGX_MAX_TRANSFER_SYNC_OPS];
 	IMG_UINT32					ui32RealDstSyncNum = 0;
 
 	for (loop = 0; loop < SGX_MAX_TRANSFER_SYNC_OPS; loop++)
 	{
-		abSrcSyncEnable[loop] = IMG_TRUE;
-		abDstSyncEnable[loop] = IMG_TRUE;
+		abSrcSyncEnable[loop] = true;
+		abDstSyncEnable[loop] = true;
 	}
 
 	if (!CCB_OFFSET_IS_VALID(SGXMKIF_TRANSFERCMD_SHARED, psCCBMemInfo, psKick, ui32SharedCmdCCBOffset))
@@ -133,7 +133,7 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 				if (psSyncInfo->sWriteOpsCompleteDevVAddr.uiAddr == psMySyncInfo->sWriteOpsCompleteDevVAddr.uiAddr)
 				{
 					PVR_DPF((PVR_DBG_WARNING, "SGXSubmitTransferKM : Same src synchronized multiple times!"));
-					abSrcSyncEnable[loop] = IMG_FALSE;
+					abSrcSyncEnable[loop] = false;
 					break;
 				}
 			}
@@ -158,7 +158,7 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 				if (psSyncInfo->sWriteOpsCompleteDevVAddr.uiAddr == psMySyncInfo->sWriteOpsCompleteDevVAddr.uiAddr)
 				{
 					PVR_DPF((PVR_DBG_WARNING, "SGXSubmitTransferKM : Same dst synchronized multiple times!"));
-					abDstSyncEnable[loop] = IMG_FALSE;
+					abDstSyncEnable[loop] = false;
 					break;
 				}
 			}
@@ -239,7 +239,7 @@ IMG_EXPORT PVRSRV_ERROR SGXSubmitTransferKM(IMG_HANDLE hDevHandle, PVRSRV_TRANSF
 
 	sCommand.ui32Data[1] = psKick->sHWTransferContextDevVAddr.uiAddr;
 
-	eError = SGXScheduleCCBCommandKM(hDevHandle, SGXMKIF_CMD_TRANSFER, &sCommand, KERNEL_ID, hDevMemContext, IMG_FALSE);
+	eError = SGXScheduleCCBCommandKM(hDevHandle, SGXMKIF_CMD_TRANSFER, &sCommand, KERNEL_ID, hDevMemContext, false);
 
 	if (eError == PVRSRV_ERROR_RETRY)
 	{

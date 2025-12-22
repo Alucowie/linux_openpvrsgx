@@ -53,12 +53,12 @@ PVRSRV_ERROR AllocateDeviceID(SYS_DATA *psSysData, IMG_UINT32 *pui32DevID);
 PVRSRV_ERROR FreeDeviceID(SYS_DATA *psSysData, IMG_UINT32 ui32DevID);
 
 #if defined(SUPPORT_MISR_IN_THREAD)
-void OSVSyncMISR(IMG_HANDLE, IMG_BOOL);
+void OSVSyncMISR(IMG_HANDLE, bool);
 #endif
 
 #if defined(SUPPORT_CUSTOM_SWAP_OPERATIONS)
 IMG_VOID PVRSRVFreeCommandCompletePacketKM(IMG_HANDLE	hCmdCookie,
-										   IMG_BOOL		bScheduleMISR);
+										   bool		bScheduleMISR);
 #endif
 /***********************************************************************
 	Local Display Class Structures
@@ -471,7 +471,7 @@ static PVRSRV_ERROR PVRSRVRemoveDCDeviceKM(IMG_UINT32 ui32DevIndex)
 		List_PVRSRV_DEVICE_NODE_Any_va(psSysData->psDeviceNodeList,
 									   &MatchDeviceKM_AnyVaCb,
 									   ui32DevIndex,
-									   IMG_FALSE,
+									   false,
 									   PVRSRV_DEVICE_CLASS_DISPLAY);
 	if (!psDeviceNode)
 	{
@@ -667,7 +667,7 @@ static PVRSRV_ERROR PVRSRVRemoveBCDeviceKM(IMG_UINT32 ui32DevIndex)
 		List_PVRSRV_DEVICE_NODE_Any_va(psSysData->psDeviceNodeList,
 									   &MatchDeviceKM_AnyVaCb,
 									   ui32DevIndex,
-									   IMG_FALSE,
+									   false,
 									   PVRSRV_DEVICE_CLASS_BUFFER);
 
 	if (!psDevNode)
@@ -746,7 +746,7 @@ PVRSRV_ERROR PVRSRVCloseDCDeviceKM (IMG_HANDLE	hDeviceKM)
 
 static PVRSRV_ERROR CloseDCDeviceCallBack(IMG_PVOID  pvParam,
 										  IMG_UINT32 ui32Param,
-										  IMG_BOOL   bDummy)
+										  bool   bDummy)
 {
 	PVRSRV_DISPLAYCLASS_PERCONTEXT_INFO *psDCPerContextInfo;
 	PVRSRV_DISPLAYCLASS_INFO *psDCInfo;
@@ -827,7 +827,7 @@ PVRSRV_ERROR PVRSRVOpenDCDeviceKM (PVRSRV_PER_PROCESS_DATA	*psPerProc,
 			List_PVRSRV_DEVICE_NODE_Any_va(psSysData->psDeviceNodeList,
 										   &MatchDeviceKM_AnyVaCb,
 										   ui32DeviceID,
-										   IMG_FALSE,
+										   false,
 										   PVRSRV_DEVICE_CLASS_DISPLAY);
 	if (!psDeviceNode)
 	{
@@ -1176,7 +1176,7 @@ static PVRSRV_ERROR DestroyDCSwapChain(PVRSRV_DC_SWAPCHAIN *psSwapChain)
 
 static PVRSRV_ERROR DestroyDCSwapChainRefCallBack(IMG_PVOID pvParam,
 												  IMG_UINT32 ui32Param,
-												  IMG_BOOL bDummy)
+												  bool bDummy)
 {
 	PVRSRV_DC_SWAPCHAIN_REF *psSwapChainRef = (PVRSRV_DC_SWAPCHAIN_REF *) pvParam;
 	PVRSRV_ERROR eError = PVRSRV_OK;
@@ -1597,7 +1597,7 @@ PVRSRV_ERROR PVRSRVGetDCBuffersKM(IMG_HANDLE	hDeviceKM,
 	{
 		IMG_UINT32 ui32ByteSize, ui32TilingStride;
 		IMG_SYS_PHYADDR *pPhyAddr;
-		IMG_BOOL bIsContiguous;
+		bool bIsContiguous;
 		IMG_HANDLE hOSMapInfo;
 		IMG_VOID *pvVAddr;
 
@@ -1636,7 +1636,7 @@ PVRSRV_ERROR PVRSRVSwapToDCBufferKM(IMG_HANDLE	hDeviceKM,
 	PVRSRV_QUEUE_INFO *psQueue;
 	DISPLAYCLASS_FLIP_COMMAND *psFlipCmd;
 	IMG_UINT32 i;
-	IMG_BOOL bAddReferenceToLast = IMG_TRUE;
+	bool bAddReferenceToLast = true;
 	IMG_UINT16 ui16SwapCommandID = DC_FLIP_COMMAND;
 	IMG_UINT32 ui32NumSrcSyncs = 1;
 	PVRSRV_KERNEL_SYNC_INFO *apsSrcSync[2];
@@ -2086,7 +2086,7 @@ PVRSRV_ERROR PVRSRVSwapToDCSystemKM(IMG_HANDLE	hDeviceKM,
 	IMG_UINT32 ui32NumSrcSyncs = 1;
 	PVRSRV_KERNEL_SYNC_INFO *apsSrcSync[2];
 	PVRSRV_COMMAND *psCommand;
-	IMG_BOOL bAddReferenceToLast = IMG_TRUE;
+	bool bAddReferenceToLast = true;
 	IMG_UINT16 ui16SwapCommandID = DC_FLIP_COMMAND;
     SYS_DATA *psSysData;
 
@@ -2249,7 +2249,7 @@ PVRSRV_ERROR PVRSRVRegisterSystemISRHandler (PFN_ISR_HANDLER	pfnISRHandler,
 				List_PVRSRV_DEVICE_NODE_Any_va(psSysData->psDeviceNodeList,
 												&MatchDeviceKM_AnyVaCb,
 												ui32DeviceID,
-												IMG_TRUE);
+												true);
 
 	if (psDevNode == IMG_NULL)
 	{
@@ -2348,7 +2348,7 @@ PVRSRVDCMemInfoGetByteSize(PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo,
 	return PVRSRV_OK;
 }
 
-static IMG_BOOL
+static bool
 PVRSRVDCMemInfoIsPhysContig(PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo)
 {
 	return OSMemHandleIsPhysContig(psKernelMemInfo->sMemBlk.hOSMemHandle);
@@ -2369,7 +2369,7 @@ PVRSRVDCMemInfoIsPhysContig(PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo)
 
 ******************************************************************************/
 IMG_EXPORT
-IMG_BOOL PVRGetDisplayClassJTable(PVRSRV_DC_DISP2SRV_KMJTABLE *psJTable)
+bool PVRGetDisplayClassJTable(PVRSRV_DC_DISP2SRV_KMJTABLE *psJTable)
 {
 	psJTable->ui32TableSize = sizeof(PVRSRV_DC_DISP2SRV_KMJTABLE);
 	psJTable->pfnPVRSRVRegisterDCDevice = &PVRSRVRegisterDCDeviceKM;
@@ -2391,7 +2391,7 @@ IMG_BOOL PVRGetDisplayClassJTable(PVRSRV_DC_DISP2SRV_KMJTABLE *psJTable)
 	psJTable->pfnPVRSRVDCMemInfoGetCpuPAddr = &PVRSRVDCMemInfoGetCpuPAddr;
 	psJTable->pfnPVRSRVDCMemInfoGetByteSize = &PVRSRVDCMemInfoGetByteSize;
 	psJTable->pfnPVRSRVDCMemInfoIsPhysContig = &PVRSRVDCMemInfoIsPhysContig;
-	return IMG_TRUE;
+	return true;
 }
 
 
@@ -2426,7 +2426,7 @@ PVRSRV_ERROR PVRSRVCloseBCDeviceKM (IMG_HANDLE	hDeviceKM)
 
 static PVRSRV_ERROR CloseBCDeviceCallBack(IMG_PVOID  pvParam,
 										  IMG_UINT32 ui32Param,
-										  IMG_BOOL   bDummy)
+										  bool   bDummy)
 {
 	PVRSRV_BUFFERCLASS_PERCONTEXT_INFO *psBCPerContextInfo;
 	PVRSRV_BUFFERCLASS_INFO *psBCInfo;
@@ -2526,7 +2526,7 @@ PVRSRV_ERROR PVRSRVOpenBCDeviceKM (PVRSRV_PER_PROCESS_DATA	*psPerProc,
 			List_PVRSRV_DEVICE_NODE_Any_va(psSysData->psDeviceNodeList,
 										   &MatchDeviceKM_AnyVaCb,
 										   ui32DeviceID,
-										   IMG_FALSE,
+										   false,
 										   PVRSRV_DEVICE_CLASS_BUFFER);
 	if (!psDeviceNode)
 	{
@@ -2764,7 +2764,7 @@ PVRSRV_ERROR PVRSRVGetBCBufferKM (IMG_HANDLE hDeviceKM,
 
 ******************************************************************************/
 IMG_EXPORT
-IMG_BOOL PVRGetBufferClassJTable(PVRSRV_BC_BUFFER2SRV_KMJTABLE *psJTable)
+bool PVRGetBufferClassJTable(PVRSRV_BC_BUFFER2SRV_KMJTABLE *psJTable)
 {
 	psJTable->ui32TableSize = sizeof(PVRSRV_BC_BUFFER2SRV_KMJTABLE);
 
@@ -2772,7 +2772,7 @@ IMG_BOOL PVRGetBufferClassJTable(PVRSRV_BC_BUFFER2SRV_KMJTABLE *psJTable)
 	psJTable->pfnPVRSRVScheduleDevices = &PVRSRVScheduleDevicesKM;
 	psJTable->pfnPVRSRVRemoveBCDevice = &PVRSRVRemoveBCDeviceKM;
 
-	return IMG_TRUE;
+	return true;
 }
 
 /******************************************************************************

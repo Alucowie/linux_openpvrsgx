@@ -118,8 +118,8 @@ typedef char				TCHAR, *PTCHAR, *PTSTR;
 /*
  * Cleanup request defines
   */
-#define  CLEANUP_WITH_POLL		IMG_FALSE
-#define  FORCE_CLEANUP			IMG_TRUE
+#define  CLEANUP_WITH_POLL		false
+#define  FORCE_CLEANUP			true
 
 #define IMG_UNDEF	(~0UL)
 

@@ -110,7 +110,7 @@ typedef struct _PVRSRV_KERNEL_MEM_INFO_
 	IMG_UINT32				ui32RefCount;
 
 	/* Set when free call ocured and a mapping was still open */
-	IMG_BOOL				bPendingFree;
+	bool				bPendingFree;
 
 
 #if defined(SUPPORT_MEMINFO_IDS)
@@ -133,7 +133,7 @@ typedef struct _PVRSRV_KERNEL_MEM_INFO_
         /* Record whether the workaround is active for this
            allocation.  The rest of the fields in this struct are
            undefined unless this is true */
-		IMG_BOOL bInUse;
+		bool bInUse;
 
         /* Store the device cookie handle from the original
            allocation, as it is not present on the "Map" API. */
@@ -353,7 +353,7 @@ typedef struct _PVRSRV_MISC_INFO_KM_
 	struct
 	{
 		/*!< Defer the CPU cache op to the next HW op to be submitted (else flush now) */
-		IMG_BOOL bDeferOp;
+		bool bDeferOp;
 
 		/*!< Type of cache operation to perform */
 		PVRSRV_MISC_INFO_CPUCACHEOP_TYPE eCacheOpType;
@@ -391,7 +391,7 @@ typedef PVRSRV_ERROR (*PFN_INSERT_CMD) (PVRSRV_QUEUE_INFO*,
 										PVRSRV_KERNEL_SYNC_INFO*[],
 										IMG_UINT32);
 /* submit command function pointer */
-typedef PVRSRV_ERROR (*PFN_SUBMIT_CMD) (PVRSRV_QUEUE_INFO*, PVRSRV_COMMAND*, IMG_BOOL);
+typedef PVRSRV_ERROR (*PFN_SUBMIT_CMD) (PVRSRV_QUEUE_INFO*, PVRSRV_COMMAND*, bool);
 
 
 /***********************************************************************

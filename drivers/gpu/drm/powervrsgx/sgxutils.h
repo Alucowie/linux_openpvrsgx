@@ -66,20 +66,20 @@ PVRSRV_ERROR SGXScheduleCCBCommand(PVRSRV_DEVICE_NODE	*psDeviceNode,
 								   SGXMKIF_CMD_TYPE		eCommandType,
 								   SGXMKIF_COMMAND		*psCommandData,
 								   IMG_HANDLE			hDevMemContext,
-								   IMG_BOOL				bLastInScene);
+								   bool				bLastInScene);
 IMG_IMPORT
 PVRSRV_ERROR SGXScheduleCCBCommandKM(PVRSRV_DEVICE_NODE		*psDeviceNode,
 									 SGXMKIF_CMD_TYPE		eCommandType,
 									 SGXMKIF_COMMAND		*psCommandData,
 									 IMG_UINT32				ui32CallerID,
 									 IMG_HANDLE				hDevMemContext,
-									 IMG_BOOL				bLastInScene);
+									 bool				bLastInScene);
 
 IMG_IMPORT
 PVRSRV_ERROR SGXScheduleProcessQueuesKM(PVRSRV_DEVICE_NODE *psDeviceNode);
 
 IMG_IMPORT
-IMG_BOOL SGXIsDevicePowered(PVRSRV_DEVICE_NODE *psDeviceNode);
+bool SGXIsDevicePowered(PVRSRV_DEVICE_NODE *psDeviceNode);
 
 IMG_IMPORT
 IMG_HANDLE SGXRegisterHWRenderContextKM(IMG_HANDLE				psDeviceNode,
@@ -102,13 +102,13 @@ IMG_HANDLE SGXRegisterHWTransferContextKM(IMG_HANDLE		      psDeviceNode,
 IMG_IMPORT
 PVRSRV_ERROR SGXFlushHWRenderTargetKM(IMG_HANDLE psSGXDevInfo,
 									  IMG_DEV_VIRTADDR psHWRTDataSetDevVAddr,
-									  IMG_BOOL bForceCleanup);
+									  bool bForceCleanup);
 
 IMG_IMPORT
-PVRSRV_ERROR SGXUnregisterHWRenderContextKM(IMG_HANDLE hHWRenderContext, IMG_BOOL bForceCleanup);
+PVRSRV_ERROR SGXUnregisterHWRenderContextKM(IMG_HANDLE hHWRenderContext, bool bForceCleanup);
 
 IMG_IMPORT
-PVRSRV_ERROR SGXUnregisterHWTransferContextKM(IMG_HANDLE hHWTransferContext, IMG_BOOL bForceCleanup);
+PVRSRV_ERROR SGXUnregisterHWTransferContextKM(IMG_HANDLE hHWTransferContext, bool bForceCleanup);
 
 IMG_IMPORT
 PVRSRV_ERROR SGXSetRenderContextPriorityKM(IMG_HANDLE       hDeviceNode,
@@ -147,7 +147,7 @@ IMG_VOID SGXWaitClocks(PVRSRV_SGXDEV_INFO	*psDevInfo,
 PVRSRV_ERROR SGXCleanupRequest(PVRSRV_DEVICE_NODE	*psDeviceNode,
 							IMG_DEV_VIRTADDR	*psHWDataDevVAddr,
 							IMG_UINT32			ui32CleanupType,
-							IMG_BOOL			bForceCleanup);
+							bool			bForceCleanup);
 
 IMG_IMPORT
 PVRSRV_ERROR PVRSRVGetSGXRevDataKM(PVRSRV_DEVICE_NODE* psDeviceNode, IMG_UINT32 *pui32SGXCoreRev,
@@ -167,13 +167,13 @@ PVRSRV_ERROR PVRSRVGetSGXRevDataKM(PVRSRV_DEVICE_NODE* psDeviceNode, IMG_UINT32 
  @Input psHWContextDevVAddr		SGX virtual address of the context to be suspended
 								or resumed. Can be of type SGXMKIF_HWRENDERCONTEXT,
 								SGXMKIF_HWTRANSFERCONTEXT or SGXMKIF_HW2DCONTEXT
- @Input bResume					IMG_TRUE to put a context into suspend state,
-								IMG_FALSE to resume a previously suspended context
+ @Input bResume					true to put a context into suspend state,
+								false to resume a previously suspended context
 
 ******************************************************************************/
 PVRSRV_ERROR SGXContextSuspend(PVRSRV_DEVICE_NODE	*psDeviceNode,
 							   IMG_DEV_VIRTADDR		*psHWContextDevVAddr,
-							   IMG_BOOL				bResume);
+							   bool				bResume);
 
 #endif /* __SGXUTILS_H__ */
 /******************************************************************************

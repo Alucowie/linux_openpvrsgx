@@ -110,7 +110,7 @@ typedef struct _DEBUG_MEM_ALLOC_REC
 	struct _DEBUG_MEM_ALLOC_REC   **ppsThis;
 } DEBUG_MEM_ALLOC_REC;
 
-static IMPLEMENT_LIST_ANY_VA_2(DEBUG_MEM_ALLOC_REC, IMG_BOOL, IMG_FALSE)
+static IMPLEMENT_LIST_ANY_VA_2(DEBUG_MEM_ALLOC_REC, bool, false)
 static IMPLEMENT_LIST_ANY_VA(DEBUG_MEM_ALLOC_REC)
 static IMPLEMENT_LIST_FOR_EACH(DEBUG_MEM_ALLOC_REC)
 static IMPLEMENT_LIST_INSERT(DEBUG_MEM_ALLOC_REC)
@@ -190,7 +190,7 @@ static void* ProcSeqOff2ElementMemArea(struct seq_file *sfile, loff_t off);
 
 static PVRSRV_LINUX_MUTEX g_sDebugMutex;
 
-static void ProcSeqStartstopDebugMutex(struct seq_file *sfile,IMG_BOOL start);
+static void ProcSeqStartstopDebugMutex(struct seq_file *sfile,bool start);
 
 typedef	struct
 {
@@ -213,13 +213,13 @@ static DEBUG_LINUX_MEM_AREA_REC *DebugLinuxMemAreaRecordFind(LinuxMemArea *psLin
 static IMG_VOID DebugLinuxMemAreaRecordRemove(LinuxMemArea *psLinuxMemArea);
 
 
-static inline IMG_BOOL
+static inline bool
 AreaIsUncached(IMG_UINT32 ui32AreaFlags)
 {
 	return (ui32AreaFlags & (PVRSRV_HAP_WRITECOMBINE | PVRSRV_HAP_UNCACHED)) != 0;
 }
 
-static inline IMG_BOOL
+static inline bool
 CanFreeToPool(LinuxMemArea *psLinuxMemArea)
 {
 	return AreaIsUncached(psLinuxMemArea->ui32AreaFlags) && !psLinuxMemArea->bNeedsCacheInvalidate;
@@ -317,7 +317,7 @@ DebugMemAllocRecordAdd(DEBUG_MEM_ALLOC_TYPE eAllocType,
 }
 
 
-static IMG_BOOL DebugMemAllocRecordRemove_AnyVaCb(DEBUG_MEM_ALLOC_REC *psCurrentRecord, va_list va)
+static bool DebugMemAllocRecordRemove_AnyVaCb(DEBUG_MEM_ALLOC_REC *psCurrentRecord, va_list va)
 {
 	DEBUG_MEM_ALLOC_TYPE eAllocType;
 	IMG_VOID *pvKey;
@@ -347,11 +347,11 @@ static IMG_BOOL DebugMemAllocRecordRemove_AnyVaCb(DEBUG_MEM_ALLOC_REC *psCurrent
 		List_DEBUG_MEM_ALLOC_REC_Remove(psCurrentRecord);
 		kfree(psCurrentRecord);
 
-		return IMG_TRUE;
+		return true;
 	}
 	else
 	{
-		return IMG_FALSE;
+		return false;
 	}
 }
 
@@ -364,7 +364,7 @@ DebugMemAllocRecordRemove(DEBUG_MEM_ALLOC_TYPE eAllocType, IMG_VOID *pvKey, IMG_
     LinuxLockMutex(&g_sDebugMutex);
 
     /* Locate the corresponding allocation entry */
-	if (!List_DEBUG_MEM_ALLOC_REC_IMG_BOOL_Any_va(g_MemoryRecords,
+	if (!List_DEBUG_MEM_ALLOC_REC_bool_Any_va(g_MemoryRecords,
 												DebugMemAllocRecordRemove_AnyVaCb,
 												eAllocType,
 												pvKey))
@@ -396,7 +396,7 @@ DebugMemAllocRecordTypeToString(DEBUG_MEM_ALLOC_TYPE eAllocType)
 }
 
 
-static IMG_BOOL
+static bool
 AllocFlagsToPGProt(pgprot_t *pPGProtFlags, IMG_UINT32 ui32AllocFlags)
 {
     pgprot_t PGProtFlags;
@@ -417,12 +417,12 @@ AllocFlagsToPGProt(pgprot_t *pPGProtFlags, IMG_UINT32 ui32AllocFlags)
                      "%s: Unknown mapping flags=0x%08x",
                      __FUNCTION__, ui32AllocFlags));
             dump_stack();
-            return IMG_FALSE;
+            return false;
     }
 
     *pPGProtFlags = PGProtFlags;
 
-    return IMG_TRUE;
+    return true;
 }
 
 static void *__old_vmalloc_node(unsigned long size, unsigned long align,
@@ -657,7 +657,7 @@ RemoveFirstEntryFromPool(void)
 }
 
 static struct page *
-AllocPage(IMG_UINT32 ui32AreaFlags, IMG_BOOL *pbFromPagePool)
+AllocPage(IMG_UINT32 ui32AreaFlags, bool *pbFromPagePool)
 {
 	struct page *psPage = NULL;
 
@@ -679,7 +679,7 @@ AllocPage(IMG_UINT32 ui32AreaFlags, IMG_BOOL *pbFromPagePool)
 		{
 			psPage = psPagePoolEntry->psPage;
 			LinuxPagePoolEntryFree(psPagePoolEntry);
-			*pbFromPagePool = IMG_TRUE;
+			*pbFromPagePool = true;
 		}
 	}
 
@@ -688,7 +688,7 @@ AllocPage(IMG_UINT32 ui32AreaFlags, IMG_BOOL *pbFromPagePool)
 		psPage = AllocPageFromLinux();
 		if (psPage)
 		{
-			*pbFromPagePool = IMG_FALSE;
+			*pbFromPagePool = false;
 		}
 	}
 
@@ -697,7 +697,7 @@ AllocPage(IMG_UINT32 ui32AreaFlags, IMG_BOOL *pbFromPagePool)
 }
 
 static IMG_VOID
-FreePage(IMG_BOOL bToPagePool, struct page *psPage)
+FreePage(bool bToPagePool, struct page *psPage)
 {
 	/* Only uncached allocations can be freed to the page pool */
 	if (bToPagePool && atomic_read(&g_sPagePoolEntryCount) < g_iPagePoolMaxEntries)
@@ -798,14 +798,14 @@ ShrinkPagePool(struct shrinker *psShrinker, struct shrink_control *psShrinkContr
 }
 #endif
 
-static IMG_BOOL
-AllocPages(IMG_UINT32 ui32AreaFlags, struct page ***pppsPageList, IMG_HANDLE *phBlockPageList, IMG_UINT32 ui32NumPages, IMG_BOOL *pbFromPagePool)
+static bool
+AllocPages(IMG_UINT32 ui32AreaFlags, struct page ***pppsPageList, IMG_HANDLE *phBlockPageList, IMG_UINT32 ui32NumPages, bool *pbFromPagePool)
 {
     struct page **ppsPageList;
     IMG_HANDLE hBlockPageList;
     IMG_INT32 i;		/* Must be signed; see "for" loop conditions */
     PVRSRV_ERROR eError;
-    IMG_BOOL bFromPagePool = IMG_FALSE;
+    bool bFromPagePool = false;
 
     eError = OSAllocMem(0, sizeof(*ppsPageList) * ui32NumPages, (IMG_VOID **)&ppsPageList, &hBlockPageList,
 							"Array of pages");
@@ -814,7 +814,7 @@ AllocPages(IMG_UINT32 ui32AreaFlags, struct page ***pppsPageList, IMG_HANDLE *ph
         goto failed_page_list_alloc;
     }
     
-    *pbFromPagePool = IMG_TRUE;
+    *pbFromPagePool = true;
     for(i = 0; i < (IMG_INT32)ui32NumPages; i++)
     {
         ppsPageList[i] = AllocPage(ui32AreaFlags, &bFromPagePool);
@@ -838,7 +838,7 @@ AllocPages(IMG_UINT32 ui32AreaFlags, struct page ***pppsPageList, IMG_HANDLE *ph
                            0
                           );
 
-    return IMG_TRUE;
+    return true;
     
 failed_alloc_pages:
     for(i--; i >= 0; i--)
@@ -848,12 +848,12 @@ failed_alloc_pages:
     (IMG_VOID) OSFreeMem(0, sizeof(*ppsPageList) * ui32NumPages, ppsPageList, hBlockPageList);
 
 failed_page_list_alloc:
-    return IMG_FALSE;
+    return false;
 }
 
 
 static IMG_VOID
-FreePages(IMG_BOOL bToPagePool, struct page **ppsPageList, IMG_HANDLE hBlockPageList, IMG_UINT32 ui32NumPages)
+FreePages(bool bToPagePool, struct page **ppsPageList, IMG_HANDLE hBlockPageList, IMG_UINT32 ui32NumPages)
 {
     IMG_INT32 i;
 
@@ -878,7 +878,7 @@ NewVMallocLinuxMemArea(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AreaFlags)
     struct page **ppsPageList = NULL;
     IMG_HANDLE hBlockPageList;
 #endif
-    IMG_BOOL bFromPagePool = IMG_FALSE;
+    bool bFromPagePool = false;
 
     psLinuxMemArea = LinuxMemAreaStructAlloc();
     if (!psLinuxMemArea)
@@ -1097,15 +1097,15 @@ FreeIORemapLinuxMemArea(LinuxMemArea *psLinuxMemArea)
  * exported from one process to another.  Services implements this
  * using memory wrapping, which ends up creating an external KV memory area.
  */
-static IMG_BOOL
-TreatExternalPagesAsContiguous(IMG_SYS_PHYADDR *psSysPhysAddr, IMG_UINT32 ui32Bytes, IMG_BOOL bPhysContig)
+static bool
+TreatExternalPagesAsContiguous(IMG_SYS_PHYADDR *psSysPhysAddr, IMG_UINT32 ui32Bytes, bool bPhysContig)
 {
 	IMG_UINT32 ui32;
 	IMG_UINT32 ui32AddrChk;
 	IMG_UINT32 ui32NumPages = RANGE_TO_PAGES(ui32Bytes);
 
 	/*
-	 * If bPhysContig is IMG_TRUE, we must assume psSysPhysAddr points
+	 * If bPhysContig is true, we must assume psSysPhysAddr points
 	 * to the address of the first page, not an array of page addresses.
 	 */
 	for (ui32 = 0, ui32AddrChk = psSysPhysAddr[0].uiAddr;
@@ -1119,7 +1119,7 @@ TreatExternalPagesAsContiguous(IMG_SYS_PHYADDR *psSysPhysAddr, IMG_UINT32 ui32By
 	}
 	if (ui32 == ui32NumPages)
 	{
-		return IMG_FALSE;
+		return false;
 	}
 
 	if (!bPhysContig)
@@ -1130,16 +1130,16 @@ TreatExternalPagesAsContiguous(IMG_SYS_PHYADDR *psSysPhysAddr, IMG_UINT32 ui32By
 		{
 			if (psSysPhysAddr[ui32].uiAddr != ui32AddrChk)
 			{
-				return IMG_FALSE;
+				return false;
 			}
 		}
 	}
 
-	return IMG_TRUE;
+	return true;
 }
 #endif
 
-LinuxMemArea *NewExternalKVLinuxMemArea(IMG_SYS_PHYADDR *pBasePAddr, IMG_VOID *pvCPUVAddr, IMG_UINT32 ui32Bytes, IMG_BOOL bPhysContig, IMG_UINT32 ui32AreaFlags)
+LinuxMemArea *NewExternalKVLinuxMemArea(IMG_SYS_PHYADDR *pBasePAddr, IMG_VOID *pvCPUVAddr, IMG_UINT32 ui32Bytes, bool bPhysContig, IMG_UINT32 ui32AreaFlags)
 {
     LinuxMemArea *psLinuxMemArea;
 
@@ -1154,7 +1154,7 @@ LinuxMemArea *NewExternalKVLinuxMemArea(IMG_SYS_PHYADDR *pBasePAddr, IMG_VOID *p
     psLinuxMemArea->uData.sExternalKV.bPhysContig =
 #if !defined(PVR_MAKE_ALL_PFNS_SPECIAL)
 	(bPhysContig || TreatExternalPagesAsContiguous(pBasePAddr, ui32Bytes, bPhysContig))
-                                                    ? IMG_TRUE : IMG_FALSE;
+                                                    ? true : false;
 #else
 	bPhysContig;
 #endif
@@ -1244,7 +1244,7 @@ NewAllocPagesLinuxMemArea(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AreaFlags)
     IMG_UINT32 ui32NumPages;
     struct page **ppsPageList;
     IMG_HANDLE hBlockPageList;
-    IMG_BOOL bFromPagePool;
+    bool bFromPagePool;
 
     psLinuxMemArea = LinuxMemAreaStructAlloc();
     if (!psLinuxMemArea)
@@ -1705,21 +1705,21 @@ LinuxMemAreaToCpuPAddr(LinuxMemArea *psLinuxMemArea, IMG_UINT32 ui32ByteOffset)
 }
 
 
-IMG_BOOL
+bool
 LinuxMemAreaPhysIsContig(LinuxMemArea *psLinuxMemArea)
 {
     switch (psLinuxMemArea->eAreaType)
     {
         case LINUX_MEM_AREA_IOREMAP:
         case LINUX_MEM_AREA_IO:
-            return IMG_TRUE;
+            return true;
 
         case LINUX_MEM_AREA_EXTERNAL_KV:
             return psLinuxMemArea->uData.sExternalKV.bPhysContig;
 
         case LINUX_MEM_AREA_VMALLOC:
         case LINUX_MEM_AREA_ALLOC_PAGES:
-            return IMG_FALSE;
+            return false;
 
         case LINUX_MEM_AREA_SUB_ALLOC:
             /* PRQA S 3670 1 */ /* ignore recursive warning */
@@ -1730,7 +1730,7 @@ LinuxMemAreaPhysIsContig(LinuxMemArea *psLinuxMemArea)
                      __FUNCTION__, psLinuxMemArea->eAreaType));
 	    break;
     }
-    return IMG_FALSE;
+    return false;
 }
 
 
@@ -1762,7 +1762,7 @@ LinuxMemAreaTypeToString(LINUX_MEM_AREA_TYPE eMemAreaType)
 }
 
 
-static void ProcSeqStartstopDebugMutex(struct seq_file *sfile, IMG_BOOL start) 
+static void ProcSeqStartstopDebugMutex(struct seq_file *sfile, bool start) 
 {
 	if (start) 
 	{
@@ -2292,7 +2292,7 @@ static struct shrinker g_sShrinker =
 	.seeks = DEFAULT_SEEKS
 };
 
-static IMG_BOOL g_bShrinkerRegistered;
+static bool g_bShrinkerRegistered;
 #endif
 
 IMG_VOID
@@ -2414,7 +2414,7 @@ LinuxMMInit(IMG_VOID)
 
 #if defined(PVR_LINUX_MEM_AREA_POOL_ALLOW_SHRINK)
 	register_shrinker(&g_sShrinker);
-	g_bShrinkerRegistered = IMG_TRUE;
+	g_bShrinkerRegistered = true;
 #endif
 
     return PVRSRV_OK;

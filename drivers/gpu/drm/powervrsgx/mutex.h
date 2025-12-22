@@ -57,7 +57,7 @@ extern IMG_INT32 LinuxTryLockMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex);
 
 extern IMG_VOID LinuxUnLockMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex);
 
-extern IMG_BOOL LinuxIsLockedMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex);
+extern bool LinuxIsLockedMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex);
 
 
 #endif /* __MUTEX_H__ */

@@ -151,18 +151,18 @@ static struct proc_dir_entry *g_ProcMMap;
 #endif	/* !defined(PVR_MAKE_ALL_PFNS_SPECIAL) */
 
 #if !defined(PVR_MAKE_ALL_PFNS_SPECIAL)
-static inline IMG_BOOL
+static inline bool
 PFNIsPhysical(IMG_UINT32 pfn)
 {
 	/* Unsigned, no need to compare >=0 */
-	return (/*(pfn >= FIRST_PHYSICAL_PFN) &&*/ (pfn <= LAST_PHYSICAL_PFN)) ? IMG_TRUE : IMG_FALSE;
+	return (/*(pfn >= FIRST_PHYSICAL_PFN) &&*/ (pfn <= LAST_PHYSICAL_PFN)) ? true : false;
 }
 
-static inline IMG_BOOL
+static inline bool
 PFNIsSpecial(IMG_UINT32 pfn)
 {
 	/* Unsigned, no need to compare <=MAX_UINT */
-	return ((pfn >= FIRST_SPECIAL_PFN) /*&& (pfn <= LAST_SPECIAL_PFN)*/) ? IMG_TRUE : IMG_FALSE;
+	return ((pfn >= FIRST_SPECIAL_PFN) /*&& (pfn <= LAST_SPECIAL_PFN)*/) ? true : false;
 }
 #endif
 
@@ -205,7 +205,7 @@ HandleToMMapOffset(IMG_HANDLE hHandle)
  * of the first page in the VMA.  The second page is assumed to have
  * PFN (vm_pgoff + 1), the third (vm_pgoff + 2) and so on.
  */
-static inline IMG_BOOL
+static inline bool
 LinuxMemAreaUsesPhysicalMap(LinuxMemArea *psLinuxMemArea)
 {
     return LinuxMemAreaPhysIsContig(psLinuxMemArea);
@@ -452,7 +452,7 @@ PVRMMapOSMemHandleToMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
     */
     list_add_tail(&psOffsetStruct->sMMapItem, &g_sMMapOffsetStructList);
 
-    psOffsetStruct->bOnMMapList = IMG_TRUE;
+    psOffsetStruct->bOnMMapList = true;
 
     PVRSRVOffsetStructIncRef(psOffsetStruct);
 
@@ -496,7 +496,7 @@ exit_unlock:
 PVRSRV_ERROR
 PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
 				IMG_HANDLE hMHandle,
-				IMG_BOOL *pbMUnmap,
+				bool *pbMUnmap,
 				IMG_UINT32 *pui32RealByteSize,
                                 IMG_UINT32 *pui32UserVAddr)
 {
@@ -534,7 +534,7 @@ PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
 
 	    PVRSRVOffsetStructDecRef(psOffsetStruct);
 
-	    *pbMUnmap = (IMG_BOOL)((psOffsetStruct->ui32RefCount == 0) && (psOffsetStruct->ui32UserVAddr != 0));
+	    *pbMUnmap = (bool)((psOffsetStruct->ui32RefCount == 0) && (psOffsetStruct->ui32UserVAddr != 0));
 
 	    *pui32UserVAddr = (*pbMUnmap) ? psOffsetStruct->ui32UserVAddr : 0;
 	    *pui32RealByteSize = (*pbMUnmap) ? psOffsetStruct->ui32RealByteSize : 0;
@@ -591,7 +591,7 @@ FindOffsetStructByOffset(IMG_UINT32 ui32Offset, IMG_UINT32 ui32RealByteSize)
  * Note, the ui32ByteOffset is _not_ implicitly page aligned since
  * LINUX_MEM_AREA_SUB_ALLOC LinuxMemAreas have no alignment constraints.
  */
-static IMG_BOOL
+static bool
 DoMapToUser(LinuxMemArea *psLinuxMemArea,
             struct vm_area_struct* ps_vma,
             IMG_UINT32 ui32ByteOffset)
@@ -601,7 +601,7 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 	if ((psLinuxMemArea->hBMHandle) && (ui32ByteOffset != 0))
 	{
 		/* Partial mapping of sparse allocations should never happen */
-		return IMG_FALSE;
+		return false;
 	}
 
     if (psLinuxMemArea->eAreaType == LINUX_MEM_AREA_SUB_ALLOC)
@@ -646,7 +646,7 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 
         if(result == 0)
         {
-            return IMG_TRUE;
+            return true;
         }
 
         PVR_DPF((PVR_DBG_MESSAGE, "%s: Failed to map contiguous physical address range (%d), trying non-contiguous path", __FUNCTION__, result));
@@ -669,19 +669,19 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 	IMG_UINT32 ui32PA;
 	IMG_UINT32 ui32AdjustedPA = ui32ByteOffset;
 #if defined(PVR_MAKE_ALL_PFNS_SPECIAL)
-	IMG_BOOL bMixedMap = IMG_FALSE;
+	bool bMixedMap = false;
 #endif
 	/* First pass, validate the page frame numbers */
 	for(ui32PA = ui32ByteOffset; ui32PA < ui32ByteEnd; ui32PA += PAGE_SIZE)
 	{
 		IMG_UINT32 pfn;
-	    IMG_BOOL bMapPage = IMG_TRUE;
+	    bool bMapPage = true;
 
 		if (psLinuxMemArea->hBMHandle)
 		{
 			if (!BM_MapPageAtOffset(psLinuxMemArea->hBMHandle, ui32PA))
 			{
-				bMapPage = IMG_FALSE;
+				bMapPage = false;
 			}
 		}
 
@@ -692,9 +692,9 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 			{
 #if !defined(PVR_MAKE_ALL_PFNS_SPECIAL)
 					PVR_DPF((PVR_DBG_ERROR,"%s: Error - PFN invalid: 0x%x", __FUNCTION__, pfn));
-					return IMG_FALSE;
+					return false;
 #else
-			bMixedMap = IMG_TRUE;
+			bMixedMap = true;
 #endif
 			}
 			ui32AdjustedPA += PAGE_SIZE;
@@ -714,14 +714,14 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 	{
 	    IMG_UINT32 pfn;
 	    IMG_INT result;
-	    IMG_BOOL bMapPage = IMG_TRUE;
+	    bool bMapPage = true;
 
 		if (psLinuxMemArea->hBMHandle)
 		{
 			/* We have a sparse allocation, check if this page should be mapped */
 			if (!BM_MapPageAtOffset(psLinuxMemArea->hBMHandle, ui32PA))
 			{
-				bMapPage = IMG_FALSE;
+				bMapPage = false;
 			}
 		}
 
@@ -736,7 +736,7 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 				if(result & VM_FAULT_ERROR)
 				{
 					PVR_DPF((PVR_DBG_ERROR,"%s: Error - vmf_insert_mixed failed (%x)", __FUNCTION__, result));
-					return IMG_FALSE;
+					return false;
 				}
 			}
 			else
@@ -752,7 +752,7 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 	                if(result != 0)
 	                {
 	                    PVR_DPF((PVR_DBG_ERROR,"%s: Error - VM_INSERT_PAGE failed (%d)", __FUNCTION__, result));
-	                    return IMG_FALSE;
+	                    return false;
 	                }
 		    }
 		    ui32AdjustedPA += PAGE_SIZE;
@@ -761,7 +761,7 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
     }
     }
 
-    return IMG_TRUE;
+    return true;
 }
 
 
@@ -985,7 +985,7 @@ PVRMMap(struct file* pFile, struct vm_area_struct* ps_vma)
     }
 
     list_del(&psOffsetStruct->sMMapItem);
-    psOffsetStruct->bOnMMapList = IMG_FALSE;
+    psOffsetStruct->bOnMMapList = false;
 
     /* Only support shared writeable mappings */
     if (((ps_vma->vm_flags & VM_WRITE) != 0) &&
@@ -1070,7 +1070,7 @@ PVRMMap(struct file* pFile, struct vm_area_struct* ps_vma)
 	        ui32FlushSize = psFlushMemArea->ui32ByteSize;
 		}
 
-        psFlushMemArea->bNeedsCacheInvalidate = IMG_FALSE;
+        psFlushMemArea->bNeedsCacheInvalidate = false;
     }
 
     /* Call the open routine to increment the usage count */
@@ -1104,7 +1104,7 @@ unlock_and_return:
  * start : TRUE if it's start, FALSE if it's stop
  *  
 */
-static void ProcSeqStartstopMMapRegistations(struct seq_file *sfile,IMG_BOOL start) 
+static void ProcSeqStartstopMMapRegistations(struct seq_file *sfile,bool start) 
 {
 	if(start) 
 	{
@@ -1284,7 +1284,7 @@ PVRMMapRegisterArea(LinuxMemArea *psLinuxMemArea)
 
     list_add_tail(&psLinuxMemArea->sMMapItem, &g_sMMapAreaList);
 
-    psLinuxMemArea->bMMapRegistered = IMG_TRUE;
+    psLinuxMemArea->bMMapRegistered = true;
 
     g_ui32RegisteredAreas++;
     /*
@@ -1358,7 +1358,7 @@ PVRMMapRemoveRegisteredArea(LinuxMemArea *psLinuxMemArea)
 
     list_del(&psLinuxMemArea->sMMapItem);
 
-    psLinuxMemArea->bMMapRegistered = IMG_FALSE;
+    psLinuxMemArea->bMMapRegistered = false;
 
     g_ui32RegisteredAreas--;
     if (psLinuxMemArea->eAreaType != LINUX_MEM_AREA_SUB_ALLOC)
@@ -1412,7 +1412,7 @@ IMG_VOID
 LinuxMMapPerProcessDisconnect(PVRSRV_ENV_PER_PROCESS_DATA *psEnvPerProc)
 {
     PKV_OFFSET_STRUCT psOffsetStruct, psTmpOffsetStruct;
-    IMG_BOOL bWarn = IMG_FALSE;
+    bool bWarn = false;
     IMG_UINT32 ui32PID = OSGetCurrentProcessIDKM();
 
     PVR_UNREFERENCED_PARAMETER(psEnvPerProc);
@@ -1426,7 +1426,7 @@ LinuxMMapPerProcessDisconnect(PVRSRV_ENV_PER_PROCESS_DATA *psEnvPerProc)
 	    if (!bWarn)
 	    {
 		PVR_DPF((PVR_DBG_WARNING, "%s: process has unmapped offset structures. Removing them", __FUNCTION__));
-		bWarn = IMG_TRUE;
+		bWarn = true;
 	    }
 	    PVR_ASSERT(psOffsetStruct->ui32Mapped == 0);
 	    PVR_ASSERT(psOffsetStruct->bOnMMapList);

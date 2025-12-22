@@ -86,7 +86,7 @@ PVRSRV_ERROR AllocateDeviceID(SYS_DATA *psSysData, IMG_UINT32 *pui32DevID)
 	{
 		if (!psDeviceWalker->bInUse)
 		{
-			psDeviceWalker->bInUse = IMG_TRUE;
+			psDeviceWalker->bInUse = true;
 			*pui32DevID = psDeviceWalker->uiID;
 			return PVRSRV_OK;
 		}
@@ -135,7 +135,7 @@ PVRSRV_ERROR FreeDeviceID(SYS_DATA *psSysData, IMG_UINT32 ui32DevID)
 				(psDeviceWalker->bInUse)
 			)
 		{
-			psDeviceWalker->bInUse = IMG_FALSE;
+			psDeviceWalker->bInUse = false;
 			return PVRSRV_OK;
 		}
 		psDeviceWalker++;
@@ -568,7 +568,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVInitialiseDevice (IMG_UINT32 ui32DevIndex)
 					 List_PVRSRV_DEVICE_NODE_Any_va(psSysData->psDeviceNodeList,
 													&MatchDeviceKM_AnyVaCb,
 													ui32DevIndex,
-													IMG_TRUE);
+													true);
 	if(!psDeviceNode)
 	{
 		/* Devinfo not in the list */
@@ -610,7 +610,7 @@ static PVRSRV_ERROR PVRSRVFinaliseSystem_SetPowerState_AnyCb(PVRSRV_DEVICE_NODE 
 {
 	PVRSRV_ERROR eError;
 
-	eError = PVRSRVPowerLock(KERNEL_ID, IMG_FALSE);
+	eError = PVRSRVPowerLock(KERNEL_ID, false);
 	if (eError != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR,"PVRSRVFinaliseSystem: Failed PVRSRVPowerLock call (device index: %d)", psDeviceNode->sDevId.ui32DeviceIndex));
@@ -654,7 +654,7 @@ static PVRSRV_ERROR PVRSRVFinaliseSystem_CompatCheck_AnyCb(PVRSRV_DEVICE_NODE *p
  @Return   PVRSRV_ERROR  :
 
 ******************************************************************************/
-PVRSRV_ERROR IMG_CALLCONV PVRSRVFinaliseSystem(IMG_BOOL bInitSuccessful)
+PVRSRV_ERROR IMG_CALLCONV PVRSRVFinaliseSystem(bool bInitSuccessful)
 {
 /*	PVRSRV_DEVICE_NODE	*psDeviceNode;*/
 	SYS_DATA		*psSysData;
@@ -832,7 +832,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVDeinitialiseDevice(IMG_UINT32 ui32DevIndex)
 					 List_PVRSRV_DEVICE_NODE_Any_va(psSysData->psDeviceNodeList,
 													&MatchDeviceKM_AnyVaCb,
 													ui32DevIndex,
-													IMG_TRUE);
+													true);
 
 	if (!psDeviceNode)
 	{
@@ -840,7 +840,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVDeinitialiseDevice(IMG_UINT32 ui32DevIndex)
 		return PVRSRV_ERROR_DEVICEID_NOT_FOUND;
 	}
 
-	eError = PVRSRVPowerLock(KERNEL_ID, IMG_FALSE);
+	eError = PVRSRVPowerLock(KERNEL_ID, false);
 	if (eError != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR,"PVRSRVDeinitialiseDevice: Failed PVRSRVPowerLock call"));
@@ -888,7 +888,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVDeinitialiseDevice(IMG_UINT32 ui32DevIndex)
 	/*
 		Close the device's resource manager context.
 	*/
-	PVRSRVResManDisconnect(psDeviceNode->hResManContext, IMG_TRUE);
+	PVRSRVResManDisconnect(psDeviceNode->hResManContext, true);
 	psDeviceNode->hResManContext = IMG_NULL;
 
 	/* remove node from list */
@@ -910,7 +910,7 @@ PVRSRV_ERROR IMG_CALLCONV PollForValueKM (volatile IMG_UINT32*	pui32LinMemAddr,
 										  IMG_UINT32			ui32Mask,
 										  IMG_UINT32			ui32Timeoutus,
 										  IMG_UINT32			ui32PollPeriodus,
-										  IMG_BOOL				bAllowPreemption)
+										  bool				bAllowPreemption)
 {
 	{
 		IMG_UINT32	ui32ActualValue = 0xFFFFFFFFU; /* Initialiser only required to prevent incorrect warning */
@@ -1367,13 +1367,13 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 
  @Input psDeviceNode
 
- @Return   IMG_BOOL : Whether any interrupts were serviced
+ @Return   bool : Whether any interrupts were serviced
 
 ******************************************************************************/
-IMG_BOOL IMG_CALLCONV PVRSRVDeviceLISR(PVRSRV_DEVICE_NODE *psDeviceNode)
+bool IMG_CALLCONV PVRSRVDeviceLISR(PVRSRV_DEVICE_NODE *psDeviceNode)
 {
 	SYS_DATA			*psSysData;
-	IMG_BOOL			bStatus = IMG_FALSE;
+	bool			bStatus = false;
 	IMG_UINT32			ui32InterruptSource;
 
 	if(!psDeviceNode)
@@ -1402,11 +1402,11 @@ out:
 static IMG_VOID PVRSRVSystemLISR_ForEachVaCb(PVRSRV_DEVICE_NODE *psDeviceNode, va_list va)
 {
 
-	IMG_BOOL *pbStatus;
+	bool *pbStatus;
 	IMG_UINT32 *pui32InterruptSource;
 	IMG_UINT32 *pui32ClearInterrupts;
 
-	pbStatus = va_arg(va, IMG_BOOL*);
+	pbStatus = va_arg(va, bool*);
 	pui32InterruptSource = va_arg(va, IMG_UINT32*);
 	pui32ClearInterrupts = va_arg(va, IMG_UINT32*);
 
@@ -1418,7 +1418,7 @@ static IMG_VOID PVRSRVSystemLISR_ForEachVaCb(PVRSRV_DEVICE_NODE *psDeviceNode, v
 			if((*psDeviceNode->pfnDeviceISR)(psDeviceNode->pvISRData))
 			{
 				/* Record if serviced any interrupts. */
-				*pbStatus = IMG_TRUE;
+				*pbStatus = true;
 			}
 			/* Combine the SOC clear bits. */
 			*pui32ClearInterrupts |= psDeviceNode->ui32SOCInterruptBit;
@@ -1436,13 +1436,13 @@ static IMG_VOID PVRSRVSystemLISR_ForEachVaCb(PVRSRV_DEVICE_NODE *psDeviceNode, v
 
  @Input pvSysData
 
- @Return   IMG_BOOL : Whether any interrupts were serviced
+ @Return   bool : Whether any interrupts were serviced
 
 ******************************************************************************/
-IMG_BOOL IMG_CALLCONV PVRSRVSystemLISR(IMG_VOID *pvSysData)
+bool IMG_CALLCONV PVRSRVSystemLISR(IMG_VOID *pvSysData)
 {
 	SYS_DATA			*psSysData = pvSysData;
-	IMG_BOOL			bStatus = IMG_FALSE;
+	bool			bStatus = false;
 	IMG_UINT32			ui32InterruptSource;
 	IMG_UINT32			ui32ClearInterrupts = 0;
 /*	PVRSRV_DEVICE_NODE	*psDeviceNode;*/
@@ -1510,9 +1510,9 @@ IMG_VOID IMG_CALLCONV PVRSRVMISR(IMG_VOID *pvSysData)
 									&PVRSRVMISR_ForEachCb);
 
 	/* Process the queues. */
-	if (PVRSRVProcessQueues(IMG_FALSE) == PVRSRV_ERROR_PROCESSING_BLOCKED)
+	if (PVRSRVProcessQueues(false) == PVRSRV_ERROR_PROCESSING_BLOCKED)
 	{
-		PVRSRVProcessQueues(IMG_FALSE);
+		PVRSRVProcessQueues(false);
 	}
 
 	/* signal global event object */
@@ -1573,14 +1573,14 @@ IMG_VOID IMG_CALLCONV PVRSRVProcessDisconnect(IMG_UINT32	ui32PID)
  @Input pArena - the arena the segment was originally allocated from.
         pbyBuffer - the system memory buffer set to null to get the size needed.
         puiBufSize - size of system memory buffer.
-        bSave - IMG_TRUE if a save is required
+        bSave - true if a save is required
 
  @Description
 	Function to save or restore Resources Live segments
 
 ******************************************************************************/
 PVRSRV_ERROR IMG_CALLCONV PVRSRVSaveRestoreLiveSegments(IMG_HANDLE hArena, IMG_PBYTE pbyBuffer,
-														IMG_SIZE_T *puiBufSize, IMG_BOOL bSave)
+														IMG_SIZE_T *puiBufSize, bool bSave)
 {
 	IMG_SIZE_T         uiBytesSaved = 0;
 	IMG_PVOID          pvLocalMemCPUVAddr;

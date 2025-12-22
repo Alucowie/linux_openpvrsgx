@@ -65,13 +65,13 @@ IMG_UINT32 PVRSRVTimeNow(IMG_VOID)
 {
 	if (!pui32TimerRegister)
 	{
-		static IMG_BOOL bFirstTime = IMG_TRUE;
+		static bool bFirstTime = true;
 
 		if (bFirstTime)
 		{
 			PVR_DPF((PVR_DBG_ERROR,"PVRSRVTimeNow: No timer register set up"));
 
-			bFirstTime = IMG_FALSE;
+			bFirstTime = false;
 		}
 
 		return 0;

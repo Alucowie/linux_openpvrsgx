@@ -85,8 +85,8 @@ PVRSRV_BRIDGE_DISPATCH_TABLE_ENTRY g_BridgeDispatchTable[BRIDGE_DISPATCH_TABLE_E
 
 PVRSRV_BRIDGE_GLOBAL_STATS g_BridgeGlobalStats;
 
-static IMG_BOOL abSharedDeviceMemHeap[PVRSRV_MAX_CLIENT_HEAPS];
-static IMG_BOOL *pbSharedDeviceMemHeap = abSharedDeviceMemHeap;
+static bool abSharedDeviceMemHeap[PVRSRV_MAX_CLIENT_HEAPS];
+static bool *pbSharedDeviceMemHeap = abSharedDeviceMemHeap;
 
 PVRSRV_ERROR
 CopyFromUserWrapper(PVRSRV_PER_PROCESS_DATA *pProcData,
@@ -173,7 +173,7 @@ PVRSRVCreateDeviceMemContextBW(IMG_UINT32 ui32BridgeID,
 	IMG_HANDLE hDevCookieInt;
 	IMG_HANDLE hDevMemContextInt;
 	IMG_UINT32 i;
-	IMG_BOOL bCreated;
+	bool bCreated;
 
 	PVRSRV_BRIDGE_ASSERT_CMD(ui32BridgeID, PVRSRV_BRIDGE_CREATE_DEVMEMCONTEXT);
 
@@ -296,7 +296,7 @@ PVRSRVDestroyDeviceMemContextBW(IMG_UINT32 ui32BridgeID,
 {
 	IMG_HANDLE hDevCookieInt;
 	IMG_HANDLE hDevMemContextInt;
-	IMG_BOOL bDestroyed;
+	bool bDestroyed;
 
 	PVRSRV_BRIDGE_ASSERT_CMD(ui32BridgeID, PVRSRV_BRIDGE_DESTROY_DEVMEMCONTEXT);
 
@@ -449,8 +449,8 @@ PVRSRVAllocDeviceMemBW(IMG_UINT32 ui32BridgeID,
 	IMG_HANDLE hDevCookieInt;
 	IMG_HANDLE hDevMemHeapInt;
 	IMG_UINT32 ui32ShareIndex;
-	IMG_BOOL bUseShareMemWorkaround;
-	IMG_BOOL *pabMapChunk = IMG_NULL;
+	bool bUseShareMemWorkaround;
+	bool *pabMapChunk = IMG_NULL;
 
 	PVRSRV_BRIDGE_ASSERT_CMD(ui32BridgeID, PVRSRV_BRIDGE_ALLOC_DEVICEMEM);
 
@@ -496,7 +496,7 @@ PVRSRVAllocDeviceMemBW(IMG_UINT32 ui32BridgeID,
 
 	/* Memory sharing workaround, version 2 */
 
-	bUseShareMemWorkaround = ((psAllocDeviceMemIN->ui32Attribs & PVRSRV_MEM_XPROC) != 0) ? IMG_TRUE : IMG_FALSE;
+	bUseShareMemWorkaround = ((psAllocDeviceMemIN->ui32Attribs & PVRSRV_MEM_XPROC) != 0) ? true : false;
 	ui32ShareIndex = 7654321; /* stops MSVC compiler warning */
 
 	if (bUseShareMemWorkaround)
@@ -538,7 +538,7 @@ PVRSRVAllocDeviceMemBW(IMG_UINT32 ui32BridgeID,
 		}
 
 		psAllocDeviceMemOUT->eError = OSAllocMem(PVRSRV_OS_PAGEABLE_HEAP,
-												 sizeof(IMG_BOOL) * psAllocDeviceMemIN->ui32NumVirtChunks,
+												 sizeof(bool) * psAllocDeviceMemIN->ui32NumVirtChunks,
 												 (IMG_VOID **) &pabMapChunk,
 												 0,
 												 "MapChunk kernel copy");
@@ -550,11 +550,11 @@ PVRSRVAllocDeviceMemBW(IMG_UINT32 ui32BridgeID,
 		psAllocDeviceMemOUT->eError = OSCopyFromUser(psPerProc,
 													 pabMapChunk,
 													 psAllocDeviceMemIN->pabMapChunk,
-													 sizeof(IMG_BOOL) * psAllocDeviceMemIN->ui32NumVirtChunks);
+													 sizeof(bool) * psAllocDeviceMemIN->ui32NumVirtChunks);
 		if (psAllocDeviceMemOUT->eError != PVRSRV_OK)
 		{
 			OSFreeMem(PVRSRV_OS_PAGEABLE_HEAP,
-					  sizeof(IMG_BOOL) * psAllocDeviceMemIN->ui32NumVirtChunks,
+					  sizeof(bool) * psAllocDeviceMemIN->ui32NumVirtChunks,
 					  pabMapChunk,
 					  0);
 			return 0;
@@ -2729,14 +2729,14 @@ PVRSRVInitSrvConnectBW(IMG_UINT32 ui32BridgeID,
 	PVR_UNREFERENCED_PARAMETER(psBridgeIn);
 
 	/* PRQA S 3415 1 */ /* side effects needed - if any step fails */
-	if((OSProcHasPrivSrvInit() == IMG_FALSE) || PVRSRVGetInitServerState(PVRSRV_INIT_SERVER_RUNNING) || PVRSRVGetInitServerState(PVRSRV_INIT_SERVER_RAN))
+	if((OSProcHasPrivSrvInit() == false) || PVRSRVGetInitServerState(PVRSRV_INIT_SERVER_RUNNING) || PVRSRVGetInitServerState(PVRSRV_INIT_SERVER_RAN))
 	{
 		psRetOUT->eError = PVRSRV_ERROR_SRV_CONNECT_FAILED;
 		return 0;
 	}
 
-	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RUNNING, IMG_TRUE);
-	psPerProc->bInitProcess = IMG_TRUE;
+	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RUNNING, true);
+	psPerProc->bInitProcess = true;
 
 	psRetOUT->eError = PVRSRV_OK;
 
@@ -2758,16 +2758,16 @@ PVRSRVInitSrvDisconnectBW(IMG_UINT32 ui32BridgeID,
 		return 0;
 	}
 
-	psPerProc->bInitProcess = IMG_FALSE;
+	psPerProc->bInitProcess = false;
 
-	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RUNNING, IMG_FALSE);
-	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RAN, IMG_TRUE);
+	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RUNNING, false);
+	PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_RAN, true);
 
 	psRetOUT->eError = PVRSRVFinaliseSystem(psInitSrvDisconnectIN->bInitSuccesful);
 
 	PVRSRVSetInitServerState( PVRSRV_INIT_SERVER_SUCCESSFUL ,
 				((psRetOUT->eError == PVRSRV_OK) && (psInitSrvDisconnectIN->bInitSuccesful))
-				? IMG_TRUE : IMG_FALSE);
+				? true : false);
 
 	return 0;
 }
@@ -2976,7 +2976,7 @@ static PVRSRV_ERROR DoModifyCompleteSyncOps(MODIFY_SYNC_OP_INFO *psModSyncOpInfo
 
 static PVRSRV_ERROR ModifyCompleteSyncOpsCallBack(IMG_PVOID		pvParam,
                                                     IMG_UINT32  ui32Param,
-                                                    IMG_BOOL    bDummy)
+                                                    bool    bDummy)
 {
 	MODIFY_SYNC_OP_INFO		*psModSyncOpInfo;
 
@@ -3415,7 +3415,7 @@ PVRSRVSyncOpsFlushToDeltaBW(IMG_UINT32                                         u
 static PVRSRV_ERROR
 FreeSyncInfoCallback(IMG_PVOID	pvParam,
                      IMG_UINT32 ui32Param,
-                     IMG_BOOL	bDummy)
+                     bool	bDummy)
 {
 	PVRSRV_KERNEL_SYNC_INFO *psSyncInfo;
 

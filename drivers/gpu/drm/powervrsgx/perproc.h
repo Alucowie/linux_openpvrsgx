@@ -55,11 +55,11 @@ typedef struct _PVRSRV_PER_PROCESS_DATA_
 	IMG_HANDLE		hPerProcData;
 	PVRSRV_HANDLE_BASE 	*psHandleBase;
 	/* Handles are being allocated in batches */
-	IMG_BOOL		bHandlesBatched;
+	bool		bHandlesBatched;
 	IMG_UINT32		ui32RefCount;
 
 	/* True if the process is the initialisation server. */
-	IMG_BOOL		bInitProcess;
+	bool		bInitProcess;
 	/*
 	 * OS specific data can be stored via this handle.
 	 * See osperproc.h for a generic mechanism for initialising

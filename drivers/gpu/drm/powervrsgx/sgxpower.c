@@ -228,10 +228,10 @@ static IMG_VOID SGXPollForClockGating (PVRSRV_SGXDEV_INFO	*psDevInfo,
 						ui32RegisterValue,
 						MAX_HW_TIME_US,
 						MAX_HW_TIME_US/WAIT_TRY_COUNT,
-						IMG_FALSE) != PVRSRV_OK)
+						false) != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR,"SGXPollForClockGating: %s failed.", pszComment));
-		SGXDumpDebugInfo(psDevInfo, IMG_FALSE);
+		SGXDumpDebugInfo(psDevInfo, false);
 		PVR_DBG_BREAK;
 	}
 }
@@ -291,7 +291,7 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 
 		sCommand.ui32Data[1] = ui32PowerCmd;
 
-		eError = SGXScheduleCCBCommand(psDeviceNode, SGXMKIF_CMD_POWER, &sCommand, IMG_NULL, IMG_FALSE);
+		eError = SGXScheduleCCBCommand(psDeviceNode, SGXMKIF_CMD_POWER, &sCommand, IMG_NULL, false);
 		if (eError != PVRSRV_OK)
 		{
 			PVR_DPF((PVR_DBG_ERROR,"SGXPrePowerState: Failed to submit power down command"));
@@ -304,10 +304,10 @@ PVRSRV_ERROR SGXPrePowerState (IMG_HANDLE				hDevHandle,
 							ui32CompleteStatus,
 							MAX_HW_TIME_US,
 							MAX_HW_TIME_US/WAIT_TRY_COUNT,
-							IMG_FALSE) != PVRSRV_OK)
+							false) != PVRSRV_OK)
 		{
 			PVR_DPF((PVR_DBG_ERROR,"SGXPrePowerState: Wait for SGX ukernel power transition failed."));
-			SGXDumpDebugInfo(psDevInfo, IMG_FALSE);
+			SGXDumpDebugInfo(psDevInfo, false);
 			PVR_DBG_BREAK;
 		}
 
@@ -388,7 +388,7 @@ PVRSRV_ERROR SGXPostPowerState (IMG_HANDLE				hDevHandle,
 			/*
 				Run the SGX init script.
 			*/
-			eError = SGXInitialise(psDevInfo, IMG_FALSE);
+			eError = SGXInitialise(psDevInfo, false);
 			if (eError != PVRSRV_OK)
 			{
 				PVR_DPF((PVR_DBG_ERROR,"SGXPostPowerState: SGXInitialise failed"));
@@ -403,7 +403,7 @@ PVRSRV_ERROR SGXPostPowerState (IMG_HANDLE				hDevHandle,
 			SGXMKIF_COMMAND		sCommand = {0};
 
 			sCommand.ui32Data[1] = PVRSRV_POWERCMD_RESUME;
-			eError = SGXScheduleCCBCommand(psDeviceNode, SGXMKIF_CMD_POWER, &sCommand, IMG_NULL, IMG_FALSE);
+			eError = SGXScheduleCCBCommand(psDeviceNode, SGXMKIF_CMD_POWER, &sCommand, IMG_NULL, false);
 			if (eError != PVRSRV_OK)
 			{
 				PVR_DPF((PVR_DBG_ERROR,"SGXPostPowerState failed to schedule CCB command: %u", eError));
@@ -435,7 +435,7 @@ PVRSRV_ERROR SGXPostPowerState (IMG_HANDLE				hDevHandle,
 
 ******************************************************************************/
 PVRSRV_ERROR SGXPreClockSpeedChange (IMG_HANDLE				hDevHandle,
-									 IMG_BOOL				bIdleDevice,
+									 bool				bIdleDevice,
 									 PVRSRV_DEV_POWER_STATE	eCurrentPowerState)
 {
 	PVRSRV_ERROR		eError;
@@ -485,7 +485,7 @@ PVRSRV_ERROR SGXPreClockSpeedChange (IMG_HANDLE				hDevHandle,
 
 ******************************************************************************/
 PVRSRV_ERROR SGXPostClockSpeedChange (IMG_HANDLE				hDevHandle,
-									  IMG_BOOL					bIdleDevice,
+									  bool					bIdleDevice,
 									  PVRSRV_DEV_POWER_STATE	eCurrentPowerState)
 {
 	PVRSRV_DEVICE_NODE	*psDeviceNode = hDevHandle;

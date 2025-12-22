@@ -95,7 +95,7 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	/*  SGX clock speed */
 	IMG_UINT32				ui32CoreClockSpeed;
 	IMG_UINT32				ui32uKernelTimerClock;
-	IMG_BOOL				bSGXIdle;
+	bool				bSGXIdle;
 
 	PVRSRV_STUB_PBDESC		*psStubPBDescListKM;
 
@@ -136,7 +136,7 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	IMG_VOID				*pvMMUContextList;
 
 	/* Copy of registry ForcePTOff entry */
-	IMG_BOOL				bForcePTOff;
+	bool				bForcePTOff;
 
 	IMG_UINT32				ui32EDMTaskReg0;
 	IMG_UINT32				ui32EDMTaskReg1;
@@ -183,7 +183,7 @@ typedef struct _SGX_TIMING_INFORMATION_
 {
 	IMG_UINT32			ui32CoreClockSpeed;
 	IMG_UINT32			ui32HWRecoveryFreq;
-	IMG_BOOL			bEnableActivePM;
+	bool			bEnableActivePM;
 	IMG_UINT32			ui32ActivePowManLatencyms;
 	IMG_UINT32			ui32uKernelFreq;
 } SGX_TIMING_INFORMATION;
@@ -299,7 +299,7 @@ typedef struct _SGX_CCB_KICK_KM_
 	SGX_INTERNEL_STATUS_UPDATE_KM	asTAStatusUpdate[SGX_MAX_TA_STATUS_VALS];
 	SGX_INTERNEL_STATUS_UPDATE_KM	as3DStatusUpdate[SGX_MAX_3D_STATUS_VALS];
 
-	IMG_BOOL	bFirstKickOrResume;
+	bool	bFirstKickOrResume;
 
 	/* CCB offset of data structure associated with this kick */
 	IMG_UINT32	ui32CCBOffset;
@@ -309,7 +309,7 @@ typedef struct _SGX_CCB_KICK_KM_
 	IMG_HANDLE	ahSrcKernelSyncInfo[SGX_MAX_SRC_SYNCS_TA];
 
 	/* TA/3D dependency data */
-	IMG_BOOL	bTADependency;
+	bool	bTADependency;
 	IMG_HANDLE	hTA3DSyncInfo;
 
 	IMG_HANDLE	hTASyncInfo;
@@ -346,12 +346,12 @@ PVRSRV_ERROR SGXRegisterDevice (PVRSRV_DEVICE_NODE *psDeviceNode);
 IMG_VOID SGXOSTimer(IMG_VOID *pvData);
 
 IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
-				  IMG_BOOL				bHardwareRecovery);
+				  bool				bHardwareRecovery);
 
 IMG_VOID SGXInitClocks(PVRSRV_SGXDEV_INFO	*psDevInfo);
 
 PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
-						   IMG_BOOL				bHardwareRecovery);
+						   bool				bHardwareRecovery);
 PVRSRV_ERROR SGXDeinitialise(IMG_HANDLE hDevCookie);
 
 PVRSRV_ERROR SGXPrePowerState(IMG_HANDLE				hDevHandle, 
@@ -363,17 +363,17 @@ PVRSRV_ERROR SGXPostPowerState(IMG_HANDLE				hDevHandle,
 							   PVRSRV_DEV_POWER_STATE	eCurrentPowerState);
 
 PVRSRV_ERROR SGXPreClockSpeedChange(IMG_HANDLE				hDevHandle,
-									IMG_BOOL				bIdleDevice,
+									bool				bIdleDevice,
 									PVRSRV_DEV_POWER_STATE	eCurrentPowerState);
 
 PVRSRV_ERROR SGXPostClockSpeedChange(IMG_HANDLE				hDevHandle,
-									 IMG_BOOL				bIdleDevice,
+									 bool				bIdleDevice,
 									 PVRSRV_DEV_POWER_STATE	eCurrentPowerState);
 
 IMG_VOID SGXPanic(PVRSRV_SGXDEV_INFO	*psDevInfo);
 
 IMG_VOID SGXDumpDebugInfo (PVRSRV_SGXDEV_INFO	*psDevInfo,
-						   IMG_BOOL				bDumpSGXRegs);
+						   bool				bDumpSGXRegs);
 
 PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode);
 

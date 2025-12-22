@@ -86,7 +86,7 @@ enum {
 #define RESMAN_CRITERIA_PVOID_PARAM		0x00000002	/*!< match by criteria param1 */
 #define RESMAN_CRITERIA_UI32_PARAM		0x00000004	/*!< match by criteria param2 */
 
-typedef PVRSRV_ERROR (*RESMAN_FREE_FN)(IMG_PVOID pvParam, IMG_UINT32 ui32Param, IMG_BOOL bForceCleanup); 
+typedef PVRSRV_ERROR (*RESMAN_FREE_FN)(IMG_PVOID pvParam, IMG_UINT32 ui32Param, bool bForceCleanup); 
 
 typedef struct _RESMAN_ITEM_ *PRESMAN_ITEM;
 typedef struct _RESMAN_CONTEXT_ *PRESMAN_CONTEXT;
@@ -113,7 +113,7 @@ PRESMAN_ITEM ResManRegisterRes(PRESMAN_CONTEXT	hResManContext,
 							   RESMAN_FREE_FN	pfnFreeResource);
 
 PVRSRV_ERROR ResManFreeResByPtr(PRESMAN_ITEM	psResItem,
-								IMG_BOOL		bForceCleanup);
+								bool		bForceCleanup);
 
 PVRSRV_ERROR ResManFreeResByCriteria(PRESMAN_CONTEXT	hResManContext,
 									 IMG_UINT32			ui32SearchCriteria, 
@@ -130,7 +130,7 @@ PVRSRV_ERROR ResManFindResourceByPtr(PRESMAN_CONTEXT	hResManContext,
 PVRSRV_ERROR PVRSRVResManConnect(IMG_HANDLE			hPerProc,
 								 PRESMAN_CONTEXT	*phResManContext);
 IMG_VOID PVRSRVResManDisconnect(PRESMAN_CONTEXT hResManContext,
-								IMG_BOOL		bKernelContext);
+								bool		bKernelContext);
 
 #endif /* __RESMAN_H__ */
 

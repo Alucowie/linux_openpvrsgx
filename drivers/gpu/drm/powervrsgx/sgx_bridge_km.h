@@ -89,7 +89,7 @@ PVRSRV_ERROR SGXReadHWPerfCBKM(IMG_HANDLE					hDevHandle,
 IMG_IMPORT
 PVRSRV_ERROR SGX2DQueryBlitsCompleteKM(PVRSRV_SGXDEV_INFO		*psDevInfo,
 									   PVRSRV_KERNEL_SYNC_INFO	*psSyncInfo,
-									   IMG_BOOL bWaitForComplete);
+									   bool bWaitForComplete);
 
 IMG_IMPORT
 PVRSRV_ERROR SGXGetInfoForSrvinitKM(IMG_HANDLE hDevHandle,
@@ -144,7 +144,7 @@ PVRSRV_ERROR DevInitSGXPart2KM(PVRSRV_PER_PROCESS_DATA *psPerProc,
 IMG_IMPORT PVRSRV_ERROR
 SGXFindSharedPBDescKM(PVRSRV_PER_PROCESS_DATA	*psPerProc,
 					  IMG_HANDLE				hDevCookie,
-					  IMG_BOOL				bLockOnFailure,
+					  bool				bLockOnFailure,
 					  IMG_UINT32				ui32TotalPBSize,
 					  IMG_HANDLE				*phSharedPBDesc,
 					  PVRSRV_KERNEL_MEM_INFO	**ppsSharedPBDescKernelMemInfo,

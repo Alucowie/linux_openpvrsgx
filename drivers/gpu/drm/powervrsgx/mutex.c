@@ -81,7 +81,7 @@ IMG_VOID LinuxUnLockMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex)
     mutex_unlock(psPVRSRVMutex);
 }
 
-IMG_BOOL LinuxIsLockedMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex)
+bool LinuxIsLockedMutex(PVRSRV_LINUX_MUTEX *psPVRSRVMutex)
 {
-    return (mutex_is_locked(psPVRSRVMutex)) ? IMG_TRUE : IMG_FALSE;
+    return (mutex_is_locked(psPVRSRVMutex)) ? true : false;
 }
