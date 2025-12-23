@@ -251,10 +251,10 @@ IMG_VOID WriteHWRegs(IMG_PVOID pvLinRegBaseAddr, IMG_UINT32 ui32Count, PVRSRV_HW
 ******************************************************************************/
 static IMG_VOID PVRSRVEnumerateDevicesKM_ForEachVaCb(PVRSRV_DEVICE_NODE *psDeviceNode, va_list va)
 {
-	IMG_UINT *pui32DevCount;
+	unsigned int *pui32DevCount;
 	PVRSRV_DEVICE_IDENTIFIER **ppsDevIdList;
 
-	pui32DevCount = va_arg(va, IMG_UINT*);
+	pui32DevCount = va_arg(va, unsigned int*);
 	ppsDevIdList = va_arg(va, PVRSRV_DEVICE_IDENTIFIER**);
 
 	if (psDeviceNode->sDevId.eDeviceType != PVRSRV_DEVICE_TYPE_EXT)

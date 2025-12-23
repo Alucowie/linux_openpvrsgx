@@ -1172,7 +1172,7 @@ static const IMG_CHAR *deviceTypeToString(PVRSRV_DEVICE_TYPE deviceType)
         {
             static IMG_CHAR text[10];
 
-            sprintf(text, "?%x", (IMG_UINT)deviceType);
+            sprintf(text, "?%x", (unsigned int)deviceType);
 
             return text;
         }
@@ -1200,7 +1200,7 @@ static const IMG_CHAR *deviceClassToString(PVRSRV_DEVICE_CLASS deviceClass)
 	{
 	    static IMG_CHAR text[10];
 
-	    sprintf(text, "?%x", (IMG_UINT)deviceClass);
+	    sprintf(text, "?%x", (unsigned int)deviceClass);
 	    return text;
 	}
     }

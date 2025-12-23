@@ -245,11 +245,11 @@ static PVRSRV_BUFFERCLASS_INFO* BCDeviceHandleToBCInfo (IMG_HANDLE hDeviceKM)
 ******************************************************************************/
 static IMG_VOID PVRSRVEnumerateDCKM_ForEachVaCb(PVRSRV_DEVICE_NODE *psDeviceNode, va_list va)
 {
-	IMG_UINT *pui32DevCount;
+	unsigned int *pui32DevCount;
 	IMG_UINT32 **ppui32DevID;
 	PVRSRV_DEVICE_CLASS peDeviceClass;
 
-	pui32DevCount = va_arg(va, IMG_UINT*);
+	pui32DevCount = va_arg(va, unsigned int*);
 	ppui32DevID = va_arg(va, IMG_UINT32**);
 	peDeviceClass = va_arg(va, PVRSRV_DEVICE_CLASS);
 
@@ -293,7 +293,7 @@ PVRSRV_ERROR PVRSRVEnumerateDCKM (PVRSRV_DEVICE_CLASS DeviceClass,
 								  IMG_UINT32 *pui32DevID )
 {
 	/*PVRSRV_DEVICE_NODE	*psDeviceNode;*/
-	IMG_UINT			ui32DevCount = 0;
+	unsigned int			ui32DevCount = 0;
 	SYS_DATA 			*psSysData;
 
 	SysAcquireData(&psSysData);

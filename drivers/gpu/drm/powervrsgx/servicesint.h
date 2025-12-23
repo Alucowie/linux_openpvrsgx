@@ -55,13 +55,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #define	ALIGNSIZE(size, alignshift)	(((size) + ((1UL << (alignshift))-1)) & ~((1UL << (alignshift))-1))
 
-#ifndef MAX
-#define MAX(a,b) 					(((a) > (b)) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a,b) 					(((a) < (b)) ? (a) : (b))
-#endif
-
 /*
 	Note:
 	MAX_CLEANUP_TRYS is set to try and be around the frame rate

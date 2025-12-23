@@ -99,8 +99,8 @@ extern IMG_VOID   PVRSRVOutputMetricTotals(IMG_VOID);
 
 #define TST_REG   ((volatile IMG_UINT8 *) (psDevInfo->pvSOCRegsBaseKM)) 	// timer start register
 
-#define TCOR_2    ((volatile IMG_UINT *)  (psDevInfo->pvSOCRegsBaseKM+28))	// timer constant register_2
-#define TCNT_2    ((volatile IMG_UINT *)  (psDevInfo->pvSOCRegsBaseKM+32))	// timer counter register_2
+#define TCOR_2    ((volatile u32 *)  (psDevInfo->pvSOCRegsBaseKM+28))	// timer constant register_2
+#define TCNT_2    ((volatile u32 *)  (psDevInfo->pvSOCRegsBaseKM+32))	// timer counter register_2
 #define TCR_2     ((volatile IMG_UINT16 *)(psDevInfo->pvSOCRegsBaseKM+36))	// timer control register_2
 
 #define TIMER_DIVISOR  4

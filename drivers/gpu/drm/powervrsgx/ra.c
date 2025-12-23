@@ -1868,7 +1868,7 @@ PVRSRV_ERROR RA_GetStats(RA_ARENA *pArena,
 	CHECK_SPACE(ui32StrLen);
 	i32Count = OSSNPrintf(pszStr, 100, "free resource count\t%u (0x%x)\n",
 							pArena->sStatistics.uFreeResourceCount,
-							(IMG_UINT)pArena->sStatistics.uFreeResourceCount);
+							(unsigned int)pArena->sStatistics.uFreeResourceCount);
 	UPDATE_SPACE(pszStr, i32Count, ui32StrLen);
 
 	CHECK_SPACE(ui32StrLen);

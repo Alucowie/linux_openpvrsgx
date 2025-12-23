@@ -1663,7 +1663,7 @@ PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode)
 		0x10100, 0x10101
 	};
 	const IMG_UINT32	ui32NumCoreExceptions = sizeof(aui32CoreRevExceptions) / (2*sizeof(IMG_UINT32));
-	IMG_UINT	i;
+	unsigned int	i;
 
 	/* Ensure it's a SGX device */
 	if(psDeviceNode->sDevId.eDeviceType != PVRSRV_DEVICE_TYPE_SGX)
@@ -2136,7 +2136,7 @@ PVRSRV_ERROR SGXReadHWPerfCBKM(IMG_HANDLE					hDevHandle,
 	PVRSRV_DEVICE_NODE	*psDeviceNode = hDevHandle;
 	PVRSRV_SGXDEV_INFO	*psDevInfo = psDeviceNode->pvDevice;
 	SGXMKIF_HWPERF_CB	*psHWPerfCB = psDevInfo->psKernelHWPerfCBMemInfo->pvLinAddrKM;
-	IMG_UINT			i;
+	unsigned int			i;
 
 	for (i = 0;
 		 psHWPerfCB->ui32Woff != psHWPerfCB->ui32Roff && i < ui32ArraySize;

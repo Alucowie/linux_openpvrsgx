@@ -1009,7 +1009,7 @@ static int __init PVRCore_Init(void)
 destroy_class:
 	class_destroy(psPvrClass);
 unregister_device:
-	unregister_chrdev((IMG_UINT)AssignedMajorNumber, DEVNAME);
+	unregister_chrdev((unsigned int)AssignedMajorNumber, DEVNAME);
 #endif
 sys_deinit:
 #endif
@@ -1096,7 +1096,7 @@ static void __exit PVRCore_Cleanup(void)
 	class_destroy(psPvrClass);
 #endif
 
-		unregister_chrdev((IMG_UINT)AssignedMajorNumber, DEVNAME);
+		unregister_chrdev((unsigned int)AssignedMajorNumber, DEVNAME);
 #endif	/* !defined(SUPPORT_DRI_DRM) */
 
 #if defined(PVR_LDM_MODULE)

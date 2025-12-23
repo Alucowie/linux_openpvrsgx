@@ -140,7 +140,7 @@ IMG_VOID PVRSRVSetupMetricTimers(IMG_VOID *pvDevInfo)
 		*TCR_2 = TIMER_DIVISOR;
 
 		/* reset the timer counter to 0 */
-		*TCOR_2 = *TCNT_2 = (IMG_UINT)0xffffffff;
+		*TCOR_2 = *TCNT_2 = (unsigned int)0xffffffff;
 
 		/* start timer 2 */
 		*TST_REG |= (IMG_UINT8)0x04;

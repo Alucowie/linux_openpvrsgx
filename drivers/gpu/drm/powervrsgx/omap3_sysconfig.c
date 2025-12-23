@@ -142,11 +142,11 @@ static IMG_CHAR *SysCreateVersionString(void)
 
 	i32Count = OSSNPrintf(aszVersionString, 100,
 						  "SGX revision = %u.%u.%u",
-						  (IMG_UINT)((ui32SGXRevision & EUR_CR_CORE_REVISION_MAJOR_MASK)
+						  (unsigned int)((ui32SGXRevision & EUR_CR_CORE_REVISION_MAJOR_MASK)
 							>> EUR_CR_CORE_REVISION_MAJOR_SHIFT),
-						  (IMG_UINT)((ui32SGXRevision & EUR_CR_CORE_REVISION_MINOR_MASK)
+						  (unsigned int)((ui32SGXRevision & EUR_CR_CORE_REVISION_MINOR_MASK)
 							>> EUR_CR_CORE_REVISION_MINOR_SHIFT),
-						  (IMG_UINT)((ui32SGXRevision & EUR_CR_CORE_REVISION_MAINTENANCE_MASK)
+						  (unsigned int)((ui32SGXRevision & EUR_CR_CORE_REVISION_MAINTENANCE_MASK)
 							>> EUR_CR_CORE_REVISION_MAINTENANCE_SHIFT)
 						 );
 

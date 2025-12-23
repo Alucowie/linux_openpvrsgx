@@ -80,7 +80,7 @@ typedef struct PVRSRV_LINUX_EVENT_OBJECT_TAG
 {
    	atomic_t	sTimeStamp;
    	IMG_UINT32  ui32TimeStampPrevious;
-	IMG_UINT	ui32Stats;
+	unsigned int	ui32Stats;
     wait_queue_head_t sWait;	
 	struct list_head        sList;
 	IMG_HANDLE		hResItem;				
