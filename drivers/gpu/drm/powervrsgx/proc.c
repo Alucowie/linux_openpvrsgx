@@ -70,7 +70,7 @@ static struct proc_dir_entry * dir;
 
 static const IMG_CHAR PVRProcDirRoot[] = "pvr";
 
-static IMG_INT pvr_proc_open(struct inode *inode,struct file *file);
+static int pvr_proc_open(struct inode *inode,struct file *file);
 static void *pvr_proc_seq_start (struct seq_file *m, loff_t *pos);
 static void pvr_proc_seq_stop (struct seq_file *m, void *v);
 static void *pvr_proc_seq_next (struct seq_file *m, void *v, loff_t *pos);
@@ -146,7 +146,7 @@ static void* ProcSeqOff2ElementSysNodes(struct seq_file * sfile, loff_t off);
 *****************************************************************************/
 off_t printAppend(IMG_CHAR * buffer, size_t size, off_t off, const IMG_CHAR * format, ...)
 {
-    IMG_INT n;
+    int n;
     size_t space = size - (size_t)off;
     va_list ap;
 
@@ -159,7 +159,7 @@ off_t printAppend(IMG_CHAR * buffer, size_t size, off_t off, const IMG_CHAR * fo
      * the print would have overflowed the buffer.  Other platforms may
      * return -1 if printing was truncated.
      */
-    if (n >= (IMG_INT)space || n < 0)
+    if (n >= (int)space || n < 0)
     {
 	/* Ensure final string is terminated */
         buffer[size - 1] = 0;
@@ -249,9 +249,9 @@ void* ProcSeq1ElementHeaderOff2Element(struct seq_file *sfile, loff_t off)
  @Return      : 0 if no errors
 
 *****************************************************************************/
-static IMG_INT pvr_proc_open(struct inode *inode,struct file *file)
+static int pvr_proc_open(struct inode *inode,struct file *file)
 {
-	IMG_INT ret = seq_open(file, &pvr_proc_seq_operations);
+	int ret = seq_open(file, &pvr_proc_seq_operations);
 	struct seq_file *seq = (struct seq_file*)file->private_data;
 
 	PVR_PROC_SEQ_HANDLERS *data = (PVR_PROC_SEQ_HANDLERS *) pde_data(inode);
@@ -640,11 +640,11 @@ struct proc_dir_entry* CreatePerProcessProcEntrySeq (
     if (!psPerProc->psProcDir)
     {
         IMG_CHAR dirname[16];
-        IMG_INT ret;
+        int ret;
 
         ret = snprintf(dirname, sizeof(dirname), "%u", ui32PID);
 
-		if (ret <=0 || ret >= (IMG_INT)sizeof(dirname))
+		if (ret <=0 || ret >= (int)sizeof(dirname))
 		{
 			PVR_DPF((PVR_DBG_ERROR, "CreatePerProcessProcEntries: couldn't generate per process proc directory name \"%u\"", ui32PID));
 			return NULL;
@@ -771,7 +771,7 @@ static ssize_t pvr_proc_read(struct file *file, char __user *buffer,size_t count
  @Return success code : 0 or -errno.
 
 *****************************************************************************/
-static IMG_INT CreateProcEntryInDir(struct proc_dir_entry *pdir, const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
+static int CreateProcEntryInDir(struct proc_dir_entry *pdir, const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
 {
     struct proc_dir_entry * file;
     mode_t mode;
@@ -836,7 +836,7 @@ static IMG_INT CreateProcEntryInDir(struct proc_dir_entry *pdir, const IMG_CHAR 
  @Return success code : 0 or -errno.
 
 *****************************************************************************/
-IMG_INT CreateProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
+int CreateProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
 {
     return CreateProcEntryInDir(dir, name, rhandler, whandler, data);
 }
@@ -862,7 +862,7 @@ IMG_INT CreateProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_
  @Return success code : 0 or -errno.
 
 *****************************************************************************/
-IMG_INT CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
+int CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
 {
     PVRSRV_ENV_PER_PROCESS_DATA *psPerProc;
     IMG_UINT32 ui32PID;
@@ -887,11 +887,11 @@ IMG_INT CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, w
     if (!psPerProc->psProcDir)
     {
         IMG_CHAR dirname[16];
-        IMG_INT ret;
+        int ret;
 
         ret = snprintf(dirname, sizeof(dirname), "%u", ui32PID);
 
-		if (ret <=0 || ret >= (IMG_INT)sizeof(dirname))
+		if (ret <=0 || ret >= (int)sizeof(dirname))
 		{
 			PVR_DPF((PVR_DBG_ERROR, "CreatePerProcessProcEntries: couldn't generate per process proc directory name \"%u\"", ui32PID));
 
@@ -932,7 +932,7 @@ IMG_INT CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, w
  @Return 0 for success, -errno for failure
 
 *****************************************************************************/
-IMG_INT CreateProcReadEntry(const IMG_CHAR * name, pvr_read_proc_t handler)
+int CreateProcReadEntry(const IMG_CHAR * name, pvr_read_proc_t handler)
 {
     struct proc_dir_entry * file;
 
@@ -970,7 +970,7 @@ IMG_INT CreateProcReadEntry(const IMG_CHAR * name, pvr_read_proc_t handler)
  @Return nothing
 
 *****************************************************************************/
-IMG_INT CreateProcEntries(IMG_VOID)
+int CreateProcEntries(IMG_VOID)
 {
     dir = proc_mkdir (PVRProcDirRoot, NULL);
 

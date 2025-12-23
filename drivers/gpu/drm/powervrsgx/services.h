@@ -745,11 +745,11 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVUnmapPhysToUserSpace(IMG_CONST PVRSRV_DEV_DATA *
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVExportDeviceMem2(IMG_CONST PVRSRV_DEV_DATA	*psDevData,
 												 PVRSRV_CLIENT_MEM_INFO		*psMemInfo,
-												 IMG_INT					*iFd);
+												 int					*iFd);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceMemory2(IMG_CONST PVRSRV_DEV_DATA	*psDevData,
-												 IMG_INT					iFd,
+												 int					iFd,
 												 IMG_HANDLE					hDstDevMemHeap,
 												 PVRSRV_CLIENT_MEM_INFO		**ppsDstMemInfo);
 
@@ -1121,19 +1121,19 @@ typedef	struct  _PVRSRV_MUTEX_OPAQUE_STRUCT_ *PVRSRV_MUTEX_HANDLE;
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateMutex(PVRSRV_MUTEX_HANDLE *phMutex,
 													   IMG_CHAR pszMutexName[],
 													   IMG_CHAR pszFilename[],
-													   IMG_INT iLine);
+													   int iLine);
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyMutex(PVRSRV_MUTEX_HANDLE hMutex,
 														IMG_CHAR pszMutexName[],
 														IMG_CHAR pszFilename[],
-														IMG_INT iLine);
+														int iLine);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVLockMutex(PVRSRV_MUTEX_HANDLE hMutex,
 												 IMG_CHAR pszMutexName[],
 												 IMG_CHAR pszFilename[],
-												 IMG_INT iLine);
+												 int iLine);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVUnlockMutex(PVRSRV_MUTEX_HANDLE hMutex,
 												   IMG_CHAR pszMutexName[],
 												   IMG_CHAR pszFilename[],
-												   IMG_INT iLine);
+												   int iLine);
 
 #define PVRSRVCreateMutex(phMutex) PVRSRVCreateMutex(phMutex, #phMutex, __FILE__, __LINE__)
 #define PVRSRVDestroyMutex(hMutex) PVRSRVDestroyMutex(hMutex, #hMutex, __FILE__, __LINE__)
@@ -1159,19 +1159,19 @@ typedef	struct  _PVRSRV_RECMUTEX_OPAQUE_STRUCT_ *PVRSRV_RECMUTEX_HANDLE;
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateRecursiveMutex(PVRSRV_RECMUTEX_HANDLE *phMutex,
 													   IMG_CHAR pszMutexName[],
 													   IMG_CHAR pszFilename[],
-													   IMG_INT iLine);
+													   int iLine);
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyRecursiveMutex(PVRSRV_RECMUTEX_HANDLE hMutex,
 														IMG_CHAR pszMutexName[],
 														IMG_CHAR pszFilename[],
-														IMG_INT iLine);
+														int iLine);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVLockRecursiveMutex(PVRSRV_RECMUTEX_HANDLE hMutex,
 												 IMG_CHAR pszMutexName[],
 												 IMG_CHAR pszFilename[],
-												 IMG_INT iLine);
+												 int iLine);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVUnlockRecursiveMutex(PVRSRV_RECMUTEX_HANDLE hMutex,
 												   IMG_CHAR pszMutexName[],
 												   IMG_CHAR pszFilename[],
-												   IMG_INT iLine);
+												   int iLine);
 
 #define PVRSRVCreateRecursiveMutex(phMutex) PVRSRVCreateRecursiveMutex(phMutex, #phMutex, __FILE__, __LINE__)
 #define PVRSRVDestroyRecursiveMutex(hMutex) PVRSRVDestroyRecursiveMutex(hMutex, #hMutex, __FILE__, __LINE__)
@@ -1199,7 +1199,7 @@ typedef	struct  _PVRSRV_SEMAPHORE_OPAQUE_STRUCT_ *PVRSRV_SEMAPHORE_HANDLE;
   	#define IMG_SEMAPHORE_WAIT_INFINITE       ((IMG_UINT64)0xFFFFFFFFFFFFFFFFull)
 
 
-static INLINE PVRSRV_ERROR PVRSRVCreateSemaphore(PVRSRV_SEMAPHORE_HANDLE *phSemaphore, IMG_INT iInitialCount)
+static INLINE PVRSRV_ERROR PVRSRVCreateSemaphore(PVRSRV_SEMAPHORE_HANDLE *phSemaphore, int iInitialCount)
 {
 	PVR_UNREFERENCED_PARAMETER(iInitialCount);
 	*phSemaphore = 0;
@@ -1219,7 +1219,7 @@ static INLINE PVRSRV_ERROR PVRSRVWaitSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphor
 	return PVRSRV_ERROR_INVALID_PARAMS;
 }
 
-static INLINE IMG_VOID PVRSRVPostSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphore, IMG_INT iPostCount)
+static INLINE IMG_VOID PVRSRVPostSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphore, int iPostCount)
 {
 	PVR_UNREFERENCED_PARAMETER(hSemaphore);
 	PVR_UNREFERENCED_PARAMETER(iPostCount);

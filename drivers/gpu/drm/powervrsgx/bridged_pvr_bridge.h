@@ -130,13 +130,13 @@ ReleaseHandleBatch(PVRSRV_PER_PROCESS_DATA *psPerProc)
 	}
 }
 
-IMG_INT
+int
 DummyBW(IMG_UINT32 ui32BridgeID,
 		IMG_VOID *psBridgeIn,
 		IMG_VOID *psBridgeOut,
 		PVRSRV_PER_PROCESS_DATA *psPerProc);
 
-typedef IMG_INT (*BridgeWrapperFunction)(IMG_UINT32 ui32BridgeID,
+typedef int (*BridgeWrapperFunction)(IMG_UINT32 ui32BridgeID,
 									 IMG_VOID *psBridgeIn,
 									 IMG_VOID *psBridgeOut,
 									 PVRSRV_PER_PROCESS_DATA *psPerProc);
@@ -189,7 +189,7 @@ extern PVRSRV_BRIDGE_GLOBAL_STATS g_BridgeGlobalStats;
 
 PVRSRV_ERROR CommonBridgeInit(IMG_VOID);
 
-IMG_INT BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
+int BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 					  PVRSRV_BRIDGE_PACKAGE   * psBridgePackageKM);
 
 #endif /* __BRIDGED_PVR_BRIDGE_H__ */

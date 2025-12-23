@@ -1107,7 +1107,7 @@ RA_Create (IMG_CHAR *name,
 {
 	RA_ARENA *pArena;
 	BT *pBT;
-	IMG_INT i;
+	int i;
 
 	PVR_DPF ((PVR_DBG_MESSAGE,
 			  "RA_Create: name='%s', base=0x%x, uSize=0x%x, alloc=0x%x, free=0x%x",
@@ -1765,7 +1765,7 @@ IMG_VOID CheckBMFreespace(IMG_VOID)
 
 #if defined (RA_STATS)
 static IMG_CHAR *
-_BTType (IMG_INT eType)
+_BTType (int eType)
 {
 	switch (eType)
 	{

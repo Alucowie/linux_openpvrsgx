@@ -460,7 +460,7 @@ IMG_VOID PVRSRVDebugPrintf	(
 
 #endif /* PVRSRV_NEED_PVR_DPF */
 
-IMG_INT PVRDebugProcSetLevel(struct file *file, const IMG_CHAR *buffer, IMG_UINT32 count, IMG_VOID *data)
+int PVRDebugProcSetLevel(struct file *file, const IMG_CHAR *buffer, IMG_UINT32 count, IMG_VOID *data)
 {
 #define	_PROC_SET_BUFFER_SZ		6
 	IMG_CHAR data_buffer[_PROC_SET_BUFFER_SZ];

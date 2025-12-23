@@ -83,7 +83,7 @@ typedef struct _DEVICE_COMMAND_DATA_
 void ProcSeqShowQueue(struct seq_file *sfile,void* el)
 {
 	PVRSRV_QUEUE_INFO *psQueue = (PVRSRV_QUEUE_INFO*)el;
-	IMG_INT cmds = 0;
+	int cmds = 0;
 	IMG_SIZE_T ui32ReadOffset;
 	IMG_SIZE_T ui32WriteOffset;
 	PVRSRV_COMMAND *psCmd;

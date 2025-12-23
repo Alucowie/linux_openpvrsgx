@@ -611,7 +611,7 @@ PVR_MOD_STATIC int PVRSRVDriverResume(LDM_DEV *pDevice)
  * 	echo 0 > /proc/pvr/power_control
  */
 
-IMG_INT PVRProcSetPowerLevel(struct file *file, const IMG_CHAR *buffer, IMG_UINT32 count, IMG_VOID *data)
+int PVRProcSetPowerLevel(struct file *file, const IMG_CHAR *buffer, IMG_UINT32 count, IMG_VOID *data)
 {
 	IMG_CHAR data_buffer[2];
 	IMG_UINT32 PVRPowerLevel;

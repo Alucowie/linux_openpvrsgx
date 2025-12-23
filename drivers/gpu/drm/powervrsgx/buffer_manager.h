@@ -592,8 +592,8 @@ PVRSRV_ERROR BM_XProcWorkaroundUnsetShareIndex(IMG_UINT32 ui32Index);
 PVRSRV_ERROR BM_XProcWorkaroundFindNewBufferAndSetShareIndex(IMG_UINT32 *pui32Index);
 
 #if defined(PVRSRV_REFCOUNT_DEBUG)
-IMG_VOID _BM_XProcIndexAcquireDebug(const IMG_CHAR *pszFile, IMG_INT iLine, IMG_UINT32 ui32Index);
-IMG_VOID _BM_XProcIndexReleaseDebug(const IMG_CHAR *pszFile, IMG_INT iLine, IMG_UINT32 ui32Index);
+IMG_VOID _BM_XProcIndexAcquireDebug(const IMG_CHAR *pszFile, int iLine, IMG_UINT32 ui32Index);
+IMG_VOID _BM_XProcIndexReleaseDebug(const IMG_CHAR *pszFile, int iLine, IMG_UINT32 ui32Index);
 
 #define BM_XProcIndexAcquire(x...) \
 	_BM_XProcIndexAcquireDebug(__FILE__, __LINE__, x)

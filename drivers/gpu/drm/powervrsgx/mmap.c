@@ -631,7 +631,7 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 #if !defined(PVR_MAKE_ALL_PFNS_SPECIAL)
     if (PFNIsPhysical(ps_vma->vm_pgoff))
     {
-	IMG_INT result;
+	int result;
 
 	PVR_ASSERT(LinuxMemAreaPhysIsContig(psLinuxMemArea));
 	PVR_ASSERT(LinuxMemAreaToCpuPFN(psLinuxMemArea, ui32ByteOffset) == ps_vma->vm_pgoff);
@@ -713,7 +713,7 @@ DoMapToUser(LinuxMemArea *psLinuxMemArea,
 	for(ui32PA = ui32ByteOffset; ui32PA < ui32ByteEnd; ui32PA += PAGE_SIZE)
 	{
 	    IMG_UINT32 pfn;
-	    IMG_INT result;
+	    int result;
 	    bool bMapPage = true;
 
 		if (psLinuxMemArea->hBMHandle)

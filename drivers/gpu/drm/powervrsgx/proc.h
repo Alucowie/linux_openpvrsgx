@@ -81,13 +81,13 @@ void* ProcSeq1ElementHeaderOff2Element(struct seq_file *sfile, loff_t off);
 off_t printAppend(IMG_CHAR * buffer, size_t size, off_t off, const IMG_CHAR * format, ...)
 	__attribute__((format(printf, 4, 5)));
 
-IMG_INT CreateProcEntries(IMG_VOID);
+int CreateProcEntries(IMG_VOID);
 
-IMG_INT CreateProcReadEntry (const IMG_CHAR * name, pvr_read_proc_t handler);
+int CreateProcReadEntry (const IMG_CHAR * name, pvr_read_proc_t handler);
 
-IMG_INT CreateProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data);
+int CreateProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data);
 
-IMG_INT CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data);
+int CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data);
 
 IMG_VOID RemoveProcEntry(const IMG_CHAR * name);
 

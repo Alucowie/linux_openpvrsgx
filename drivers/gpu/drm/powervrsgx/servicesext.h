@@ -895,7 +895,7 @@ typedef struct ACCESS_INFO_TAG
 
 typedef struct {
 	IMG_UINT32 threadId;
-	IMG_INT    suspendCount;
+	int    suspendCount;
 } PVRSRV_THREAD_SUSPEND_COUNT;
 
 #define PVRSRV_PDUMP_SUSPEND_Q_NAME "PVRSRVPDumpSuspendMsgQ"

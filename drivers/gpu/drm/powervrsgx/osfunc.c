@@ -390,7 +390,7 @@ IMG_VOID OSMemCopy(IMG_VOID *pvDst, IMG_VOID *pvSrc, IMG_UINT32 ui32Size)
 {
 #if defined(USE_UNOPTIMISED_MEMCPY)
     IMG_UINT8 *Src,*Dst;
-    IMG_INT i;
+    int i;
 
     Src=(IMG_UINT8 *)pvSrc;
     Dst=(IMG_UINT8 *)pvDst;
@@ -424,7 +424,7 @@ IMG_VOID OSMemSet(IMG_VOID *pvDest, IMG_UINT8 ui8Value, IMG_UINT32 ui32Size)
 {
 #if defined(USE_UNOPTIMISED_MEMSET)
     IMG_UINT8 *Buff;
-    IMG_INT i;
+    int i;
 
     Buff=(IMG_UINT8 *)pvDest;
     for(i=0;i<ui32Size;i++)
@@ -432,7 +432,7 @@ IMG_VOID OSMemSet(IMG_VOID *pvDest, IMG_UINT8 ui8Value, IMG_UINT32 ui32Size)
         Buff[i]=ui8Value;
     }
 #else
-    memset(pvDest, (IMG_INT) ui8Value, (size_t) ui32Size);
+    memset(pvDest, (int) ui8Value, (size_t) ui32Size);
 #endif
 }
 
@@ -1883,7 +1883,7 @@ static IMG_UINT32 OSPCIAddrRangeFunc(enum HOST_PCI_ADDR_RANGE_FUNC eFunc,
         {
             int err;
 
-            err = pci_request_region(psPVRPCI->psPCIDev, (IMG_INT)ui32Index, PVRSRV_MODNAME);
+            err = pci_request_region(psPVRPCI->psPCIDev, (int)ui32Index, PVRSRV_MODNAME);
             if (err != 0)
             {
                 PVR_DPF((PVR_DBG_ERROR, "OSPCIAddrRangeFunc: pci_request_region_failed (%d)", err));
@@ -1895,7 +1895,7 @@ static IMG_UINT32 OSPCIAddrRangeFunc(enum HOST_PCI_ADDR_RANGE_FUNC eFunc,
         case HOST_PCI_ADDR_RANGE_FUNC_RELEASE:
             if (psPVRPCI->abPCIResourceInUse[ui32Index])
             {
-                pci_release_region(psPVRPCI->psPCIDev, (IMG_INT)ui32Index);
+                pci_release_region(psPVRPCI->psPCIDev, (int)ui32Index);
                 psPVRPCI->abPCIResourceInUse[ui32Index] = false;
             }
             return 1;
@@ -2796,11 +2796,11 @@ typedef enum _eWrapMemType_
 typedef struct _sWrapMemInfo_
 {
     eWrapMemType eType;
-    IMG_INT iNumPages;
-    IMG_INT iNumPagesMapped;
+    int iNumPages;
+    int iNumPagesMapped;
     struct page **ppsPages;
     IMG_SYS_PHYADDR *psPhysAddr;
-    IMG_INT iPageOffset;
+    int iPageOffset;
     IMG_UINT32 ulStartAddr;
     IMG_UINT32 ulBeyondEndAddr;
     struct vm_area_struct *psVMArea;
@@ -2870,7 +2870,7 @@ static bool CPUVAddrToPFN(struct vm_area_struct *psVMArea, IMG_UINT32 ulCPUVAddr
 PVRSRV_ERROR OSReleasePhysPageAddr(IMG_HANDLE hOSWrapMem)
 {
     sWrapMemInfo *psInfo = (sWrapMemInfo *)hOSWrapMem;
-    IMG_INT i;
+    int i;
 
     if (psInfo == IMG_NULL)
     {
@@ -3011,7 +3011,7 @@ PVRSRV_ERROR OSAcquirePhysPageAddr(IMG_VOID *pvCPUVAddr,
     IMG_UINT32 ulAddrRange;
     IMG_UINT32 ulBeyondEndAddr;
     IMG_UINT32 ulAddr;
-    IMG_INT i;
+    int i;
     struct vm_area_struct *psVMArea;
     sWrapMemInfo *psInfo = NULL;
     bool bHavePageStructs = false;
@@ -3049,8 +3049,8 @@ PVRSRV_ERROR OSAcquirePhysPageAddr(IMG_VOID *pvCPUVAddr,
     psInfo->ulStartAddr = ulStartAddrOrig;
     psInfo->ulBeyondEndAddr = ulBeyondEndAddrOrig;
 
-    psInfo->iNumPages = (IMG_INT)(ulAddrRange >> PAGE_SHIFT);
-    psInfo->iPageOffset = (IMG_INT)(ulStartAddrOrig & ~PAGE_MASK);
+    psInfo->iNumPages = (int)(ulAddrRange >> PAGE_SHIFT);
+    psInfo->iPageOffset = (int)(ulStartAddrOrig & ~PAGE_MASK);
 
     /* Allocate physical address array */
     psInfo->psPhysAddr = kmalloc((size_t)psInfo->iNumPages * sizeof(*psInfo->psPhysAddr), GFP_KERNEL);

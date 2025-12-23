@@ -231,7 +231,7 @@ PVRSRV_BridgeDispatchKM(struct file *pFile, unsigned int unref__ ioctlCmd, unsig
 	PVRSRV_BRIDGE_PACKAGE *psBridgePackageKM;
 	IMG_UINT32 ui32PID = OSGetCurrentProcessIDKM();
 	PVRSRV_PER_PROCESS_DATA *psPerProc;
-	IMG_INT err = -EFAULT;
+	int err = -EFAULT;
 
 	LinuxLockMutex(&gPVRSRVLock);
 

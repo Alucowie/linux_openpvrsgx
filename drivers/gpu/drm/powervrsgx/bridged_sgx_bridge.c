@@ -61,7 +61,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "sgxutils.h"
 #include "buffer_manager.h"
 
-static IMG_INT
+static int
 SGXGetClientInfoBW(IMG_UINT32 ui32BridgeID,
 				   PVRSRV_BRIDGE_IN_GETCLIENTINFO *psGetClientInfoIN,
 				   PVRSRV_BRIDGE_OUT_GETCLIENTINFO *psGetClientInfoOUT,
@@ -87,7 +87,7 @@ SGXGetClientInfoBW(IMG_UINT32 ui32BridgeID,
 	return 0;
 }
 
-static IMG_INT
+static int
 SGXReleaseClientInfoBW(IMG_UINT32 ui32BridgeID,
 					   PVRSRV_BRIDGE_IN_RELEASECLIENTINFO *psReleaseClientInfoIN,
 					   PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -126,7 +126,7 @@ SGXReleaseClientInfoBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXGetInternalDevInfoBW(IMG_UINT32 ui32BridgeID,
 						PVRSRV_BRIDGE_IN_GETINTERNALDEVINFO *psSGXGetInternalDevInfoIN,
 						PVRSRV_BRIDGE_OUT_GETINTERNALDEVINFO *psSGXGetInternalDevInfoOUT,
@@ -165,7 +165,7 @@ SGXGetInternalDevInfoBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXDoKickBW(IMG_UINT32 ui32BridgeID,
 			PVRSRV_BRIDGE_IN_DOKICK *psDoKickIN,
 			PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -173,7 +173,7 @@ SGXDoKickBW(IMG_UINT32 ui32BridgeID,
 {
 	IMG_HANDLE hDevCookieInt;
 	IMG_UINT32 i;
-	IMG_INT ret = 0;
+	int ret = 0;
 	IMG_UINT32 ui32NumDstSyncs;
 	IMG_HANDLE *phKernelSyncInfoHandles = IMG_NULL;
 
@@ -383,7 +383,7 @@ PVRSRV_BRIDGE_SGX_DOKICK_RETURN_RESULT:
 }
 
 
-static IMG_INT
+static int
 SGXScheduleProcessQueuesBW(IMG_UINT32 ui32BridgeID,
 			PVRSRV_BRIDGE_IN_SGX_SCHEDULE_PROCESS_QUEUES *psScheduleProcQIN,
 			PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -410,7 +410,7 @@ SGXScheduleProcessQueuesBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXSubmitTransferBW(IMG_UINT32 ui32BridgeID,
 			PVRSRV_BRIDGE_IN_SUBMITTRANSFER *psSubmitTransferIN,
 			PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -512,7 +512,7 @@ SGXSubmitTransferBW(IMG_UINT32 ui32BridgeID,
 	return 0;
 }
 
-static IMG_INT
+static int
 SGXSetTransferContextPriorityBW(IMG_UINT32 ui32BridgeID,
                         PVRSRV_BRIDGE_IN_SGX_SET_TRANSFER_CONTEXT_PRIORITY *psSGXSetTransferContextPriorityIN,
                         PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -554,7 +554,7 @@ SGXSetTransferContextPriorityBW(IMG_UINT32 ui32BridgeID,
     return 0;
 }
 
-static IMG_INT
+static int
 SGXSetRenderContextPriorityBW(IMG_UINT32 ui32BridgeID,
                         PVRSRV_BRIDGE_IN_SGX_SET_RENDER_CONTEXT_PRIORITY *psSGXSetRenderContextPriorityIN,
                         PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -597,7 +597,7 @@ SGXSetRenderContextPriorityBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXGetMiscInfoBW(IMG_UINT32 ui32BridgeID,
 				 PVRSRV_BRIDGE_IN_SGXGETMISCINFO *psSGXGetMiscInfoIN,
 				 PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -666,7 +666,7 @@ SGXGetMiscInfoBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXReadHWPerfCBBW(IMG_UINT32							ui32BridgeID,
 				  PVRSRV_BRIDGE_IN_SGX_READ_HWPERF_CB	*psSGXReadHWPerfCBIN,
 				  PVRSRV_BRIDGE_OUT_SGX_READ_HWPERF_CB	*psSGXReadHWPerfCBOUT,
@@ -723,7 +723,7 @@ SGXReadHWPerfCBBW(IMG_UINT32							ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 				  PVRSRV_BRIDGE_IN_SGXDEVINITPART2 *psSGXDevInitPart2IN,
 				  PVRSRV_BRIDGE_OUT_SGXDEVINITPART2 *psSGXDevInitPart2OUT,
@@ -1089,7 +1089,7 @@ SGXDevInitPart2BW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXRegisterHWRenderContextBW(IMG_UINT32 ui32BridgeID,
 							 PVRSRV_BRIDGE_IN_SGX_REGISTER_HW_RENDER_CONTEXT *psSGXRegHWRenderContextIN,
 							 PVRSRV_BRIDGE_OUT_SGX_REGISTER_HW_RENDER_CONTEXT *psSGXRegHWRenderContextOUT,
@@ -1140,7 +1140,7 @@ SGXRegisterHWRenderContextBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXUnregisterHWRenderContextBW(IMG_UINT32 ui32BridgeID,
 							   PVRSRV_BRIDGE_IN_SGX_UNREGISTER_HW_RENDER_CONTEXT *psSGXUnregHWRenderContextIN,
 							   PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -1176,7 +1176,7 @@ SGXUnregisterHWRenderContextBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXRegisterHWTransferContextBW(IMG_UINT32 ui32BridgeID,
 							 PVRSRV_BRIDGE_IN_SGX_REGISTER_HW_TRANSFER_CONTEXT *psSGXRegHWTransferContextIN,
 							 PVRSRV_BRIDGE_OUT_SGX_REGISTER_HW_TRANSFER_CONTEXT *psSGXRegHWTransferContextOUT,
@@ -1226,7 +1226,7 @@ SGXRegisterHWTransferContextBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXUnregisterHWTransferContextBW(IMG_UINT32 ui32BridgeID,
 							   PVRSRV_BRIDGE_IN_SGX_UNREGISTER_HW_TRANSFER_CONTEXT *psSGXUnregHWTransferContextIN,
 							   PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -1262,7 +1262,7 @@ SGXUnregisterHWTransferContextBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXFlushHWRenderTargetBW(IMG_UINT32 ui32BridgeID,
 						  PVRSRV_BRIDGE_IN_SGX_FLUSH_HW_RENDER_TARGET *psSGXFlushHWRenderTargetIN,
 						  PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -1291,7 +1291,7 @@ SGXFlushHWRenderTargetBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGX2DQueryBlitsCompleteBW(IMG_UINT32 ui32BridgeID,
 						  PVRSRV_BRIDGE_IN_2DQUERYBLTSCOMPLETE *ps2DQueryBltsCompleteIN,
 						  PVRSRV_BRIDGE_RETURN *psRetOUT,
@@ -1334,7 +1334,7 @@ SGX2DQueryBlitsCompleteBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXFindSharedPBDescBW(IMG_UINT32 ui32BridgeID,
 					  PVRSRV_BRIDGE_IN_SGXFINDSHAREDPBDESC *psSGXFindSharedPBDescIN,
 					  PVRSRV_BRIDGE_OUT_SGXFINDSHAREDPBDESC *psSGXFindSharedPBDescOUT,
@@ -1471,7 +1471,7 @@ PVRSRV_BRIDGE_SGX_FINDSHAREDPBDESC_EXIT:
 }
 
 
-static IMG_INT
+static int
 SGXUnrefSharedPBDescBW(IMG_UINT32 ui32BridgeID,
 					   PVRSRV_BRIDGE_IN_SGXUNREFSHAREDPBDESC *psSGXUnrefSharedPBDescIN,
 					   PVRSRV_BRIDGE_OUT_SGXUNREFSHAREDPBDESC *psSGXUnrefSharedPBDescOUT,
@@ -1508,7 +1508,7 @@ SGXUnrefSharedPBDescBW(IMG_UINT32 ui32BridgeID,
 }
 
 
-static IMG_INT
+static int
 SGXAddSharedPBDescBW(IMG_UINT32 ui32BridgeID,
 					 PVRSRV_BRIDGE_IN_SGXADDSHAREDPBDESC *psSGXAddSharedPBDescIN,
 					 PVRSRV_BRIDGE_OUT_SGXADDSHAREDPBDESC *psSGXAddSharedPBDescOUT,
@@ -1521,7 +1521,7 @@ SGXAddSharedPBDescBW(IMG_UINT32 ui32BridgeID,
 	PVRSRV_KERNEL_MEM_INFO *psHWBlockKernelMemInfo;
 	IMG_UINT32 ui32KernelMemInfoHandlesCount =
 		psSGXAddSharedPBDescIN->ui32KernelMemInfoHandlesCount;
-	IMG_INT ret = 0;
+	int ret = 0;
 	IMG_HANDLE *phKernelMemInfoHandles = IMG_NULL;
 	PVRSRV_KERNEL_MEM_INFO **ppsKernelMemInfos = IMG_NULL;
 	IMG_UINT32 i;
@@ -1724,7 +1724,7 @@ PVRSRV_BRIDGE_SGX_ADDSHAREDPBDESC_RETURN_RESULT:
 	return ret;
 }
 
-static IMG_INT
+static int
 SGXGetInfoForSrvinitBW(IMG_UINT32 ui32BridgeID,
 					   PVRSRV_BRIDGE_IN_SGXINFO_FOR_SRVINIT *psSGXInfoForSrvinitIN,
 					   PVRSRV_BRIDGE_OUT_SGXINFO_FOR_SRVINIT *psSGXInfoForSrvinitOUT,

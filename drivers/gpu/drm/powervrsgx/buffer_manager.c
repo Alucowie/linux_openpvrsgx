@@ -2386,7 +2386,7 @@ static PVRSRV_ERROR XProcWorkaroundHandleToSI(IMG_HANDLE hOSMemHandle, IMG_UINT3
 }
 
 #if defined(PVRSRV_REFCOUNT_DEBUG)
-IMG_VOID _BM_XProcIndexAcquireDebug(const IMG_CHAR *pszFile, IMG_INT iLine, IMG_UINT32 ui32Index)
+IMG_VOID _BM_XProcIndexAcquireDebug(const IMG_CHAR *pszFile, int iLine, IMG_UINT32 ui32Index)
 #else
 IMG_VOID _BM_XProcIndexAcquire(IMG_UINT32 ui32Index)
 #endif
@@ -2399,7 +2399,7 @@ IMG_VOID _BM_XProcIndexAcquire(IMG_UINT32 ui32Index)
 }
 
 #if defined(PVRSRV_REFCOUNT_DEBUG)
-IMG_VOID _BM_XProcIndexReleaseDebug(const IMG_CHAR *pszFile, IMG_INT iLine, IMG_UINT32 ui32Index)
+IMG_VOID _BM_XProcIndexReleaseDebug(const IMG_CHAR *pszFile, int iLine, IMG_UINT32 ui32Index)
 #else
 IMG_VOID _BM_XProcIndexRelease(IMG_UINT32 ui32Index)
 #endif

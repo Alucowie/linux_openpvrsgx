@@ -1217,7 +1217,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 		IMG_UINT32	ui32StrLen;
 		IMG_UINT32 	ui32LenStrPerNum = 12; /* string length per UI32: 10 digits + '.' + '\0' = 12 bytes */
 		IMG_INT32	i32Count;
-		IMG_INT i;
+		int i;
 		psMiscInfo->ui32StatePresent |= PVRSRV_MISC_INFO_DDKVERSION_PRESENT;
 
 		/* construct DDK string */
