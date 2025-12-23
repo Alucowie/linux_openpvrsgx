@@ -55,7 +55,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define IMG_ADDRSPACE_PHYSADDR_BITS		32
 #endif
 
-typedef unsigned char	IMG_UINT8,	*IMG_PUINT8;
+typedef unsigned char	*IMG_PUINT8;
 typedef unsigned char	IMG_BYTE,	*IMG_PBYTE;
 typedef signed char		IMG_INT8,	*IMG_PINT8;
 typedef char			IMG_CHAR,	*IMG_PCHAR;

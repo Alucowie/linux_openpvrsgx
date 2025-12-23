@@ -143,7 +143,7 @@ IMG_VOID PVRSRVSetupMetricTimers(IMG_VOID *pvDevInfo)
 		*TCOR_2 = *TCNT_2 = (unsigned int)0xffffffff;
 
 		/* start timer 2 */
-		*TST_REG |= (IMG_UINT8)0x04;
+		*TST_REG |= (u8)0x04;
 
 		pui32TimerRegister = (IMG_UINT32 *)TCNT_2;
 

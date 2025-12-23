@@ -162,7 +162,7 @@ PVRSRV_ERROR OSReleaseSubMemHandle(IMG_HANDLE hOSMemHandle, IMG_UINT32 ui32Flags
 
 IMG_UINT32 OSGetCurrentProcessIDKM(IMG_VOID);
 IMG_UINTPTR_T OSGetCurrentThreadID( IMG_VOID );
-IMG_VOID OSMemSet(IMG_VOID *pvDest, IMG_UINT8 ui8Value, IMG_SIZE_T ui32Size);
+IMG_VOID OSMemSet(IMG_VOID *pvDest, uint8_t ui8Value, IMG_SIZE_T ui32Size);
 
 PVRSRV_ERROR OSAllocPages_Impl(IMG_UINT32 ui32Flags, IMG_SIZE_T ui32Size, IMG_UINT32 ui32PageSize,
 							   IMG_PVOID pvPrivData, IMG_UINT32 ui32PrivDataLength, IMG_HANDLE hBMHandle, IMG_PVOID *ppvLinAddr, IMG_HANDLE *phPageAlloc);
@@ -226,7 +226,7 @@ else alias to level 1 wrapper, else the wrapper function will be used*/
 
 	typedef struct
 	{	
-		IMG_UINT8 sGuardRegionBefore[8];
+		uint8_t sGuardRegionBefore[8];
 		IMG_CHAR sFileName[128];
 		IMG_UINT32 uLineNo;
 		IMG_SIZE_T uSize;

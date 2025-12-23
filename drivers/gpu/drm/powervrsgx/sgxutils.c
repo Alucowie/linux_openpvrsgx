@@ -781,8 +781,8 @@ IMG_HANDLE SGXRegisterHWRenderContextKM(IMG_HANDLE				hDeviceNode,
     MMU_CONTEXT *psMMUContext;
     IMG_DEV_PHYADDR sPDDevPAddr;
     int iPtrByte;
-    IMG_UINT8 *pSrc;
-    IMG_UINT8 *pDst;
+    u8 *pSrc;
+    u8 *pDst;
 	PRESMAN_ITEM psResItem;
 
 	eError = OSAllocMem(PVRSRV_OS_PAGEABLE_HEAP,
@@ -855,8 +855,8 @@ IMG_HANDLE SGXRegisterHWRenderContextKM(IMG_HANDLE				hDeviceNode,
        provided ui32OffsetToPDDevPAddr is a validly-aligned address for the
        current CPU architecture.
      */
-    pSrc = (IMG_UINT8 *)&sPDDevPAddr;
-    pDst = (IMG_UINT8 *)psCleanup->psHWRenderContextMemInfo->pvLinAddrKM;
+    pSrc = (uint8_t *)&sPDDevPAddr;
+    pDst = (uint8_t *)psCleanup->psHWRenderContextMemInfo->pvLinAddrKM;
     pDst += ui32OffsetToPDDevPAddr;
 
     for (iPtrByte = 0; iPtrByte < sizeof(IMG_DEV_PHYADDR); iPtrByte++)
@@ -939,8 +939,8 @@ IMG_HANDLE SGXRegisterHWTransferContextKM(IMG_HANDLE				hDeviceNode,
     MMU_CONTEXT *psMMUContext;
     IMG_DEV_PHYADDR sPDDevPAddr;
     int iPtrByte;
-    IMG_UINT8 *pSrc;
-    IMG_UINT8 *pDst;
+    uint8_t *pSrc;
+    uint8_t *pDst;
 	PRESMAN_ITEM psResItem;
 
 	eError = OSAllocMem(PVRSRV_OS_PAGEABLE_HEAP,
@@ -1013,8 +1013,8 @@ IMG_HANDLE SGXRegisterHWTransferContextKM(IMG_HANDLE				hDeviceNode,
        provided ui32OffsetToPDDevPAddr is a validly-aligned address for the
        current CPU architecture.
      */
-    pSrc = (IMG_UINT8 *)&sPDDevPAddr;
-    pDst = (IMG_UINT8 *)psCleanup->psHWTransferContextMemInfo->pvLinAddrKM;
+    pSrc = (uint8_t *)&sPDDevPAddr;
+    pDst = (uint8_t *)psCleanup->psHWTransferContextMemInfo->pvLinAddrKM;
     pDst += ui32OffsetToPDDevPAddr;
 
     for (iPtrByte = 0; iPtrByte < sizeof(IMG_DEV_PHYADDR); iPtrByte++)
@@ -1086,8 +1086,8 @@ PVRSRV_ERROR SGXSetTransferContextPriorityKM(
                 IMG_UINT32 ui32OffsetOfPriorityField)
 {
 	SGX_HW_TRANSFER_CONTEXT_CLEANUP *psCleanup;
-    IMG_UINT8 *pSrc;
-    IMG_UINT8 *pDst;
+    uint8_t *pSrc;
+    uint8_t *pDst;
     int iPtrByte;
 	PVR_UNREFERENCED_PARAMETER(hDeviceNode);
 
@@ -1109,9 +1109,9 @@ PVRSRV_ERROR SGXSetTransferContextPriorityKM(
            cannot be sure that offset (passed from user-land) is safe to deref
            as a word-ptr on current CPU arch: copy one byte at a time.
          */
-        pDst = (IMG_UINT8 *)psCleanup->psHWTransferContextMemInfo->pvLinAddrKM;
+        pDst = (uint8_t *)psCleanup->psHWTransferContextMemInfo->pvLinAddrKM;
         pDst += ui32OffsetOfPriorityField;
-        pSrc = (IMG_UINT8 *)&ui32Priority;
+        pSrc = (uint8_t *)&ui32Priority;
 
         for (iPtrByte = 0; iPtrByte < sizeof(ui32Priority); iPtrByte++)
         {
@@ -1129,8 +1129,8 @@ PVRSRV_ERROR SGXSetRenderContextPriorityKM(
                 IMG_UINT32 ui32OffsetOfPriorityField)
 {
 	SGX_HW_RENDER_CONTEXT_CLEANUP *psCleanup;
-    IMG_UINT8 *pSrc;
-    IMG_UINT8 *pDst;
+    uint8_t *pSrc;
+    uint8_t *pDst;
     int iPtrByte;
 	PVR_UNREFERENCED_PARAMETER(hDeviceNode);
 
@@ -1151,10 +1151,10 @@ PVRSRV_ERROR SGXSetRenderContextPriorityKM(
            cannot be sure that offset (passed from user-land) is safe to deref
            as a word-ptr on current CPU arch: copy one byte at a time.
          */
-        pDst = (IMG_UINT8 *)psCleanup->psHWRenderContextMemInfo->pvLinAddrKM;
+        pDst = (uint8_t *)psCleanup->psHWRenderContextMemInfo->pvLinAddrKM;
         pDst += ui32OffsetOfPriorityField;
 
-        pSrc = (IMG_UINT8 *)&ui32Priority;
+        pSrc = (uint8_t *)&ui32Priority;
 
         for (iPtrByte = 0; iPtrByte < sizeof(ui32Priority); iPtrByte++)
         {

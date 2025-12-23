@@ -1724,7 +1724,7 @@ PVRSRV_ERROR PVRSRVSwapToDCBufferKM(IMG_HANDLE	hDeviceKM,
 	/* setup the clip rects */
 	psFlipCmd->ui32ClipRectCount = ui32ClipRectCount;
 	/* cliprect memory appends the command structure */
-	psFlipCmd->psClipRect = (IMG_RECT*)((IMG_UINT8*)psFlipCmd + sizeof(DISPLAYCLASS_FLIP_COMMAND));	// PRQA S 3305
+	psFlipCmd->psClipRect = (IMG_RECT*)((u8*)psFlipCmd + sizeof(DISPLAYCLASS_FLIP_COMMAND));	// PRQA S 3305
 	/* copy the clip rects */
 	for(i=0; i<ui32ClipRectCount; i++)
 	{

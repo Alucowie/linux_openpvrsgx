@@ -76,8 +76,8 @@ typedef struct _PVRSRV_SGXDEV_INFO_
 	PVRSRV_DEVICE_TYPE		eDeviceType;
 	PVRSRV_DEVICE_CLASS		eDeviceClass;
 
-	IMG_UINT8				ui8VersionMajor;
-	IMG_UINT8				ui8VersionMinor;
+	u8				ui8VersionMajor;
+	u8				ui8VersionMinor;
 	IMG_UINT32				ui32CoreConfig;
 	IMG_UINT32				ui32CoreFlags;
 

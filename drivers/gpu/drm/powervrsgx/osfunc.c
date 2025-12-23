@@ -389,11 +389,11 @@ bool OSMemHandleIsPhysContig(IMG_VOID *hOSMemHandle)
 IMG_VOID OSMemCopy(IMG_VOID *pvDst, IMG_VOID *pvSrc, IMG_UINT32 ui32Size)
 {
 #if defined(USE_UNOPTIMISED_MEMCPY)
-    IMG_UINT8 *Src,*Dst;
+    u8 *Src,*Dst;
     int i;
 
-    Src=(IMG_UINT8 *)pvSrc;
-    Dst=(IMG_UINT8 *)pvDst;
+    Src=(u8 *)pvSrc;
+    Dst=(u8 *)pvDst;
     for(i=0;i<ui32Size;i++)
     {
         Dst[i]=Src[i];
@@ -420,13 +420,13 @@ IMG_VOID OSMemCopy(IMG_VOID *pvDst, IMG_VOID *pvSrc, IMG_UINT32 ui32Size)
  @Return   IMG_VOID
 
 ******************************************************************************/
-IMG_VOID OSMemSet(IMG_VOID *pvDest, IMG_UINT8 ui8Value, IMG_UINT32 ui32Size)
+IMG_VOID OSMemSet(IMG_VOID *pvDest, uint8_t ui8Value, IMG_UINT32 ui32Size)
 {
 #if defined(USE_UNOPTIMISED_MEMSET)
-    IMG_UINT8 *Buff;
+    uint8_t *Buff;
     int i;
 
-    Buff=(IMG_UINT8 *)pvDest;
+    Buff=(uint8_t *)pvDest;
     for(i=0;i<ui32Size;i++)
     {
         Buff[i]=ui8Value;
@@ -3435,7 +3435,7 @@ static inline void DoInnerCacheOp(IMG_HANDLE hOSMemHandle,
 	{
 		IMG_UINT32 ui32ByteRemain = ui32Length;
 		IMG_UINT32 ui32BytesToDo = PAGE_SIZE - (((IMG_UINT32) pvRangeAddrStart) & (~PAGE_MASK));
-		IMG_UINT8 *pbDo = (IMG_UINT8 *) pvRangeAddrStart;
+		uint8_t *pbDo = (uint8_t *) pvRangeAddrStart;
 	
 		while(ui32ByteRemain)
 		{
@@ -3580,7 +3580,7 @@ static inline void DoVirtualCacheOp(IMG_HANDLE hOSMemHandle,
 	{
 		IMG_UINT32 ui32ByteRemain = ui32Length;
 		IMG_UINT32 ui32BytesToDo = PAGE_SIZE - (((IMG_UINTPTR_T) pvRangeAddrStart) & (~PAGE_MASK));
-		IMG_UINT8 *pbDo = (IMG_UINT8 *) pvRangeAddrStart;
+		uint8_t *pbDo = (uint8_t *) pvRangeAddrStart;
 
 		while(ui32ByteRemain)
 		{

@@ -277,7 +277,7 @@ static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo)
 			Wait for the DC invalidate to complete - indicated by
 			outstanding reads reaching zero.
 		*/
-		if (PollForValueKM((IMG_UINT32 *)((IMG_UINT8*)psDevInfo->pvRegsBaseKM + EUR_CR_BIF_MEM_REQ_STAT),
+		if (PollForValueKM((IMG_UINT32 *)((u8*)psDevInfo->pvRegsBaseKM + EUR_CR_BIF_MEM_REQ_STAT),
 							0,
 							EUR_CR_BIF_MEM_REQ_STAT_READS_MASK,
 							MAX_HW_TIME_US,
