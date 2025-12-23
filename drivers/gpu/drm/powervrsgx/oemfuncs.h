@@ -28,9 +28,9 @@
 #define __OEMFUNCS_H__
 
 typedef IMG_UINT32   (*PFN_SRV_BRIDGEDISPATCH)( IMG_UINT32  Ioctl,
-												IMG_BYTE   *pInBuf,
+												u8   *pInBuf,
 												IMG_UINT32  InBufLen, 
-											    IMG_BYTE   *pOutBuf,
+											    u8   *pOutBuf,
 												IMG_UINT32  OutBufLen,
 												IMG_UINT32 *pdwBytesTransferred);
 typedef struct PVRSRV_DC_OEM_JTABLE_TAG

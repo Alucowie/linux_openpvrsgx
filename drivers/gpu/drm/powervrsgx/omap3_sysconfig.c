@@ -51,9 +51,9 @@ extern struct platform_device *gpsPVRLDMDev;
 #endif
 
 IMG_UINT32 PVRSRV_BridgeDispatchKM(IMG_UINT32	Ioctl,
-								   IMG_BYTE		*pInBuf,
+								   u8		*pInBuf,
 								   IMG_UINT32	InBufLen,
-								   IMG_BYTE		*pOutBuf,
+								   u8		*pOutBuf,
 								   IMG_UINT32	OutBufLen,
 								   IMG_UINT32	*pdwBytesTransferred);
 

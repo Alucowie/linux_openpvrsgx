@@ -2448,7 +2448,7 @@ PVRSRV_ERROR MMU_BIFResetPDAlloc(PVRSRV_SGXDEV_INFO *psDevInfo)
 	SYS_DATA *psSysData;
 	RA_ARENA *psLocalDevMemArena;
 	IMG_HANDLE hOSMemHandle = IMG_NULL;
-	IMG_BYTE *pui8MemBlock = IMG_NULL;
+	u8 *pui8MemBlock = IMG_NULL;
 	IMG_SYS_PHYADDR sMemBlockSysPAddr;
 	IMG_CPU_PHYADDR sMemBlockCpuPAddr;
 

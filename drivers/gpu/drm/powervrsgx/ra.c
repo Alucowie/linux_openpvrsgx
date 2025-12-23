@@ -1645,16 +1645,16 @@ RA_Free (RA_ARENA *pArena, IMG_UINTPTR_T base, bool bFreeBackingStore)
 
 #ifdef USE_BM_FREESPACE_CHECK
 {
-	IMG_BYTE* p;
-	IMG_BYTE* endp;
+	u8* p;
+	u8* endp;
 
-	p = (IMG_BYTE*)pBT->base + SysGetDevicePhysOffset();
-	endp = (IMG_BYTE*)((IMG_UINT32)(p + pBT->uSize));
+	p = (u8*)pBT->base + SysGetDevicePhysOffset();
+	endp = (u8*)((IMG_UINT32)(p + pBT->uSize));
 	while ((IMG_UINT32)p & 3)
 	{
 		*p++ = 0xAA;
 	}
-	while (p < (IMG_BYTE*)((IMG_UINT32)endp & 0xfffffffc))
+	while (p < (u8*)((IMG_UINT32)endp & 0xfffffffc))
 	{
 		*(IMG_UINT32*)p = 0xAAAAAAAA;
 		p += sizeof(IMG_UINT32);
@@ -1663,7 +1663,7 @@ RA_Free (RA_ARENA *pArena, IMG_UINTPTR_T base, bool bFreeBackingStore)
 	{
 		*p++ = 0xAA;
 	}
-	PVR_DPF((PVR_DBG_MESSAGE,"BM_FREESPACE_CHECK: RA_Free Cleared %08X to %08X (size=0x%x)",(IMG_BYTE*)pBT->base + SysGetDevicePhysOffset(),endp-1,pBT->uSize));
+	PVR_DPF((PVR_DBG_MESSAGE,"BM_FREESPACE_CHECK: RA_Free Cleared %08X to %08X (size=0x%x)",(u8*)pBT->base + SysGetDevicePhysOffset(),endp-1,pBT->uSize));
 }
 #endif
 		_FreeBT (pArena, pBT, bFreeBackingStore);
@@ -1725,8 +1725,8 @@ RA_ARENA* pJFSavedArena = IMG_NULL;
 IMG_VOID CheckBMFreespace(IMG_VOID)
 {
 	BT *pBT;
-	IMG_BYTE* p;
-	IMG_BYTE* endp;
+	u8* p;
+	u8* endp;
 
 	if (pJFSavedArena != IMG_NULL)
 	{
@@ -1734,8 +1734,8 @@ IMG_VOID CheckBMFreespace(IMG_VOID)
 		{
 			if (pBT->type == btt_free)
 			{
-				p = (IMG_BYTE*)pBT->base + SysGetDevicePhysOffset();
-				endp = (IMG_BYTE*)((IMG_UINT32)(p + pBT->uSize) & 0xfffffffc);
+				p = (u8*)pBT->base + SysGetDevicePhysOffset();
+				endp = (u8*)((IMG_UINT32)(p + pBT->uSize) & 0xfffffffc);
 
 				while ((IMG_UINT32)p & 3)
 				{

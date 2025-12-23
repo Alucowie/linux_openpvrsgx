@@ -3803,11 +3803,11 @@ static void per_cpu_cache_flush(void *arg)
 
 static void x86_flush_cache_range(const void *pvStart, const void *pvEnd)
 {
-	IMG_BYTE *pbStart = (IMG_BYTE *)pvStart;
-	IMG_BYTE *pbEnd = (IMG_BYTE *)pvEnd;
-	IMG_BYTE *pbBase;
+	u8 *pbStart = (u8 *)pvStart;
+	u8 *pbEnd = (u8 *)pvEnd;
+	u8 *pbBase;
 
-	pbEnd = (IMG_BYTE *)ROUND_UP((IMG_UINTPTR_T)pbEnd,
+	pbEnd = (u8 *)ROUND_UP((IMG_UINTPTR_T)pbEnd,
 								 boot_cpu_data.x86_clflush_size);
 
 	mb();
