@@ -216,7 +216,7 @@ IMG_VOID LinuxMMCleanup(IMG_VOID);
  * @return 
  ******************************************************************************/
 #define KMallocWrapper(ui32ByteSize, uFlags) _KMallocWrapper(ui32ByteSize, uFlags, __FILE__, __LINE__)
-IMG_VOID *_KMallocWrapper(IMG_UINT32 ui32ByteSize, gfp_t uFlags, IMG_CHAR *szFileName, IMG_UINT32 ui32Line);
+IMG_VOID *_KMallocWrapper(IMG_UINT32 ui32ByteSize, gfp_t uFlags, char *szFileName, IMG_UINT32 ui32Line);
 
 
 /*!
@@ -228,7 +228,7 @@ IMG_VOID *_KMallocWrapper(IMG_UINT32 ui32ByteSize, gfp_t uFlags, IMG_CHAR *szFil
  * @return 
  ******************************************************************************/
 #define KFreeWrapper(pvCpuVAddr) _KFreeWrapper(pvCpuVAddr, __FILE__, __LINE__)
-IMG_VOID _KFreeWrapper(IMG_VOID *pvCpuVAddr, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
+IMG_VOID _KFreeWrapper(IMG_VOID *pvCpuVAddr, char *pszFileName, IMG_UINT32 ui32Line);
 
 
 /*!
@@ -241,7 +241,7 @@ IMG_VOID _KFreeWrapper(IMG_VOID *pvCpuVAddr, IMG_CHAR *pszFileName, IMG_UINT32 u
  * @return 
  ******************************************************************************/
 #define VMallocWrapper(ui32Bytes, ui32AllocFlags) _VMallocWrapper(ui32Bytes, ui32AllocFlags, __FILE__, __LINE__)
-IMG_VOID *_VMallocWrapper(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AllocFlags, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
+IMG_VOID *_VMallocWrapper(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AllocFlags, char *pszFileName, IMG_UINT32 ui32Line);
 
 
 /*!
@@ -253,7 +253,7 @@ IMG_VOID *_VMallocWrapper(IMG_UINT32 ui32Bytes, IMG_UINT32 ui32AllocFlags, IMG_C
  * @return 
  ******************************************************************************/
 #define VFreeWrapper(pvCpuVAddr) _VFreeWrapper(pvCpuVAddr, __FILE__, __LINE__)
-IMG_VOID _VFreeWrapper(IMG_VOID *pvCpuVAddr, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
+IMG_VOID _VFreeWrapper(IMG_VOID *pvCpuVAddr, char *pszFileName, IMG_UINT32 ui32Line);
 
 
 /*!
@@ -293,7 +293,7 @@ IMG_VOID FreeVMallocLinuxMemArea(LinuxMemArea *psLinuxMemArea);
 IMG_VOID *_IORemapWrapper(IMG_CPU_PHYADDR BasePAddr,
                           IMG_UINT32 ui32Bytes,
                           IMG_UINT32 ui32MappingFlags,
-                          IMG_CHAR *pszFileName,
+                          char *pszFileName,
                           IMG_UINT32 ui32Line);
 
 
@@ -356,7 +356,7 @@ IMG_VOID FreeExternalKVLinuxMemArea(LinuxMemArea *psLinuxMemArea);
  ******************************************************************************/
 #define IOUnmapWrapper(pvIORemapCookie) \
     _IOUnmapWrapper(pvIORemapCookie, __FILE__, __LINE__)
-IMG_VOID _IOUnmapWrapper(IMG_VOID *pvIORemapCookie, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
+IMG_VOID _IOUnmapWrapper(IMG_VOID *pvIORemapCookie, char *pszFileName, IMG_UINT32 ui32Line);
 
 
 /*!
@@ -382,7 +382,7 @@ struct page *LinuxMemAreaOffsetToPage(LinuxMemArea *psLinuxMemArea, IMG_UINT32 u
  *
  * @return 
  ******************************************************************************/
-LinuxKMemCache *KMemCacheCreateWrapper(IMG_CHAR *pszName, size_t Size, size_t Align, IMG_UINT32 ui32Flags);
+LinuxKMemCache *KMemCacheCreateWrapper(char *pszName, size_t Size, size_t Align, IMG_UINT32 ui32Flags);
 
 
 /*!
@@ -407,7 +407,7 @@ IMG_VOID KMemCacheDestroyWrapper(LinuxKMemCache *psCache);
  ******************************************************************************/
 #define KMemCacheAllocWrapper(psCache, Flags) _KMemCacheAllocWrapper(psCache, Flags, __FILE__, __LINE__)
 
-IMG_VOID *_KMemCacheAllocWrapper(LinuxKMemCache *psCache, gfp_t Flags, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
+IMG_VOID *_KMemCacheAllocWrapper(LinuxKMemCache *psCache, gfp_t Flags, char *pszFileName, IMG_UINT32 ui32Line);
 
 /*!
  *******************************************************************************
@@ -419,7 +419,7 @@ IMG_VOID *_KMemCacheAllocWrapper(LinuxKMemCache *psCache, gfp_t Flags, IMG_CHAR 
  * @return 
  ******************************************************************************/
 #define KMemCacheFreeWrapper(psCache, pvObject) _KMemCacheFreeWrapper(psCache, pvObject, __FILE__, __LINE__)
-IMG_VOID _KMemCacheFreeWrapper(LinuxKMemCache *psCache, IMG_VOID *pvObject, IMG_CHAR *pszFileName, IMG_UINT32 ui32Line);
+IMG_VOID _KMemCacheFreeWrapper(LinuxKMemCache *psCache, IMG_VOID *pvObject, char *pszFileName, IMG_UINT32 ui32Line);
 
 
 /*!
@@ -430,7 +430,7 @@ IMG_VOID _KMemCacheFreeWrapper(LinuxKMemCache *psCache, IMG_VOID *pvObject, IMG_
  *
  * @return 
  ******************************************************************************/
-const IMG_CHAR *KMemCacheNameWrapper(LinuxKMemCache *psCache);
+const char *KMemCacheNameWrapper(LinuxKMemCache *psCache);
 
 
 /*!
@@ -600,7 +600,7 @@ LinuxMemAreaRootType(LinuxMemArea *psLinuxMemArea)
  *
  * @return const string representation of type
  ******************************************************************************/
-const IMG_CHAR *LinuxMemAreaTypeToString(LINUX_MEM_AREA_TYPE eMemAreaType);
+const char *LinuxMemAreaTypeToString(LINUX_MEM_AREA_TYPE eMemAreaType);
 
 
 /*!
@@ -611,6 +611,6 @@ const IMG_CHAR *LinuxMemAreaTypeToString(LINUX_MEM_AREA_TYPE eMemAreaType);
  *
  * @return 
  ******************************************************************************/
-const IMG_CHAR *HAPFlagsToString(IMG_UINT32 ui32Flags);
+const char *HAPFlagsToString(IMG_UINT32 ui32Flags);
 
 #endif /* __MM_H__ */

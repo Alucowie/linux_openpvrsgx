@@ -118,9 +118,9 @@ static PVRSRV_ERROR SysLocateDevices(SYS_DATA *psSysData)
 }
 
 
-static IMG_CHAR *SysCreateVersionString(void)
+static char *SysCreateVersionString(void)
 {
-	static IMG_CHAR aszVersionString[100];
+	static char aszVersionString[100];
 	SYS_DATA	*psSysData;
 	IMG_UINT32	ui32SGXRevision;
 	IMG_INT32	i32Count;

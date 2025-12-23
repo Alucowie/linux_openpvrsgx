@@ -52,7 +52,7 @@ typedef int (write_proc_t)(struct file *file, const char __user *buffer,unsigned
 
 #define END_OF_FILE (off_t) -1
 
-typedef off_t (pvr_read_proc_t)(IMG_CHAR *, size_t, off_t);
+typedef off_t (pvr_read_proc_t)(char *, size_t, off_t);
 
 
 #define PVR_PROC_SEQ_START_TOKEN (void*)1
@@ -78,25 +78,25 @@ void* ProcSeq1ElementOff2Element(struct seq_file *sfile, loff_t off);
 /** off2element function for elements with only ONE element (+ header) */
 void* ProcSeq1ElementHeaderOff2Element(struct seq_file *sfile, loff_t off);
 
-off_t printAppend(IMG_CHAR * buffer, size_t size, off_t off, const IMG_CHAR * format, ...)
+off_t printAppend(char * buffer, size_t size, off_t off, const char * format, ...)
 	__attribute__((format(printf, 4, 5)));
 
 int CreateProcEntries(IMG_VOID);
 
-int CreateProcReadEntry (const IMG_CHAR * name, pvr_read_proc_t handler);
+int CreateProcReadEntry (const char * name, pvr_read_proc_t handler);
 
-int CreateProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data);
+int CreateProcEntry(const char * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data);
 
-int CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data);
+int CreatePerProcessProcEntry(const char * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data);
 
-IMG_VOID RemoveProcEntry(const IMG_CHAR * name);
+IMG_VOID RemoveProcEntry(const char * name);
 
-IMG_VOID RemovePerProcessProcEntry(const IMG_CHAR * name);
+IMG_VOID RemovePerProcessProcEntry(const char * name);
 
 IMG_VOID RemoveProcEntries(IMG_VOID);
 
 struct proc_dir_entry* CreateProcReadEntrySeq (
-								const IMG_CHAR* name, 
+								const char* name, 
 								IMG_VOID* data,
 								pvr_next_proc_seq_t next_handler, 
 								pvr_show_proc_seq_t show_handler,
@@ -105,7 +105,7 @@ struct proc_dir_entry* CreateProcReadEntrySeq (
 							   );
 
 struct proc_dir_entry* CreateProcEntrySeq (
-								const IMG_CHAR* name, 
+								const char* name, 
 								IMG_VOID* data,
 								pvr_next_proc_seq_t next_handler, 
 								pvr_show_proc_seq_t show_handler,
@@ -115,7 +115,7 @@ struct proc_dir_entry* CreateProcEntrySeq (
 							   );
 
 struct proc_dir_entry* CreatePerProcessProcEntrySeq (
-								const IMG_CHAR* name, 
+								const char* name, 
 								IMG_VOID* data,
 								pvr_next_proc_seq_t next_handler, 
 								pvr_show_proc_seq_t show_handler,

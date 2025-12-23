@@ -305,7 +305,7 @@ typedef struct _PVRSRV_HEAP_INFO_KM_
 typedef struct _PVRSRV_EVENTOBJECT_KM_
 {
 	/* globally unique name of the event object */
-	IMG_CHAR	szName[EVENTOBJNAME_MAXLENGTH];
+	char	szName[EVENTOBJNAME_MAXLENGTH];
 	/* kernel specific handle for the event object */
 	IMG_HANDLE	hOSEventKM;
 
@@ -332,7 +332,7 @@ typedef struct _PVRSRV_MISC_INFO_KM_
 	IMG_UINT32	ui32SOCClockGateRegsSize;
 
 	/* Memory Stats/DDK version string depending on ui32StateRequest flags */
-	IMG_CHAR	*pszMemoryStr;
+	char	*pszMemoryStr;
 	IMG_UINT32	ui32MemoryStrLen;
 
 	/* global event object */

@@ -2666,9 +2666,9 @@ DummyBW(IMG_UINT32 ui32BridgeID,
  ********************************************************************************/
 IMG_VOID
 _SetDispatchTableEntry(IMG_UINT32 ui32Index,
-					   const IMG_CHAR *pszIOCName,
+					   const char *pszIOCName,
 					   BridgeWrapperFunction pfFunction,
-					   const IMG_CHAR *pszFunctionName)
+					   const char *pszFunctionName)
 {
 	static IMG_UINT32 ui32PrevIndex = ~0UL;		/* -1 */
 

@@ -116,7 +116,7 @@ typedef struct _RA_SEGMENT_DETAILS_ RA_SEGMENT_DETAILS;
  *  @Return arena handle, or IMG_NULL.
  */
 RA_ARENA *
-RA_Create (IMG_CHAR *name,
+RA_Create (char *name,
            IMG_UINTPTR_T base,
            IMG_SIZE_T uSize,
            BM_MAPPING *psMapping,
@@ -277,11 +277,11 @@ bool RA_GetNextLiveSegment(IMG_HANDLE hArena, RA_SEGMENT_DETAILS *psSegDetails);
  *  @Return PVRSRV_ERROR
  */
 PVRSRV_ERROR RA_GetStats(RA_ARENA *pArena,
-							IMG_CHAR **ppszStr, 
+							char **ppszStr, 
 							IMG_UINT32 *pui32StrLen);
 
 PVRSRV_ERROR RA_GetStatsFreeMem(RA_ARENA *pArena,
-								IMG_CHAR **ppszStr, 
+								char **ppszStr, 
 								IMG_UINT32 *pui32StrLen);
 
 #endif /* #ifdef RA_STATS */

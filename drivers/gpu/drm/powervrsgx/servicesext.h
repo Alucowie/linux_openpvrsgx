@@ -870,7 +870,7 @@ typedef struct DISPLAY_INFO_TAG
 	IMG_UINT32 ui32PhysicalWidthmm;
 	IMG_UINT32 ui32PhysicalHeightmm;
 	/* display name */
-	IMG_CHAR	szDisplayName[MAX_DISPLAY_NAME_SIZE];
+	char	szDisplayName[MAX_DISPLAY_NAME_SIZE];
 #if defined(SUPPORT_HW_CURSOR)
 	/* cursor dimensions */
 	IMG_UINT16	ui32CursorWidth;
@@ -940,7 +940,7 @@ typedef struct BUFFER_INFO_TAG
 	IMG_UINT32			ui32Width;
 	IMG_UINT32			ui32Height;
 	IMG_UINT32			ui32Flags;
-	IMG_CHAR			szDeviceName[MAX_BUFFER_DEVICE_NAME_SIZE];
+	char			szDeviceName[MAX_BUFFER_DEVICE_NAME_SIZE];
 } BUFFER_INFO;
 
 typedef enum _OVERLAY_DEINTERLACE_MODE_

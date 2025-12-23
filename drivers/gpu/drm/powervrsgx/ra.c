@@ -175,7 +175,7 @@ typedef struct _BT_ BT;
 struct _RA_ARENA_
 {
 	/* arena name for diagnostics output */
-	IMG_CHAR *name;
+	char *name;
 
 	/* allocations within this arena are quantum sized */
 	IMG_SIZE_T uQuantum;
@@ -1092,7 +1092,7 @@ _AttemptAllocAligned (RA_ARENA *pArena,
 	@Return         arena handle, or IMG_NULL.
 ******************************************************************************/
 RA_ARENA *
-RA_Create (IMG_CHAR *name,
+RA_Create (char *name,
 		   IMG_UINTPTR_T base,
 		   IMG_SIZE_T uSize,
 		   BM_MAPPING *psMapping,
@@ -1764,7 +1764,7 @@ IMG_VOID CheckBMFreespace(IMG_VOID)
 
 
 #if defined (RA_STATS)
-static IMG_CHAR *
+static char *
 _BTType (int eType)
 {
 	switch (eType)
@@ -1832,10 +1832,10 @@ RA_Dump (RA_ARENA *pArena)
 	@Return         PVRSRV_ERROR
 ******************************************************************************/
 PVRSRV_ERROR RA_GetStats(RA_ARENA *pArena,
-							IMG_CHAR **ppszStr,
+							char **ppszStr,
 							IMG_UINT32 *pui32StrLen)
 {
-	IMG_CHAR 	*pszStr = *ppszStr;
+	char 	*pszStr = *ppszStr;
 	IMG_UINT32 	ui32StrLen = *pui32StrLen;
 	IMG_INT32	i32Count;
 	BT 			*pBT;
@@ -1925,10 +1925,10 @@ PVRSRV_ERROR RA_GetStats(RA_ARENA *pArena,
 }
 
 PVRSRV_ERROR RA_GetStatsFreeMem(RA_ARENA *pArena,
-								IMG_CHAR **ppszStr, 
+								char **ppszStr, 
 								IMG_UINT32 *pui32StrLen)
 {
-	IMG_CHAR 	*pszStr = *ppszStr;
+	char 	*pszStr = *ppszStr;
 	IMG_UINT32 	ui32StrLen = *pui32StrLen;
 	IMG_INT32	i32Count;
 	CHECK_SPACE(ui32StrLen);

@@ -738,7 +738,7 @@ typedef struct PVRSRV_BRIDGE_IN_PDUMP_DUMPREG_TAG
 	IMG_HANDLE		hDevCookie;
 	PVRSRV_HWREG	sHWReg;
 	IMG_UINT32		ui32Flags;
-	IMG_CHAR		szRegRegion[32];
+	char		szRegRegion[32];
 
 }PVRSRV_BRIDGE_IN_PDUMP_DUMPREG;
 
@@ -752,7 +752,7 @@ typedef struct PVRSRV_BRIDGE_IN_PDUMP_REGPOL_TAG
 	PVRSRV_HWREG sHWReg;
 	IMG_UINT32 ui32Mask;
 	IMG_UINT32 ui32Flags;
-	IMG_CHAR   szRegRegion[32];
+	char   szRegRegion[32];
 }PVRSRV_BRIDGE_IN_PDUMP_REGPOL;
 
 /******************************************************************************
@@ -789,7 +789,7 @@ typedef struct PVRSRV_BRIDGE_IN_PDUMP_MEMPAGES_TAG
 typedef struct PVRSRV_BRIDGE_IN_PDUMP_COMMENT_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
-	IMG_CHAR szComment[PVRSRV_PDUMP_MAX_COMMENT_SIZE];
+	char szComment[PVRSRV_PDUMP_MAX_COMMENT_SIZE];
 	IMG_UINT32 ui32Flags;
 
 }PVRSRV_BRIDGE_IN_PDUMP_COMMENT;
@@ -814,7 +814,7 @@ typedef struct PVRSRV_BRIDGE_IN_PDUMP_BITMAP_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
 	IMG_HANDLE hDevCookie;
-	IMG_CHAR   szFileName[PVRSRV_PDUMP_MAX_FILENAME_SIZE];
+	char   szFileName[PVRSRV_PDUMP_MAX_FILENAME_SIZE];
 	IMG_UINT32 ui32FileOffset;
 	IMG_UINT32 ui32Width;
 	IMG_UINT32 ui32Height;
@@ -836,12 +836,12 @@ typedef struct PVRSRV_BRIDGE_IN_PDUMP_READREG_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
 	IMG_HANDLE hDevCookie;
-	IMG_CHAR   szFileName[PVRSRV_PDUMP_MAX_FILENAME_SIZE];
+	char   szFileName[PVRSRV_PDUMP_MAX_FILENAME_SIZE];
 	IMG_UINT32 ui32FileOffset;
 	IMG_UINT32 ui32Address;
 	IMG_UINT32 ui32Size;
 	IMG_UINT32 ui32Flags;
-	IMG_CHAR   szRegRegion[32];
+	char   szRegRegion[32];
 
 }PVRSRV_BRIDGE_IN_PDUMP_READREG;
 
@@ -851,7 +851,7 @@ typedef struct PVRSRV_BRIDGE_IN_PDUMP_READREG_TAG
 typedef struct PVRSRV_BRIDGE_IN_PDUMP_DRIVERINFO_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
-	IMG_CHAR szString[PVRSRV_PDUMP_MAX_COMMENT_SIZE];
+	char szString[PVRSRV_PDUMP_MAX_COMMENT_SIZE];
 	bool bContinuous;
 
 }PVRSRV_BRIDGE_IN_PDUMP_DRIVERINFO;

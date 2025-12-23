@@ -459,7 +459,7 @@ IMG_HANDLE ParentHandle(struct sHandle *psHandle)
  * containing the linked list structure.
  */
 #define	LIST_PTR_FROM_INDEX_AND_OFFSET(psBase, i, p, po, eo) \
-		((struct sHandleList *)((IMG_CHAR *)(INDEX_TO_HANDLE_STRUCT_PTR(psBase, i)) + (((i) == (p)) ? (po) : (eo))))
+		((struct sHandleList *)((char *)(INDEX_TO_HANDLE_STRUCT_PTR(psBase, i)) + (((i) == (p)) ? (po) : (eo))))
 
 /*!
 ******************************************************************************

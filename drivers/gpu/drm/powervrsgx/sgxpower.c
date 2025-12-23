@@ -213,7 +213,7 @@ static IMG_VOID SGXStartTimer(PVRSRV_SGXDEV_INFO	*psDevInfo)
 static IMG_VOID SGXPollForClockGating (PVRSRV_SGXDEV_INFO	*psDevInfo,
 									   IMG_UINT32			ui32Register,
 									   IMG_UINT32			ui32RegisterValue,
-									   IMG_CHAR				*pszComment)
+									   char				*pszComment)
 {
 	PVR_UNREFERENCED_PARAMETER(psDevInfo);
 	PVR_UNREFERENCED_PARAMETER(ui32Register);

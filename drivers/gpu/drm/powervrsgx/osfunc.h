@@ -78,7 +78,7 @@ IMG_UINT32 OSClockus(IMG_VOID);
 IMG_SIZE_T OSGetPageSize(IMG_VOID);
 PVRSRV_ERROR OSInstallDeviceLISR(IMG_VOID *pvSysData,
 								 IMG_UINT32 ui32Irq,
-								 IMG_CHAR *pszISRName,
+								 char *pszISRName,
 								 IMG_VOID *pvDeviceNode);
 PVRSRV_ERROR OSUninstallDeviceLISR(IMG_VOID *pvSysData);
 PVRSRV_ERROR OSInstallSystemLISR(IMG_VOID *pvSysData, IMG_UINT32 ui32Irq);
@@ -213,21 +213,21 @@ else alias to level 1 wrapper, else the wrapper function will be used*/
 										IMG_UINT32 ui32Size,
 										IMG_PVOID *ppvCpuVAddr,
 										IMG_HANDLE *phBlockAlloc,
-										IMG_CHAR *pszFilename,
+										char *pszFilename,
 										IMG_UINT32 ui32Line);
 	
 	PVRSRV_ERROR OSFreeMem_Debug_Wrapper(IMG_UINT32 ui32Flags,
 									 IMG_UINT32 ui32Size,
 									 IMG_PVOID pvCpuVAddr,
 									 IMG_HANDLE hBlockAlloc,
-									 IMG_CHAR *pszFilename,
+									 char *pszFilename,
 									 IMG_UINT32 ui32Line);
 
 
 	typedef struct
 	{	
 		uint8_t sGuardRegionBefore[8];
-		IMG_CHAR sFileName[128];
+		char sFileName[128];
 		IMG_UINT32 uLineNo;
 		IMG_SIZE_T uSize;
 		IMG_SIZE_T uSizeParityCheck;
@@ -247,8 +247,8 @@ else alias to level 1 wrapper, else the wrapper function will be used*/
  
 /*If level 1 wrapper is enabled declare the functions with extra parameters
 else alias to level 0 and declare the functions without the extra debugging parameters*/
-	PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_SIZE_T ui32Size, IMG_PVOID *ppvLinAddr, IMG_HANDLE *phBlockAlloc, IMG_CHAR *pszFilename, IMG_UINT32 ui32Line);
-	PVRSRV_ERROR OSFreeMem_Impl(IMG_UINT32 ui32Flags, IMG_SIZE_T ui32Size, IMG_PVOID pvLinAddr, IMG_HANDLE hBlockAlloc, IMG_CHAR *pszFilename, IMG_UINT32 ui32Line);
+	PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_SIZE_T ui32Size, IMG_PVOID *ppvLinAddr, IMG_HANDLE *phBlockAlloc, char *pszFilename, IMG_UINT32 ui32Line);
+	PVRSRV_ERROR OSFreeMem_Impl(IMG_UINT32 ui32Flags, IMG_SIZE_T ui32Size, IMG_PVOID pvLinAddr, IMG_HANDLE hBlockAlloc, char *pszFilename, IMG_UINT32 ui32Line);
 	
 	#define OSAllocMem_Debug_Linux_Memory_Allocations OSAllocMem_Impl
 	#define OSFreeMem_Debug_Linux_Memory_Allocations OSFreeMem_Impl
@@ -260,11 +260,11 @@ bool OSMemHandleIsPhysContig(IMG_VOID *hOSMemHandle);
 
 PVRSRV_ERROR OSInitEnvData(IMG_PVOID *ppvEnvSpecificData);
 PVRSRV_ERROR OSDeInitEnvData(IMG_PVOID pvEnvSpecificData);
-IMG_CHAR* OSStringCopy(IMG_CHAR *pszDest, const IMG_CHAR *pszSrc);
-IMG_INT32 OSSNPrintf(IMG_CHAR *pStr, IMG_SIZE_T ui32Size, const IMG_CHAR *pszFormat, ...) IMG_FORMAT_PRINTF(3, 4);
+char* OSStringCopy(char *pszDest, const char *pszSrc);
+IMG_INT32 OSSNPrintf(char *pStr, IMG_SIZE_T ui32Size, const char *pszFormat, ...) IMG_FORMAT_PRINTF(3, 4);
 #define OSStringLength(pszString) strlen(pszString)
 
-PVRSRV_ERROR OSEventObjectCreateKM(const IMG_CHAR *pszName,
+PVRSRV_ERROR OSEventObjectCreateKM(const char *pszName,
 								 PVRSRV_EVENTOBJECT *psEventObject);
 PVRSRV_ERROR OSEventObjectDestroyKM(PVRSRV_EVENTOBJECT *psEventObject);
 PVRSRV_ERROR OSEventObjectSignalKM(IMG_HANDLE hOSEventKM);
@@ -453,7 +453,7 @@ IMG_VOID OSTimeDestroy(IMG_PVOID pvData);
 IMG_VOID OSReleaseBridgeLock(IMG_VOID);
 IMG_VOID OSReacquireBridgeLock(IMG_VOID);
 
-IMG_VOID OSGetCurrentProcessNameKM(IMG_CHAR *pszName, IMG_UINT32 ui32Size);
+IMG_VOID OSGetCurrentProcessNameKM(char *pszName, IMG_UINT32 ui32Size);
 
 #endif /* __OSFUNC_H__ */
 

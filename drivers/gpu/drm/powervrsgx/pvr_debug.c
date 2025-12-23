@@ -63,8 +63,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define	PVR_DEBUG_ALWAYS_USE_SPINLOCK
 #endif
 
-static bool VBAppend(IMG_CHAR *pszBuf, IMG_UINT32 ui32BufSiz,
-						 const IMG_CHAR* pszFormat, va_list VArgs)
+static bool VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz,
+						 const char* pszFormat, va_list VArgs)
 						 IMG_FORMAT_PRINTF(3, 0);
 
 
@@ -72,8 +72,8 @@ static bool VBAppend(IMG_CHAR *pszBuf, IMG_UINT32 ui32BufSiz,
 
 #define PVR_MAX_FILEPATH_LEN 256
 
-static bool BAppend(IMG_CHAR *pszBuf, IMG_UINT32 ui32BufSiz,
-						const IMG_CHAR *pszFormat, ...)
+static bool BAppend(char *pszBuf, IMG_UINT32 ui32BufSiz,
+						const char *pszFormat, ...)
 						IMG_FORMAT_PRINTF(3, 4);
 
 /* NOTE: Must NOT be static! Used in module.c.. */
@@ -86,11 +86,11 @@ IMG_UINT32 gPVRDebugLevel =
 
 #if !defined(PVR_DEBUG_ALWAYS_USE_SPINLOCK)
 /* Message buffer for non-IRQ messages */
-static IMG_CHAR gszBufferNonIRQ[PVR_MAX_MSG_LEN + 1];
+static char gszBufferNonIRQ[PVR_MAX_MSG_LEN + 1];
 #endif
 
 /* Message buffer for IRQ messages */
-static IMG_CHAR gszBufferIRQ[PVR_MAX_MSG_LEN + 1];
+static char gszBufferIRQ[PVR_MAX_MSG_LEN + 1];
 
 #if !defined(PVR_DEBUG_ALWAYS_USE_SPINLOCK)
 /* The lock is used to control access to gszBufferNonIRQ */
@@ -137,7 +137,7 @@ static inline void ReleaseBufferLock(unsigned long ulLockFlags)
 #endif
 }
 
-static inline void SelectBuffer(IMG_CHAR **ppszBuf, IMG_UINT32 *pui32BufSiz)
+static inline void SelectBuffer(char **ppszBuf, IMG_UINT32 *pui32BufSiz)
 {
 #if !defined(PVR_DEBUG_ALWAYS_USE_SPINLOCK)
 	if (USE_SPIN_LOCK)
@@ -160,7 +160,7 @@ static inline void SelectBuffer(IMG_CHAR **ppszBuf, IMG_UINT32 *pui32BufSiz)
  * The function takes a variable number of arguments, pointed
  * to by the var args list.
  */
-static bool VBAppend(IMG_CHAR *pszBuf, IMG_UINT32 ui32BufSiz, const IMG_CHAR* pszFormat, va_list VArgs)
+static bool VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz, const char* pszFormat, va_list VArgs)
 {
 	IMG_UINT32 ui32Used;
 	IMG_UINT32 ui32Space;
@@ -194,11 +194,11 @@ IMG_VOID PVRDPFInit(IMG_VOID)
 	@Input       ... - Zero or more arguments for use by the format string
 	@Return      None
  ******************************************************************************/
-IMG_VOID PVRSRVReleasePrintf(const IMG_CHAR *pszFormat, ...)
+IMG_VOID PVRSRVReleasePrintf(const char *pszFormat, ...)
 {
 	va_list vaArgs;
 	unsigned long ulLockFlags = 0;
-	IMG_CHAR *pszBuf;
+	char *pszBuf;
 	IMG_UINT32 ui32BufSiz;
 
 	SelectBuffer(&pszBuf, &ui32BufSiz);
@@ -232,11 +232,11 @@ IMG_VOID PVRSRVReleasePrintf(const IMG_CHAR *pszFormat, ...)
 	@Input       ... - Zero or more arguments for use by the format string
 	@Return      None
  ******************************************************************************/
-IMG_VOID PVRSRVTrace(const IMG_CHAR* pszFormat, ...)
+IMG_VOID PVRSRVTrace(const char* pszFormat, ...)
 {
 	va_list VArgs;
 	unsigned long ulLockFlags = 0;
-	IMG_CHAR *pszBuf;
+	char *pszBuf;
 	IMG_UINT32 ui32BufSiz;
 
 	SelectBuffer(&pszBuf, &ui32BufSiz);
@@ -270,7 +270,7 @@ IMG_VOID PVRSRVTrace(const IMG_CHAR* pszFormat, ...)
  * The function takes a variable number of arguments, calling
  * VBAppend to do the actual work.
  */
-static bool BAppend(IMG_CHAR *pszBuf, IMG_UINT32 ui32BufSiz, const IMG_CHAR *pszFormat, ...)
+static bool BAppend(char *pszBuf, IMG_UINT32 ui32BufSiz, const char *pszFormat, ...)
 {
 	va_list VArgs;
 	bool bTrunc;
@@ -297,15 +297,15 @@ static bool BAppend(IMG_CHAR *pszBuf, IMG_UINT32 ui32BufSiz, const IMG_CHAR *psz
  ******************************************************************************/
 IMG_VOID PVRSRVDebugPrintf	(
 						IMG_UINT32	ui32DebugLevel,
-						const IMG_CHAR*	pszFullFileName,
+						const char*	pszFullFileName,
 						IMG_UINT32	ui32Line,
-						const IMG_CHAR*	pszFormat,
+						const char*	pszFormat,
 						...
 					)
 {
 	bool bTrace;
-	const IMG_CHAR *pszFileName = pszFullFileName;
-	IMG_CHAR *pszLeafName;
+	const char *pszFileName = pszFullFileName;
+	char *pszLeafName;
 
 
 	bTrace = (bool)(ui32DebugLevel & DBGPRIV_CALLTRACE) ? true : false;
@@ -314,7 +314,7 @@ IMG_VOID PVRSRVDebugPrintf	(
 	{
 		va_list vaArgs;
 		unsigned long ulLockFlags = 0;
-		IMG_CHAR *pszBuf;
+		char *pszBuf;
 		IMG_UINT32 ui32BufSiz;
 
 		SelectBuffer(&pszBuf, &ui32BufSiz);
@@ -375,10 +375,10 @@ IMG_VOID PVRSRVDebugPrintf	(
 			if (bTrace == false)
 			{
 				/* Buffer for rewriting filepath in log messages */
-				static IMG_CHAR szFileNameRewrite[PVR_MAX_FILEPATH_LEN];
+				static char szFileNameRewrite[PVR_MAX_FILEPATH_LEN];
 
-				IMG_CHAR* pszTruncIter;
-				IMG_CHAR* pszTruncBackInter;
+				char* pszTruncIter;
+				char* pszTruncBackInter;
 
 				/* Truncate path (DEBUG_LOG_PATH_TRUNCATE shoud be set to EURASIA env var)*/
 				if (strlen(pszFullFileName) > strlen(DEBUG_LOG_PATH_TRUNCATE)+1)
@@ -389,14 +389,14 @@ IMG_VOID PVRSRVDebugPrintf	(
 				strncpy(szFileNameRewrite, pszFileName,PVR_MAX_FILEPATH_LEN);
 
 				if(strlen(szFileNameRewrite) == PVR_MAX_FILEPATH_LEN-1) {
-					IMG_CHAR szTruncateMassage[] = "FILENAME TRUNCATED";
+					char szTruncateMassage[] = "FILENAME TRUNCATED";
 					strcpy(szFileNameRewrite + (PVR_MAX_FILEPATH_LEN - 1 - strlen(szTruncateMassage)), szTruncateMassage);
 				}
 
 				pszTruncIter = szFileNameRewrite;
 				while(*pszTruncIter++ != 0)
 				{
-					IMG_CHAR* pszNextStartPoint;
+					char* pszNextStartPoint;
 					/* Find '/../' pattern */
 					if(
 					   !( ( *pszTruncIter == '/' && (pszTruncIter-4 >= szFileNameRewrite) ) &&
@@ -429,7 +429,7 @@ IMG_VOID PVRSRVDebugPrintf	(
 				if(*pszFileName == '/') pszFileName++;
 
 #if !defined(__sh__)
-				pszLeafName = (IMG_CHAR *)strrchr (pszFileName, '\\');
+				pszLeafName = (char *)strrchr (pszFileName, '\\');
 
 				if (pszLeafName)
 				{
@@ -460,10 +460,10 @@ IMG_VOID PVRSRVDebugPrintf	(
 
 #endif /* PVRSRV_NEED_PVR_DPF */
 
-int PVRDebugProcSetLevel(struct file *file, const IMG_CHAR *buffer, IMG_UINT32 count, IMG_VOID *data)
+int PVRDebugProcSetLevel(struct file *file, const char *buffer, IMG_UINT32 count, IMG_VOID *data)
 {
 #define	_PROC_SET_BUFFER_SZ		6
-	IMG_CHAR data_buffer[_PROC_SET_BUFFER_SZ];
+	char data_buffer[_PROC_SET_BUFFER_SZ];
 
 	if (count > _PROC_SET_BUFFER_SZ)
 	{

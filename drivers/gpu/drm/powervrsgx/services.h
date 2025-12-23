@@ -295,8 +295,8 @@ typedef struct _PVRSRV_DEVICE_IDENTIFIER_
 	PVRSRV_DEVICE_TYPE		eDeviceType;		/*!< Identifies the type of the device */
 	PVRSRV_DEVICE_CLASS		eDeviceClass;		/*!< Identifies more general class of device - display/3d/mpeg etc */
 	IMG_UINT32				ui32DeviceIndex;	/*!< Index of the device within the system */
-	IMG_CHAR				*pszPDumpDevName;	/*!< Pdump memory bank name */
-	IMG_CHAR				*pszPDumpRegName;	/*!< Pdump register bank name */
+	char				*pszPDumpDevName;	/*!< Pdump memory bank name */
+	char				*pszPDumpRegName;	/*!< Pdump register bank name */
 
 } PVRSRV_DEVICE_IDENTIFIER;
 
@@ -451,7 +451,7 @@ typedef struct _PVRSRV_HEAP_INFO_
 typedef struct _PVRSRV_EVENTOBJECT_
 {
 	/* globally unique name of the event object */
-	IMG_CHAR	szName[EVENTOBJNAME_MAXLENGTH];
+	char	szName[EVENTOBJNAME_MAXLENGTH];
 	/* kernel specific handle for the event object */
 	IMG_HANDLE	hOSEventKM;
 } PVRSRV_EVENTOBJECT;
@@ -486,7 +486,7 @@ typedef struct _PVRSRV_MISC_INFO_
 	IMG_UINT32	ui32SOCClockGateRegsSize;
 
 	/* Memory Stats/DDK version string depending on ui32StateRequest flags */
-	IMG_CHAR	*pszMemoryStr;
+	char	*pszMemoryStr;
 	IMG_UINT32	ui32MemoryStrLen;
 
 	/* global event object */
@@ -971,21 +971,21 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpSync(IMG_CONST PVRSRV_CONNECTION *psConnect
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpReg(IMG_CONST PVRSRV_DEV_DATA *psDevData,
-										 IMG_CHAR *pszRegRegion,
+										 char *pszRegRegion,
 											IMG_UINT32 ui32RegAddr,
 											IMG_UINT32 ui32RegValue,
 											IMG_UINT32 ui32Flags);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpRegPolWithFlags(const PVRSRV_DEV_DATA *psDevData,
-													 IMG_CHAR *pszRegRegion,
+													 char *pszRegRegion,
 													 IMG_UINT32 ui32RegAddr,
 													 IMG_UINT32 ui32RegValue,
 													 IMG_UINT32 ui32Mask,
 													 IMG_UINT32 ui32Flags);
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpRegPol(const PVRSRV_DEV_DATA *psDevData,
-											IMG_CHAR *pszRegRegion,
+											char *pszRegRegion,
 											IMG_UINT32 ui32RegAddr,
 											IMG_UINT32 ui32RegValue,
 											IMG_UINT32 ui32Mask);
@@ -1016,26 +1016,26 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpSetFrame(IMG_CONST PVRSRV_CONNECTION *psCon
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpComment(IMG_CONST PVRSRV_CONNECTION *psConnection,
-											 IMG_CONST IMG_CHAR *pszComment,
+											 IMG_CONST char *pszComment,
 											 bool bContinuous);
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpCommentf(IMG_CONST PVRSRV_CONNECTION *psConnection,
 											  bool bContinuous,
-											  IMG_CONST IMG_CHAR *pszFormat, ...)
+											  IMG_CONST char *pszFormat, ...)
 											  IMG_FORMAT_PRINTF(3, 4)
 ;
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpCommentWithFlagsf(IMG_CONST PVRSRV_CONNECTION *psConnection,
 													   IMG_UINT32 ui32Flags,
-													   IMG_CONST IMG_CHAR *pszFormat, ...)
+													   IMG_CONST char *pszFormat, ...)
 													   IMG_FORMAT_PRINTF(3, 4)
 ;
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpDriverInfo(IMG_CONST PVRSRV_CONNECTION *psConnection,
-								 				IMG_CHAR *pszString,
+								 				char *pszString,
 												bool bContinuous);
 
 IMG_IMPORT
@@ -1044,7 +1044,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpIsCapturing(IMG_CONST PVRSRV_CONNECTION *ps
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpBitmap(IMG_CONST PVRSRV_DEV_DATA *psDevData,
-								 			IMG_CHAR *pszFileName,
+								 			char *pszFileName,
 											IMG_UINT32 ui32FileOffset,
 											IMG_UINT32 ui32Width,
 											IMG_UINT32 ui32Height,
@@ -1058,8 +1058,8 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpBitmap(IMG_CONST PVRSRV_DEV_DATA *psDevData
 
 IMG_IMPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpRegRead(IMG_CONST PVRSRV_DEV_DATA *psDevData,
-											IMG_CONST IMG_CHAR *pszRegRegion,
-								 			IMG_CONST IMG_CHAR *pszFileName,
+											IMG_CONST char *pszRegRegion,
+								 			IMG_CONST char *pszFileName,
 											IMG_UINT32 ui32FileOffset,
 											IMG_UINT32 ui32Address,
 											IMG_UINT32 ui32Size,
@@ -1074,28 +1074,28 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVPDumpCycleCountRegRead(IMG_CONST PVRSRV_DEV_DATA
 														IMG_UINT32 ui32RegOffset,
 														bool bLastFrame);
 
-IMG_IMPORT IMG_HANDLE	PVRSRVLoadLibrary(const IMG_CHAR *pszLibraryName);
+IMG_IMPORT IMG_HANDLE	PVRSRVLoadLibrary(const char *pszLibraryName);
 IMG_IMPORT PVRSRV_ERROR	PVRSRVUnloadLibrary(IMG_HANDLE hExtDrv);
-IMG_IMPORT PVRSRV_ERROR	PVRSRVGetLibFuncAddr(IMG_HANDLE hExtDrv, const IMG_CHAR *pszFunctionName, IMG_VOID **ppvFuncAddr);
+IMG_IMPORT PVRSRV_ERROR	PVRSRVGetLibFuncAddr(IMG_HANDLE hExtDrv, const char *pszFunctionName, IMG_VOID **ppvFuncAddr);
 
 IMG_IMPORT IMG_UINT32 PVRSRVClockus (void);
 IMG_IMPORT IMG_VOID PVRSRVWaitus (IMG_UINT32 ui32Timeus);
 IMG_IMPORT IMG_VOID PVRSRVReleaseThreadQuanta (void);
 IMG_IMPORT IMG_UINT32 IMG_CALLCONV PVRSRVGetCurrentProcessID(void);
-IMG_IMPORT IMG_CHAR * IMG_CALLCONV PVRSRVSetLocale(const IMG_CHAR *pszLocale);
+IMG_IMPORT char * IMG_CALLCONV PVRSRVSetLocale(const char *pszLocale);
 
 
 
 
 
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVCreateAppHintState(IMG_MODULE_ID eModuleID,
-														const IMG_CHAR *pszAppName,
+														const char *pszAppName,
 														IMG_VOID **ppvState);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVFreeAppHintState(IMG_MODULE_ID eModuleID,
 										 IMG_VOID *pvHintState);
 
 IMG_IMPORT bool IMG_CALLCONV PVRSRVGetAppHint(IMG_VOID			*pvHintState,
-												  const IMG_CHAR	*pszHintName,
+												  const char	*pszHintName,
 												  IMG_DATA_TYPE		eDataType,
 												  const IMG_VOID	*pvDefault,
 												  IMG_VOID			*pvReturn);
@@ -1119,20 +1119,20 @@ typedef	struct  _PVRSRV_MUTEX_OPAQUE_STRUCT_ *PVRSRV_MUTEX_HANDLE;
 #if defined(PVR_DEBUG_MUTEXES)
 
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateMutex(PVRSRV_MUTEX_HANDLE *phMutex,
-													   IMG_CHAR pszMutexName[],
-													   IMG_CHAR pszFilename[],
+													   char pszMutexName[],
+													   char pszFilename[],
 													   int iLine);
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyMutex(PVRSRV_MUTEX_HANDLE hMutex,
-														IMG_CHAR pszMutexName[],
-														IMG_CHAR pszFilename[],
+														char pszMutexName[],
+														char pszFilename[],
 														int iLine);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVLockMutex(PVRSRV_MUTEX_HANDLE hMutex,
-												 IMG_CHAR pszMutexName[],
-												 IMG_CHAR pszFilename[],
+												 char pszMutexName[],
+												 char pszFilename[],
 												 int iLine);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVUnlockMutex(PVRSRV_MUTEX_HANDLE hMutex,
-												   IMG_CHAR pszMutexName[],
-												   IMG_CHAR pszFilename[],
+												   char pszMutexName[],
+												   char pszFilename[],
 												   int iLine);
 
 #define PVRSRVCreateMutex(phMutex) PVRSRVCreateMutex(phMutex, #phMutex, __FILE__, __LINE__)
@@ -1157,20 +1157,20 @@ typedef	struct  _PVRSRV_RECMUTEX_OPAQUE_STRUCT_ *PVRSRV_RECMUTEX_HANDLE;
 #if defined(PVR_DEBUG_MUTEXES)
 
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateRecursiveMutex(PVRSRV_RECMUTEX_HANDLE *phMutex,
-													   IMG_CHAR pszMutexName[],
-													   IMG_CHAR pszFilename[],
+													   char pszMutexName[],
+													   char pszFilename[],
 													   int iLine);
 IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyRecursiveMutex(PVRSRV_RECMUTEX_HANDLE hMutex,
-														IMG_CHAR pszMutexName[],
-														IMG_CHAR pszFilename[],
+														char pszMutexName[],
+														char pszFilename[],
 														int iLine);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVLockRecursiveMutex(PVRSRV_RECMUTEX_HANDLE hMutex,
-												 IMG_CHAR pszMutexName[],
-												 IMG_CHAR pszFilename[],
+												 char pszMutexName[],
+												 char pszFilename[],
 												 int iLine);
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVUnlockRecursiveMutex(PVRSRV_RECMUTEX_HANDLE hMutex,
-												   IMG_CHAR pszMutexName[],
-												   IMG_CHAR pszFilename[],
+												   char pszMutexName[],
+												   char pszFilename[],
 												   int iLine);
 
 #define PVRSRVCreateRecursiveMutex(phMutex) PVRSRVCreateRecursiveMutex(phMutex, #phMutex, __FILE__, __LINE__)
@@ -1227,14 +1227,14 @@ static INLINE IMG_VOID PVRSRVPostSemaphore(PVRSRV_SEMAPHORE_HANDLE hSemaphore, i
 
 
 /* Non-exported APIs */
-IMG_IMPORT IMG_PVOID IMG_CALLCONV PVRSRVAllocUserModeMemTracking(IMG_SIZE_T ui32Size, IMG_CHAR *pszFileName, IMG_UINT32 ui32LineNumber);
+IMG_IMPORT IMG_PVOID IMG_CALLCONV PVRSRVAllocUserModeMemTracking(IMG_SIZE_T ui32Size, char *pszFileName, IMG_UINT32 ui32LineNumber);
 
-IMG_IMPORT IMG_PVOID IMG_CALLCONV PVRSRVCallocUserModeMemTracking(IMG_SIZE_T ui32Size, IMG_CHAR *pszFileName, IMG_UINT32 ui32LineNumber);
+IMG_IMPORT IMG_PVOID IMG_CALLCONV PVRSRVCallocUserModeMemTracking(IMG_SIZE_T ui32Size, char *pszFileName, IMG_UINT32 ui32LineNumber);
 
 IMG_IMPORT IMG_VOID  IMG_CALLCONV PVRSRVFreeUserModeMemTracking(IMG_VOID *pvMem);
 
 IMG_IMPORT IMG_PVOID IMG_CALLCONV PVRSRVReallocUserModeMemTracking(IMG_VOID *pvMem, IMG_SIZE_T ui32NewSize, 
-													  IMG_CHAR *pszFileName, IMG_UINT32 ui32LineNumber);
+													  char *pszFileName, IMG_UINT32 ui32LineNumber);
 
 /******************************************************************************
  * PVR Event Object API(s)
@@ -1446,7 +1446,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVFreeSyncInfo(IMG_CONST PVRSRV_DEV_DATA *psDevDat
 
  ******************************************************************************/
 IMG_IMPORT
-const IMG_CHAR *PVRSRVGetErrorString(PVRSRV_ERROR eError);
+const char *PVRSRVGetErrorString(PVRSRV_ERROR eError);
 
 
 /*!

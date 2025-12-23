@@ -950,12 +950,12 @@ PVRSRV_ERROR IMG_CALLCONV PollForValueKM (volatile IMG_UINT32*	pui32LinMemAddr,
 /*Level 3 of the loop nesting*/
 static IMG_VOID PVRSRVGetMiscInfoKM_RA_GetStats_ForEachVaCb(BM_HEAP *psBMHeap, va_list va)
 {
-	IMG_CHAR **ppszStr;
+	char **ppszStr;
 	IMG_UINT32 *pui32StrLen;
 	IMG_UINT32 ui32Mode;
-	PVRSRV_ERROR (*pfnGetStats)(RA_ARENA *, IMG_CHAR **, IMG_UINT32 *);
+	PVRSRV_ERROR (*pfnGetStats)(RA_ARENA *, char **, IMG_UINT32 *);
 
-	ppszStr = va_arg(va, IMG_CHAR**);
+	ppszStr = va_arg(va, char**);
 	pui32StrLen = va_arg(va, IMG_UINT32*);
 	ui32Mode = va_arg(va, IMG_UINT32);
 
@@ -996,12 +996,12 @@ static PVRSRV_ERROR PVRSRVGetMiscInfoKM_BMContext_AnyVaCb(BM_CONTEXT *psBMContex
 
 	IMG_UINT32 *pui32StrLen;
 	IMG_INT32 *pi32Count;
-	IMG_CHAR **ppszStr;
+	char **ppszStr;
 	IMG_UINT32 ui32Mode;
 
 	pui32StrLen = va_arg(va, IMG_UINT32*);
 	pi32Count = va_arg(va, IMG_INT32*);
-	ppszStr = va_arg(va, IMG_CHAR**);
+	ppszStr = va_arg(va, char**);
 	ui32Mode = va_arg(va, IMG_UINT32);
 
 	CHECK_SPACE(*pui32StrLen);
@@ -1023,12 +1023,12 @@ static PVRSRV_ERROR PVRSRVGetMiscInfoKM_Device_AnyVaCb(PVRSRV_DEVICE_NODE *psDev
 {
 	IMG_UINT32 *pui32StrLen;
 	IMG_INT32 *pi32Count;
-	IMG_CHAR **ppszStr;
+	char **ppszStr;
 	IMG_UINT32 ui32Mode;
 
 	pui32StrLen = va_arg(va, IMG_UINT32*);
 	pi32Count = va_arg(va, IMG_INT32*);
-	ppszStr = va_arg(va, IMG_CHAR**);
+	ppszStr = va_arg(va, char**);
 	ui32Mode = va_arg(va, IMG_UINT32);
 
 	CHECK_SPACE(*pui32StrLen);
@@ -1135,7 +1135,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 /*		BM_HEAP				*psBMHeap;
 		BM_CONTEXT			*psBMContext;
 		PVRSRV_DEVICE_NODE	*psDeviceNode;*/
-		IMG_CHAR			*pszStr;
+		char			*pszStr;
 		IMG_UINT32			ui32StrLen;
 		IMG_INT32			i32Count;
 
@@ -1179,7 +1179,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 	if(((psMiscInfo->ui32StateRequest & PVRSRV_MISC_INFO_FREEMEM_PRESENT) != 0)
 		&& psMiscInfo->pszMemoryStr)
 	{
-		IMG_CHAR			*pszStr;
+		char			*pszStr;
 		IMG_UINT32			ui32StrLen;
 		IMG_INT32			i32Count;
 		
@@ -1213,7 +1213,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetMiscInfoKM(PVRSRV_MISC_INFO *psMiscInfo)
 		&& ((psMiscInfo->ui32StateRequest & PVRSRV_MISC_INFO_MEMSTATS_PRESENT) == 0UL)
 		&& (psMiscInfo->pszMemoryStr != IMG_NULL))
 	{
-		IMG_CHAR	*pszStr;
+		char	*pszStr;
 		IMG_UINT32	ui32StrLen;
 		IMG_UINT32 	ui32LenStrPerNum = 12; /* string length per UI32: 10 digits + '.' + '\0' = 12 bytes */
 		IMG_INT32	i32Count;
@@ -1682,14 +1682,14 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVSaveRestoreLiveSegments(IMG_HANDLE hArena, u8 *p
 
  @Input		eError : PVRSRV_ERROR enum
 
- @Return	const IMG_CHAR * : Text string
+ @Return	const char * : Text string
 
  @Note		Must be kept in sync with servicesext.h
 
 ******************************************************************************/
 
 IMG_EXPORT
-const IMG_CHAR *PVRSRVGetErrorStringKM(PVRSRV_ERROR eError)
+const char *PVRSRVGetErrorStringKM(PVRSRV_ERROR eError)
 { 
 /* PRQA S 5087 1 */ /* include file required here */
 #include "pvrsrv_errors.h"

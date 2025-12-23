@@ -150,9 +150,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif /* defined(PVRSRV_NEW_PVR_DPF) */
 
 IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVDebugPrintf(IMG_UINT32 ui32DebugLevel,
-												   const IMG_CHAR *pszFileName,
+												   const char *pszFileName,
 												   IMG_UINT32 ui32Line,
-												   const IMG_CHAR *pszFormat,
+												   const char *pszFormat,
 												   ...) IMG_FORMAT_PRINTF(4, 5);
 
 #else  /* defined(PVRSRV_NEED_PVR_DPF) */
@@ -168,7 +168,7 @@ IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVDebugPrintf(IMG_UINT32 ui32DebugLevel,
 
 	#define PVR_TRACE(X)	PVRSRVTrace X
 
-IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVTrace(const IMG_CHAR* pszFormat, ... )
+IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVTrace(const char* pszFormat, ... )
 	IMG_FORMAT_PRINTF(1, 2);
 
 #else /* defined(PVRSRV_NEED_PVR_TRACE) */

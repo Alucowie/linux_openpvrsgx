@@ -51,7 +51,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	((psCCBKick)->offset <= (psCCBMemInfo)->uAllocSize - sizeof(type)))
 
 #define	CCB_DATA_FROM_OFFSET(type, psCCBMemInfo, psCCBKick, offset) \
-	((type *)(((IMG_CHAR *)(psCCBMemInfo)->pvLinAddrKM) + \
+	((type *)(((char *)(psCCBMemInfo)->pvLinAddrKM) + \
 		(psCCBKick)->offset))
 
 extern IMG_UINT64 ui64KickCount;

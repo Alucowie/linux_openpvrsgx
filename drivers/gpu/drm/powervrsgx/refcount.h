@@ -65,27 +65,27 @@ void PVRSRVDumpRefCountCCB(void);
 #define PVRSRVBMBufDecExport(x...) \
 	PVRSRVBMBufDecExport2(__FILE__, __LINE__, x)
 
-void PVRSRVKernelSyncInfoIncRef2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVKernelSyncInfoIncRef2(const char *pszFile, int iLine,
 								 PVRSRV_KERNEL_SYNC_INFO *psKernelSyncInfo,
 								 PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo);
-void PVRSRVKernelSyncInfoDecRef2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVKernelSyncInfoDecRef2(const char *pszFile, int iLine,
 								 PVRSRV_KERNEL_SYNC_INFO *psKernelSyncInfo,
 								 PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo);
-void PVRSRVKernelMemInfoIncRef2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVKernelMemInfoIncRef2(const char *pszFile, int iLine,
 								PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo);
-void PVRSRVKernelMemInfoDecRef2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVKernelMemInfoDecRef2(const char *pszFile, int iLine,
 								PVRSRV_KERNEL_MEM_INFO *psKernelMemInfo);
-void PVRSRVBMBufIncRef2(const IMG_CHAR *pszFile,
+void PVRSRVBMBufIncRef2(const char *pszFile,
 						int iLine, BM_BUF *pBuf);
-void PVRSRVBMBufDecRef2(const IMG_CHAR *pszFile,
+void PVRSRVBMBufDecRef2(const char *pszFile,
 						int iLine, BM_BUF *pBuf);
-void PVRSRVBMBufIncExport2(const IMG_CHAR *pszFile,
+void PVRSRVBMBufIncExport2(const char *pszFile,
 						   int iLine, BM_BUF *pBuf);
-void PVRSRVBMBufDecExport2(const IMG_CHAR *pszFile,
+void PVRSRVBMBufDecExport2(const char *pszFile,
 						   int iLine, BM_BUF *pBuf);
-void PVRSRVBMXProcIncRef2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVBMXProcIncRef2(const char *pszFile, int iLine,
 						  IMG_UINT32 ui32Index);
-void PVRSRVBMXProcDecRef2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVBMXProcDecRef2(const char *pszFile, int iLine,
 						  IMG_UINT32 ui32Index);
 
 #include "mmap.h"
@@ -99,13 +99,13 @@ void PVRSRVBMXProcDecRef2(const IMG_CHAR *pszFile, int iLine,
 #define PVRSRVOffsetStructDecMapped(x...) \
 	PVRSRVOffsetStructDecMapped2(__FILE__, __LINE__, x)
 
-void PVRSRVOffsetStructIncRef2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVOffsetStructIncRef2(const char *pszFile, int iLine,
 							   PKV_OFFSET_STRUCT psOffsetStruct);
-void PVRSRVOffsetStructDecRef2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVOffsetStructDecRef2(const char *pszFile, int iLine,
 							   PKV_OFFSET_STRUCT psOffsetStruct);
-void PVRSRVOffsetStructIncMapped2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVOffsetStructIncMapped2(const char *pszFile, int iLine,
 								  PKV_OFFSET_STRUCT psOffsetStruct);
-void PVRSRVOffsetStructDecMapped2(const IMG_CHAR *pszFile, int iLine,
+void PVRSRVOffsetStructDecMapped2(const char *pszFile, int iLine,
 								  PKV_OFFSET_STRUCT psOffsetStruct);
 
 #else /* defined(PVRSRV_REFCOUNT_DEBUG) */

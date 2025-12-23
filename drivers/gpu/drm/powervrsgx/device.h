@@ -79,10 +79,10 @@ typedef struct _DEVICE_MEMORY_HEAP_INFO_
 	IMG_UINT32				ui32HeapID;
 
 	/* heap identifier string */
-	IMG_CHAR				*pszName;
+	char				*pszName;
 
 	/* backing store identifier string */
-	IMG_CHAR				*pszBSName;
+	char				*pszBSName;
 	
 	/* Device virtual address of base of heap */
 	IMG_DEV_VIRTADDR		sDevVAddrBase;
@@ -152,7 +152,7 @@ typedef struct DEV_ARENA_DESCRIPTOR_TAG
 {
 	IMG_UINT32				ui32HeapID;		/*!< memory pool has a unique id for diagnostic purposes */
 
-	IMG_CHAR				*pszName;		/*!< memory pool has a unique string for diagnostic purposes */
+	char				*pszName;		/*!< memory pool has a unique string for diagnostic purposes */
 
 	IMG_DEV_VIRTADDR		BaseDevVAddr;	/*!< Device virtual base address of the managed memory pool. */
 
@@ -175,7 +175,7 @@ typedef struct _PDUMP_MMU_ATTRIB_
 {
 	PVRSRV_DEVICE_IDENTIFIER	sDevId;
 	
-	IMG_CHAR	*pszPDRegRegion;
+	char	*pszPDRegRegion;
 	
 	/* data page info */
 	IMG_UINT32 ui32DataPageMask;

@@ -89,7 +89,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define PVRSRV_MODNAME "pvrsrvkm"
 
-PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOID *ppvCpuVAddr, IMG_HANDLE *phBlockAlloc, IMG_CHAR *pszFilename, IMG_UINT32 ui32Line)
+PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOID *ppvCpuVAddr, IMG_HANDLE *phBlockAlloc, char *pszFilename, IMG_UINT32 ui32Line)
 {
     PVR_UNREFERENCED_PARAMETER(ui32Flags);
     PVR_UNREFERENCED_PARAMETER(phBlockAlloc);
@@ -113,7 +113,7 @@ PVRSRV_ERROR OSAllocMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOI
     return PVRSRV_OK;
 }
 
-PVRSRV_ERROR OSFreeMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOID pvCpuVAddr, IMG_HANDLE hBlockAlloc, IMG_CHAR *pszFilename, IMG_UINT32 ui32Line)
+PVRSRV_ERROR OSFreeMem_Impl(IMG_UINT32 ui32Flags, IMG_UINT32 ui32Size, IMG_PVOID pvCpuVAddr, IMG_HANDLE hBlockAlloc, char *pszFilename, IMG_UINT32 ui32Line)
 {
     PVR_UNREFERENCED_PARAMETER(ui32Flags);
     PVR_UNREFERENCED_PARAMETER(ui32Size);
@@ -442,7 +442,7 @@ IMG_VOID OSMemSet(IMG_VOID *pvDest, uint8_t ui8Value, IMG_UINT32 ui32Size)
  @Function	OSStringCopy
  @Description strcpy
 ******************************************************************************/
-IMG_CHAR *OSStringCopy(IMG_CHAR *pszDest, const IMG_CHAR *pszSrc)
+char *OSStringCopy(char *pszDest, const char *pszSrc)
 {
     return (strcpy(pszDest, pszSrc));
 }
@@ -452,7 +452,7 @@ IMG_CHAR *OSStringCopy(IMG_CHAR *pszDest, const IMG_CHAR *pszSrc)
  @Function	OSSNPrintf
  @Description snprintf
 ******************************************************************************/
-IMG_INT32 OSSNPrintf(IMG_CHAR *pStr, IMG_UINT32 ui32Size, const IMG_CHAR *pszFormat, ...)
+IMG_INT32 OSSNPrintf(char *pStr, IMG_UINT32 ui32Size, const char *pszFormat, ...)
 {
     va_list argList;
     IMG_INT32 iCount;
@@ -859,7 +859,7 @@ out:
 ******************************************************************************/
 PVRSRV_ERROR OSInstallDeviceLISR(IMG_VOID *pvSysData,
                                     IMG_UINT32 ui32Irq,
-                                    IMG_CHAR *pszISRName,
+                                    char *pszISRName,
                                     IMG_VOID *pvDeviceNode)
 {
     SYS_DATA *psSysData = (SYS_DATA*)pvSysData;
@@ -2467,7 +2467,7 @@ PVRSRV_ERROR OSDisableTimer (IMG_HANDLE hTimer)
  @Return   PVRSRV_ERROR  : 
 
 ******************************************************************************/
-PVRSRV_ERROR OSEventObjectCreateKM(const IMG_CHAR *pszName, PVRSRV_EVENTOBJECT *psEventObject)
+PVRSRV_ERROR OSEventObjectCreateKM(const char *pszName, PVRSRV_EVENTOBJECT *psEventObject)
 {
 
     PVRSRV_ERROR eError = PVRSRV_OK;
@@ -4150,7 +4150,7 @@ IMG_VOID OSTimeDestroy(IMG_PVOID pvData)
 	kfree(pvData);
 }
 
-IMG_VOID OSGetCurrentProcessNameKM(IMG_CHAR *pszName, IMG_UINT32 ui32Size)
+IMG_VOID OSGetCurrentProcessNameKM(char *pszName, IMG_UINT32 ui32Size)
 {
 	strncpy(pszName, current->comm, MIN(ui32Size,TASK_COMM_LEN));
 }

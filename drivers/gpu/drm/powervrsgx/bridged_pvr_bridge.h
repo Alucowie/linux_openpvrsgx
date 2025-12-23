@@ -145,8 +145,8 @@ typedef struct _PVRSRV_BRIDGE_DISPATCH_TABLE_ENTRY
 {
 	BridgeWrapperFunction pfFunction; /*!< The wrapper function that validates the ioctl
 										arguments before calling into srvkm proper */
-	const IMG_CHAR *pszIOCName; /*!< Name of the ioctl: e.g. "PVRSRV_BRIDGE_CONNECT_SERVICES" */
-	const IMG_CHAR *pszFunctionName; /*!< Name of the wrapper function: e.g. "PVRSRVConnectBW" */
+	const char *pszIOCName; /*!< Name of the ioctl: e.g. "PVRSRV_BRIDGE_CONNECT_SERVICES" */
+	const char *pszFunctionName; /*!< Name of the wrapper function: e.g. "PVRSRVConnectBW" */
 	IMG_UINT32 ui32CallCount; /*!< The total number of times the ioctl has been called */
 	IMG_UINT32 ui32CopyFromUserTotalBytes; /*!< The total number of bytes copied from
 											 userspace within this ioctl */
@@ -161,9 +161,9 @@ extern PVRSRV_BRIDGE_DISPATCH_TABLE_ENTRY g_BridgeDispatchTable[BRIDGE_DISPATCH_
 
 IMG_VOID
 _SetDispatchTableEntry(IMG_UINT32 ui32Index,
-					   const IMG_CHAR *pszIOCName,
+					   const char *pszIOCName,
 					   BridgeWrapperFunction pfFunction,
-					   const IMG_CHAR *pszFunctionName);
+					   const char *pszFunctionName);
 
 
 /* PRQA S 0884,3410 2*/ /* macro relies on the lack of brackets */

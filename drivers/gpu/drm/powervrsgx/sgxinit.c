@@ -822,7 +822,7 @@ static PVRSRV_ERROR DevDeInitSGX (IMG_VOID *pvDeviceNode)
 ******************************************************************************/
 static IMG_VOID SGXDumpDebugReg (PVRSRV_SGXDEV_INFO	*psDevInfo,
 								 IMG_UINT32			ui32CoreNum,
-								 IMG_CHAR			*pszName,
+								 char			*pszName,
 								 IMG_UINT32			ui32RegAddr)
 {
 	IMG_UINT32	ui32RegVal;

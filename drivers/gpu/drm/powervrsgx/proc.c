@@ -68,7 +68,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // The proc entry for our /proc/pvr directory
 static struct proc_dir_entry * dir;
 
-static const IMG_CHAR PVRProcDirRoot[] = "pvr";
+static const char PVRProcDirRoot[] = "pvr";
 
 static int pvr_proc_open(struct inode *inode,struct file *file);
 static void *pvr_proc_seq_start (struct seq_file *m, loff_t *pos);
@@ -144,7 +144,7 @@ static void* ProcSeqOff2ElementSysNodes(struct seq_file * sfile, loff_t off);
            plus number of chars added); 'size' if full.
 
 *****************************************************************************/
-off_t printAppend(IMG_CHAR * buffer, size_t size, off_t off, const IMG_CHAR * format, ...)
+off_t printAppend(char * buffer, size_t size, off_t off, const char * format, ...)
 {
     int n;
     size_t space = size - (size_t)off;
@@ -420,7 +420,7 @@ static int pvr_proc_seq_show (struct seq_file *proc_seq_file, void *v)
 *****************************************************************************/
 static struct proc_dir_entry* CreateProcEntryInDirSeq(
 									   struct proc_dir_entry *pdir,
-									   const IMG_CHAR * name,
+									   const char * name,
     								   IMG_VOID* data,
 									   pvr_next_proc_seq_t next_handler,
 									   pvr_show_proc_seq_t show_handler,
@@ -502,7 +502,7 @@ static struct proc_dir_entry* CreateProcEntryInDirSeq(
 
 *****************************************************************************/
 struct proc_dir_entry* CreateProcReadEntrySeq (
-								const IMG_CHAR * name,
+								const char * name,
 								IMG_VOID* data,
 								pvr_next_proc_seq_t next_handler,
 								pvr_show_proc_seq_t show_handler,
@@ -554,7 +554,7 @@ struct proc_dir_entry* CreateProcReadEntrySeq (
 
 *****************************************************************************/
 struct proc_dir_entry* CreateProcEntrySeq (
-											const IMG_CHAR * name,
+											const char * name,
 											IMG_VOID* data,
 											pvr_next_proc_seq_t next_handler,
 											pvr_show_proc_seq_t show_handler,
@@ -609,7 +609,7 @@ struct proc_dir_entry* CreateProcEntrySeq (
 
 *****************************************************************************/
 struct proc_dir_entry* CreatePerProcessProcEntrySeq (
-									  const IMG_CHAR * name,
+									  const char * name,
     								  IMG_VOID* data,
 									  pvr_next_proc_seq_t next_handler,
 									  pvr_show_proc_seq_t show_handler,
@@ -639,7 +639,7 @@ struct proc_dir_entry* CreatePerProcessProcEntrySeq (
 
     if (!psPerProc->psProcDir)
     {
-        IMG_CHAR dirname[16];
+        char dirname[16];
         int ret;
 
         ret = snprintf(dirname, sizeof(dirname), "%u", ui32PID);
@@ -771,7 +771,7 @@ static ssize_t pvr_proc_read(struct file *file, char __user *buffer,size_t count
  @Return success code : 0 or -errno.
 
 *****************************************************************************/
-static int CreateProcEntryInDir(struct proc_dir_entry *pdir, const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
+static int CreateProcEntryInDir(struct proc_dir_entry *pdir, const char * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
 {
     struct proc_dir_entry * file;
     mode_t mode;
@@ -836,7 +836,7 @@ static int CreateProcEntryInDir(struct proc_dir_entry *pdir, const IMG_CHAR * na
  @Return success code : 0 or -errno.
 
 *****************************************************************************/
-int CreateProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
+int CreateProcEntry(const char * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
 {
     return CreateProcEntryInDir(dir, name, rhandler, whandler, data);
 }
@@ -862,7 +862,7 @@ int CreateProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t wh
  @Return success code : 0 or -errno.
 
 *****************************************************************************/
-int CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
+int CreatePerProcessProcEntry(const char * name, read_proc_t rhandler, write_proc_t whandler, IMG_VOID *data)
 {
     PVRSRV_ENV_PER_PROCESS_DATA *psPerProc;
     IMG_UINT32 ui32PID;
@@ -886,7 +886,7 @@ int CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write
 
     if (!psPerProc->psProcDir)
     {
-        IMG_CHAR dirname[16];
+        char dirname[16];
         int ret;
 
         ret = snprintf(dirname, sizeof(dirname), "%u", ui32PID);
@@ -932,7 +932,7 @@ int CreatePerProcessProcEntry(const IMG_CHAR * name, read_proc_t rhandler, write
  @Return 0 for success, -errno for failure
 
 *****************************************************************************/
-int CreateProcReadEntry(const IMG_CHAR * name, pvr_read_proc_t handler)
+int CreateProcReadEntry(const char * name, pvr_read_proc_t handler)
 {
     struct proc_dir_entry * file;
 
@@ -1035,7 +1035,7 @@ int CreateProcEntries(IMG_VOID)
  @Return nothing
 
 *****************************************************************************/
-IMG_VOID RemoveProcEntry(const IMG_CHAR * name)
+IMG_VOID RemoveProcEntry(const char * name)
 {
     if (dir)
     {
@@ -1059,7 +1059,7 @@ IMG_VOID RemoveProcEntry(const IMG_CHAR * name)
  @Return nothing
 
 *****************************************************************************/
-IMG_VOID RemovePerProcessProcEntry(const IMG_CHAR *name)
+IMG_VOID RemovePerProcessProcEntry(const char *name)
 {
     PVRSRV_ENV_PER_PROCESS_DATA *psPerProc;
 
@@ -1126,7 +1126,7 @@ IMG_VOID RemoveProcEntries(IMG_VOID)
 static void ProcSeqShowVersion(struct seq_file *sfile,void* el)
 {
 	SYS_DATA *psSysData;
-	IMG_CHAR *pszSystemVersionString = "None";
+	char *pszSystemVersionString = "None";
 
 	if(el == PVR_PROC_SEQ_START_TOKEN)
 	{
@@ -1164,13 +1164,13 @@ static void ProcSeqShowVersion(struct seq_file *sfile,void* el)
  @Return   amount of data placed in buffer, 0, or END_OF_FILE :
 
 ******************************************************************************/
-static const IMG_CHAR *deviceTypeToString(PVRSRV_DEVICE_TYPE deviceType)
+static const char *deviceTypeToString(PVRSRV_DEVICE_TYPE deviceType)
 {
     switch (deviceType)
     {
         default:
         {
-            static IMG_CHAR text[10];
+            static char text[10];
 
             sprintf(text, "?%x", (unsigned int)deviceType);
 
@@ -1180,7 +1180,7 @@ static const IMG_CHAR *deviceTypeToString(PVRSRV_DEVICE_TYPE deviceType)
 }
 
 
-static const IMG_CHAR *deviceClassToString(PVRSRV_DEVICE_CLASS deviceClass)
+static const char *deviceClassToString(PVRSRV_DEVICE_CLASS deviceClass)
 {
     switch (deviceClass)
     {
@@ -1198,7 +1198,7 @@ static const IMG_CHAR *deviceClassToString(PVRSRV_DEVICE_CLASS deviceClass)
 	}
 	default:
 	{
-	    static IMG_CHAR text[10];
+	    static char text[10];
 
 	    sprintf(text, "?%x", (unsigned int)deviceClass);
 	    return text;

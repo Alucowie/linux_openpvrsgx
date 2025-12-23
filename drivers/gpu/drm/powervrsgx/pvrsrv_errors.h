@@ -55,14 +55,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	resources.c:
 	IMG_EXPORT
-	const IMG_CHAR *PVRSRVGetErrorString(PVRSRV_ERROR eError)
+	const char *PVRSRVGetErrorString(PVRSRV_ERROR eError)
 	{
 	#include "pvrsrv_errors.h"
 	}
 
 	pvrsrv.c:
 	IMG_EXPORT
-	const IMG_CHAR *PVRSRVGetErrorStringKM(PVRSRV_ERROR eError)
+	const char *PVRSRVGetErrorStringKM(PVRSRV_ERROR eError)
 	{
 	#include "pvrsrv_errors.h"
 	}

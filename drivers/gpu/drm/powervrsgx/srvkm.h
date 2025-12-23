@@ -51,7 +51,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	#define PVR_LOG(X)			PVRSRVReleasePrintf X;
 	#endif
 
-	IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVReleasePrintf(const IMG_CHAR *pszFormat, ...) IMG_FORMAT_PRINTF(1, 2);
+	IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVReleasePrintf(const char *pszFormat, ...) IMG_FORMAT_PRINTF(1, 2);
 
 	IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PVRSRVProcessConnect(IMG_UINT32	ui32PID, IMG_UINT32 ui32Flags);
 	IMG_IMPORT IMG_VOID IMG_CALLCONV PVRSRVProcessDisconnect(IMG_UINT32	ui32PID);
@@ -115,6 +115,6 @@ LOOP_UNTIL_TIMEOUT(MAX_HW_TIME_US)
 
  ******************************************************************************/
 IMG_IMPORT
-const IMG_CHAR *PVRSRVGetErrorStringKM(PVRSRV_ERROR eError);
+const char *PVRSRVGetErrorStringKM(PVRSRV_ERROR eError);
 
 #endif /* __SRVKM_H__ */

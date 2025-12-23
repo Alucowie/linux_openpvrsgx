@@ -139,7 +139,7 @@ struct _MMU_CONTEXT_
 	PVRSRV_SGXDEV_INFO *psDevInfo;
 
 	IMG_UINT32 ui32PID;
-	IMG_CHAR szName[MMU_CONTEXT_NAME_SIZE];
+	char szName[MMU_CONTEXT_NAME_SIZE];
 
 	struct _MMU_CONTEXT_ *psNext;
 };

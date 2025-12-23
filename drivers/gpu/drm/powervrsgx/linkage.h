@@ -52,11 +52,11 @@ IMG_VOID PVRDPFInit(IMG_VOID);
 PVRSRV_ERROR PVROSFuncInit(IMG_VOID);
 IMG_VOID PVROSFuncDeInit(IMG_VOID);
 
-int PVRDebugProcSetLevel(struct file *file, const IMG_CHAR *buffer, IMG_UINT32 count, IMG_VOID *data);
+int PVRDebugProcSetLevel(struct file *file, const char *buffer, IMG_UINT32 count, IMG_VOID *data);
 void ProcSeqShowDebugLevel(struct seq_file *sfile,void* el);
 
 #ifdef PVR_MANUAL_POWER_CONTROL
-int PVRProcSetPowerLevel(struct file *file, const IMG_CHAR *buffer, IMG_UINT32 count, IMG_VOID *data);
+int PVRProcSetPowerLevel(struct file *file, const char *buffer, IMG_UINT32 count, IMG_VOID *data);
 
 void ProcSeqShowPowerLevel(struct seq_file *sfile,void* el);
 
