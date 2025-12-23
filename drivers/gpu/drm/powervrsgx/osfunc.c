@@ -68,7 +68,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "mmap.h"
 #include "env_data.h"
 #include "proc.h"
-#include "mutex.h"
 #include "event.h"
 #include "linkage.h"
 #include "pvr_uaccess.h"
@@ -3411,7 +3410,7 @@ IMG_VOID *FindMMapBaseVAddr(struct list_head *psMMapOffsetStructList,
 	return IMG_NULL;
 }
 
-extern PVRSRV_LINUX_MUTEX g_sMMapMutex;
+extern struct mutex g_sMMapMutex;
 
 #if ! defined(__arm__)
 # define USE_VIRTUAL_CACHE_OP
@@ -3621,7 +3620,7 @@ bool CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 
 	PVR_ASSERT(psLinuxMemArea != IMG_NULL);
 
-	LinuxLockMutex(&g_sMMapMutex);
+	mutex_lock(&g_sMMapMutex);
 
 	psMMapOffsetStructList = &psLinuxMemArea->sMMapOffsetStructList;
 
@@ -3767,7 +3766,7 @@ bool CheckExecuteCacheOp(IMG_HANDLE hOSMemHandle,
 	                 pfnVirtualCacheOp);
 #endif
 
-	LinuxUnLockMutex(&g_sMMapMutex);
+	mutex_unlock(&g_sMMapMutex);
 
 #if defined(USE_PHYSICAL_CACHE_OP)
 	PVR_ASSERT(pfnMemAreaToPhys != IMG_NULL);
@@ -3787,7 +3786,7 @@ err_blocked:
 							  "%p-%p (type %d)", __func__,
 			 pvVirtRangeStart, pvVirtRangeStart + ui32Length,
 			 psLinuxMemArea->eAreaType));
-	LinuxUnLockMutex(&g_sMMapMutex);
+	mutex_unlock(&g_sMMapMutex);
 	return false;
 }
 
@@ -4105,12 +4104,12 @@ IMG_UINT32 OSAtomicRead(IMG_PVOID pvRefCount)
 
 IMG_VOID OSReleaseBridgeLock(IMG_VOID)
 {
-       LinuxUnLockMutex(&gPVRSRVLock);
+       mutex_unlock(&gPVRSRVLock);
 }
 
 IMG_VOID OSReacquireBridgeLock(IMG_VOID)
 {
-       LinuxLockMutex(&gPVRSRVLock);
+       mutex_lock(&gPVRSRVLock);
 }
 
 typedef struct _OSTime

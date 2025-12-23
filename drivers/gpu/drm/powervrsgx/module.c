@@ -90,7 +90,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvrmmap.h"
 #include "mm.h"
 #include "mmap.h"
-#include "mutex.h"
 #include "pvr_debug.h"
 #include "srvkm.h"
 #include "perproc.h"
@@ -173,7 +172,7 @@ static struct file_operations pvrsrv_fops =
 };
 #endif
 
-PVRSRV_LINUX_MUTEX gPVRSRVLock;
+struct mutex gPVRSRVLock;
 
 /* PID of process being released */
 IMG_UINT32 gui32ReleasePID;
@@ -397,7 +396,7 @@ struct device *PVRLDMGetDevice(void)
 #endif
 
 #if defined(PVR_LDM_MODULE) || defined(SUPPORT_DRI_DRM)
-static PVRSRV_LINUX_MUTEX gsPMMutex;
+static struct mutex gsPMMutex;
 static bool bDriverIsSuspended;
 static bool bDriverIsShutdown;
 #endif
@@ -428,7 +427,7 @@ PVR_MOD_STATIC void PVRSRVDriverShutdown(LDM_DEV *pDevice)
 {
 	PVR_TRACE(("PVRSRVDriverShutdown(pDevice=%p)", pDevice));
 
-	LinuxLockMutex(&gsPMMutex);
+	mutex_lock(&gsPMMutex);
 
 	if (!bDriverIsShutdown && !bDriverIsSuspended)
 	{
@@ -437,7 +436,7 @@ PVR_MOD_STATIC void PVRSRVDriverShutdown(LDM_DEV *pDevice)
 		 * processes trying to use the driver after it has been
 		 * shutdown.
 		 */
-		LinuxLockMutex(&gPVRSRVLock);
+		mutex_lock(&gPVRSRVLock);
 
 		(void) PVRSRVSetPowerStateKM(PVRSRV_SYS_POWER_STATE_D3);
 	}
@@ -445,7 +444,7 @@ PVR_MOD_STATIC void PVRSRVDriverShutdown(LDM_DEV *pDevice)
 	bDriverIsShutdown = true;
 
 	/* The bridge mutex is held on exit */
-	LinuxUnLockMutex(&gsPMMutex);
+	mutex_unlock(&gsPMMutex);
 }
 
 #endif /* defined(PVR_LDM_MODULE) || defined(PVR_DRI_DRM_PLATFORM_DEV) */
@@ -494,11 +493,11 @@ PVR_MOD_STATIC int PVRSRVDriverSuspend(LDM_DEV *pDevice, pm_message_t state)
 #if !(defined(PVR_MANUAL_POWER_CONTROL) && !defined(SUPPORT_DRI_DRM))
 	PVR_TRACE(( "PVRSRVDriverSuspend(pDevice=%p)", pDevice));
 
-	LinuxLockMutex(&gsPMMutex);
+	mutex_lock(&gsPMMutex);
 
 	if (!bDriverIsSuspended && !bDriverIsShutdown)
 	{
-		LinuxLockMutex(&gPVRSRVLock);
+		mutex_lock(&gPVRSRVLock);
 
 		if (PVRSRVSetPowerStateKM(PVRSRV_SYS_POWER_STATE_D3) == PVRSRV_OK)
 		{
@@ -507,12 +506,12 @@ PVR_MOD_STATIC int PVRSRVDriverSuspend(LDM_DEV *pDevice, pm_message_t state)
 		}
 		else
 		{
-			LinuxUnLockMutex(&gPVRSRVLock);
+			mutex_unlock(&gPVRSRVLock);
 			res = -EINVAL;
 		}
 	}
 
-	LinuxUnLockMutex(&gsPMMutex);
+	mutex_unlock(&gsPMMutex);
 #endif
 	return res;
 }
@@ -551,14 +550,14 @@ PVR_MOD_STATIC int PVRSRVDriverResume(LDM_DEV *pDevice)
 #if !(defined(PVR_MANUAL_POWER_CONTROL) && !defined(SUPPORT_DRI_DRM))
 	PVR_TRACE(("PVRSRVDriverResume(pDevice=%p)", pDevice));
 
-	LinuxLockMutex(&gsPMMutex);
+	mutex_lock(&gsPMMutex);
 
 	if (bDriverIsSuspended && !bDriverIsShutdown)
 	{
 		if (PVRSRVSetPowerStateKM(PVRSRV_SYS_POWER_STATE_D0) == PVRSRV_OK)
 		{
 			bDriverIsSuspended = false;
-			LinuxUnLockMutex(&gPVRSRVLock);
+			mutex_unlock(&gPVRSRVLock);
 		}
 		else
 		{
@@ -567,7 +566,7 @@ PVR_MOD_STATIC int PVRSRVDriverResume(LDM_DEV *pDevice)
 		}
 	}
 
-	LinuxUnLockMutex(&gsPMMutex);
+	mutex_unlock(&gsPMMutex);
 #endif
 	return res;
 }
@@ -689,7 +688,7 @@ static int PVRSRVOpen(struct inode unref__ * pInode, struct file *pFile)
 	PVRSRV_ENV_PER_PROCESS_DATA *psEnvPerProc;
 #endif
 
-	LinuxLockMutex(&gPVRSRVLock);
+	mutex_lock(&gPVRSRVLock);
 
 	pFile->f_mode |= FMODE_UNSIGNED_OFFSET;
 
@@ -727,7 +726,7 @@ static int PVRSRVOpen(struct inode unref__ * pInode, struct file *pFile)
 	PRIVATE_DATA(pFile) = psPrivateData;
 	iRet = 0;
 err_unlock:	
-	LinuxUnLockMutex(&gPVRSRVLock);
+	mutex_unlock(&gPVRSRVLock);
 	return iRet;
 }
 
@@ -758,7 +757,7 @@ static int PVRSRVRelease(struct inode unref__ * pInode, struct file *pFile)
 	PVRSRV_FILE_PRIVATE_DATA *psPrivateData;
 	int err = 0;
 
-	LinuxLockMutex(&gPVRSRVLock);
+	mutex_lock(&gPVRSRVLock);
 
 #if defined(SUPPORT_DRI_DRM)
 	psPrivateData = (PVRSRV_FILE_PRIVATE_DATA *)pvPrivData;
@@ -819,7 +818,7 @@ static int PVRSRVRelease(struct inode unref__ * pInode, struct file *pFile)
 	}
 
 err_unlock:
-	LinuxUnLockMutex(&gPVRSRVLock);
+	mutex_unlock(&gPVRSRVLock);
 #if defined(SUPPORT_DRI_DRM)
 	return;
 #else
@@ -888,9 +887,9 @@ static int __init PVRCore_Init(void)
 	PVR_TRACE(("PVRCore_Init"));
 
 #if defined(PVR_LDM_MODULE) || defined(SUPPORT_DRI_DRM)
-	LinuxInitMutex(&gsPMMutex);
+	mutex_init(&gsPMMutex);
 #endif
-	LinuxInitMutex(&gPVRSRVLock);
+	mutex_init(&gPVRSRVLock);
 
 	if (CreateProcEntries ())
 	{

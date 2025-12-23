@@ -16,7 +16,6 @@ powervrsgx-y := \
 	mm.o \
 	mmap.o \
 	module.o \
-	mutex.o \
 	omap3_sysconfig.o \
 	omap3_sysutils.o \
 	osfunc.o \

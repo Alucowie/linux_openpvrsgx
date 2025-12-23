@@ -64,7 +64,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "mmap.h"
 #include "env_data.h"
 #include "proc.h"
-#include "mutex.h"
 #include "lock.h"
 #include "event.h"
 
@@ -373,11 +372,11 @@ PVRSRV_ERROR LinuxEventObjectWait(IMG_HANDLE hOSEventObject, IMG_UINT32 ui32MSTi
 			break;
 		}
 
-		LinuxUnLockMutex(&gPVRSRVLock);		
+		mutex_unlock(&gPVRSRVLock);
 
 		ui32TimeOutJiffies = (IMG_UINT32)schedule_timeout((IMG_INT32)ui32TimeOutJiffies);
 		
-		LinuxLockMutex(&gPVRSRVLock);
+		mutex_lock(&gPVRSRVLock);
 		psLinuxEventObject->ui32Stats++;
 	} while (ui32TimeOutJiffies);
 

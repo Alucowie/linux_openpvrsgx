@@ -62,7 +62,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "mmap.h"
 #include "mm.h"
 #include "proc.h"
-#include "mutex.h"
 #include "handle.h"
 #include "perproc.h"
 #include "env_perproc.h"
@@ -83,7 +82,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * As a corollary to this, the mmap entry points must not call
  * any driver code that relies on gPVRSRVLock is held.
  */
-PVRSRV_LINUX_MUTEX g_sMMapMutex;
+struct mutex g_sMMapMutex;
 
 static LinuxKMemCache *g_psMemmapCache = NULL;
 static LIST_HEAD(g_sMMapAreaList);
@@ -368,7 +367,7 @@ PVRMMapOSMemHandleToMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
     IMG_HANDLE hOSMemHandle;
     PVRSRV_ERROR eError;
 
-    LinuxLockMutex(&g_sMMapMutex);
+    mutex_lock(&g_sMMapMutex);
 
     PVR_ASSERT(PVRSRVGetMaxHandle(psPerProc->psHandleBase) <= MAX_MMAP_HANDLE);
 
@@ -465,7 +464,7 @@ PVRMMapOSMemHandleToMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
 	*pui32MMapOffset = *pui32MMapOffset << (PAGE_SHIFT - 12);
 
 exit_unlock:
-    LinuxUnLockMutex(&g_sMMapMutex);
+    mutex_unlock(&g_sMMapMutex);
 
     return eError;
 }
@@ -506,7 +505,7 @@ PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
     PVRSRV_ERROR eError;
     IMG_UINT32 ui32PID = OSGetCurrentProcessIDKM();
 
-    LinuxLockMutex(&g_sMMapMutex);
+    mutex_lock(&g_sMMapMutex);
 
     PVR_ASSERT(PVRSRVGetMaxHandle(psPerProc->psHandleBase) <= MAX_MMAP_HANDLE);
 
@@ -550,7 +549,7 @@ PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
     eError =  PVRSRV_ERROR_MAPPING_NOT_FOUND;
 
 exit_unlock:
-    LinuxUnLockMutex(&g_sMMapMutex);
+    mutex_unlock(&g_sMMapMutex);
 
     return eError;
 }
@@ -797,11 +796,11 @@ MMapVOpenNoLock(struct vm_area_struct* ps_vma)
 static void
 MMapVOpen(struct vm_area_struct* ps_vma)
 {
-    LinuxLockMutex(&g_sMMapMutex);
+    mutex_lock(&g_sMMapMutex);
 
     MMapVOpenNoLock(ps_vma);
 
-    LinuxUnLockMutex(&g_sMMapMutex);
+    mutex_unlock(&g_sMMapMutex);
 }
 
 
@@ -840,11 +839,11 @@ MMapVCloseNoLock(struct vm_area_struct* ps_vma)
 static void
 MMapVClose(struct vm_area_struct* ps_vma)
 {
-    LinuxLockMutex(&g_sMMapMutex);
+    mutex_lock(&g_sMMapMutex);
 
     MMapVCloseNoLock(ps_vma);
 
-    LinuxUnLockMutex(&g_sMMapMutex);
+    mutex_unlock(&g_sMMapMutex);
 }
 
 /*
@@ -861,7 +860,7 @@ static int MMapVAccess(struct vm_area_struct *ps_vma, unsigned long addr,
 	int iRetVal = -EINVAL;
 	IMG_VOID *pvKernelAddr;
 
-	LinuxLockMutex(&g_sMMapMutex);
+	mutex_lock(&g_sMMapMutex);
 
 	psOffsetStruct = (PKV_OFFSET_STRUCT)ps_vma->vm_private_data;
 	psLinuxMemArea = psOffsetStruct->psLinuxMemArea;
@@ -904,7 +903,7 @@ static int MMapVAccess(struct vm_area_struct *ps_vma, unsigned long addr,
 	}
 
 exit_unlock:
-	LinuxUnLockMutex(&g_sMMapMutex);
+	mutex_unlock(&g_sMMapMutex);
     return iRetVal;
 }
 
@@ -944,7 +943,7 @@ PVRMMap(struct file* pFile, struct vm_area_struct* ps_vma)
 
     PVR_UNREFERENCED_PARAMETER(pFile);
 
-    LinuxLockMutex(&g_sMMapMutex);
+    mutex_lock(&g_sMMapMutex);
     
     ui32ByteSize = ps_vma->vm_end - ps_vma->vm_start;
     
@@ -959,7 +958,7 @@ PVRMMap(struct file* pFile, struct vm_area_struct* ps_vma)
     if (psOffsetStruct == IMG_NULL)
     {
 #if defined(SUPPORT_DRI_DRM)
-        LinuxUnLockMutex(&g_sMMapMutex);
+        mutex_unlock(&g_sMMapMutex);
 
 #if !defined(SUPPORT_DRI_DRM_EXT)
         /* Pass unknown requests onto the DRM module */
@@ -1085,7 +1084,7 @@ unlock_and_return:
         DestroyOffsetStruct(psOffsetStruct);
     }
 
-    LinuxUnLockMutex(&g_sMMapMutex);
+    mutex_unlock(&g_sMMapMutex);
 
     if(psFlushMemArea)
     {
@@ -1108,11 +1107,11 @@ static void ProcSeqStartstopMMapRegistations(struct seq_file *sfile,bool start)
 {
 	if(start) 
 	{
-	    LinuxLockMutex(&g_sMMapMutex);		
+	    mutex_lock(&g_sMMapMutex);		
 	}
 	else
 	{
-	    LinuxUnLockMutex(&g_sMMapMutex);
+	    mutex_unlock(&g_sMMapMutex);
 	}
 }
 
@@ -1265,7 +1264,7 @@ PVRMMapRegisterArea(LinuxMemArea *psLinuxMemArea)
     PVRSRV_ERROR eError;
     const char *pszName = LinuxMemAreaTypeToString(LinuxMemAreaRootType(psLinuxMemArea));
 
-    LinuxLockMutex(&g_sMMapMutex);
+    mutex_lock(&g_sMMapMutex);
 
     PVR_DPF((PVR_DBG_MESSAGE,
              "%s(%s, psLinuxMemArea 0x%p, ui32AllocFlags 0x%8x)",
@@ -1300,7 +1299,7 @@ PVRMMapRegisterArea(LinuxMemArea *psLinuxMemArea)
     eError = PVRSRV_OK;
 
 exit_unlock:
-    LinuxUnLockMutex(&g_sMMapMutex);
+    mutex_unlock(&g_sMMapMutex);
 
     return eError;
 }
@@ -1326,7 +1325,7 @@ PVRMMapRemoveRegisteredArea(LinuxMemArea *psLinuxMemArea)
     PVRSRV_ERROR eError;
     PKV_OFFSET_STRUCT psOffsetStruct, psTmpOffsetStruct;
 
-    LinuxLockMutex(&g_sMMapMutex);
+    mutex_lock(&g_sMMapMutex);
 
     PVR_ASSERT(psLinuxMemArea->bMMapRegistered);
 
@@ -1369,7 +1368,7 @@ PVRMMapRemoveRegisteredArea(LinuxMemArea *psLinuxMemArea)
     eError = PVRSRV_OK;
 
 exit_unlock:
-    LinuxUnLockMutex(&g_sMMapMutex);
+    mutex_unlock(&g_sMMapMutex);
     return eError;
 }
 
@@ -1417,7 +1416,7 @@ LinuxMMapPerProcessDisconnect(PVRSRV_ENV_PER_PROCESS_DATA *psEnvPerProc)
 
     PVR_UNREFERENCED_PARAMETER(psEnvPerProc);
 
-    LinuxLockMutex(&g_sMMapMutex);
+    mutex_lock(&g_sMMapMutex);
 
     list_for_each_entry_safe(psOffsetStruct, psTmpOffsetStruct, &g_sMMapOffsetStructList, sMMapItem)
     {
@@ -1435,7 +1434,7 @@ LinuxMMapPerProcessDisconnect(PVRSRV_ENV_PER_PROCESS_DATA *psEnvPerProc)
 	}
     }
 
-    LinuxUnLockMutex(&g_sMMapMutex);
+    mutex_unlock(&g_sMMapMutex);
 }
 
 
@@ -1481,7 +1480,7 @@ PVRSRV_ERROR LinuxMMapPerProcessHandleOptions(PVRSRV_HANDLE_BASE *psHandleBase)
 IMG_VOID
 PVRMMapInit(IMG_VOID)
 {
-    LinuxInitMutex(&g_sMMapMutex);
+    mutex_init(&g_sMMapMutex);
 
     g_psMemmapCache = KMemCacheCreateWrapper("img-mmap", sizeof(KV_OFFSET_STRUCT), 0, 0);
     if (!g_psMemmapCache)

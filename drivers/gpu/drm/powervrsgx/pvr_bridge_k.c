@@ -45,7 +45,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "services.h"
 #include "pvr_bridge.h"
 #include "perproc.h"
-#include "mutex.h"
 #include "syscommon.h"
 #include "pvr_debug.h"
 #include "proc.h"
@@ -80,7 +79,7 @@ static void ProcSeqShowBridgeStats(struct seq_file *sfile,void* el);
 static void* ProcSeqOff2ElementBridgeStats(struct seq_file * sfile, loff_t off);
 static void ProcSeqStartstopBridgeStats(struct seq_file *sfile,bool start);
 
-extern PVRSRV_LINUX_MUTEX gPVRSRVLock;
+extern struct mutex gPVRSRVLock;
 
 #if defined(SUPPORT_MEMINFO_IDS)
 static IMG_UINT64 ui64Stamp;
@@ -123,11 +122,11 @@ static void ProcSeqStartstopBridgeStats(struct seq_file *sfile,bool start)
 {
 	if(start) 
 	{
-		LinuxLockMutex(&gPVRSRVLock);
+		mutex_lock(&gPVRSRVLock);
 	}
 	else
 	{
-		LinuxUnLockMutex(&gPVRSRVLock);
+		mutex_unlock(&gPVRSRVLock);
 	}
 }
 
@@ -233,7 +232,7 @@ PVRSRV_BridgeDispatchKM(struct file *pFile, unsigned int unref__ ioctlCmd, unsig
 	PVRSRV_PER_PROCESS_DATA *psPerProc;
 	int err = -EFAULT;
 
-	LinuxLockMutex(&gPVRSRVLock);
+	mutex_lock(&gPVRSRVLock);
 
 #if defined(SUPPORT_DRI_DRM)
 	psBridgePackageKM = (PVRSRV_BRIDGE_PACKAGE *)arg;
@@ -499,6 +498,6 @@ PVRSRV_BridgeDispatchKM(struct file *pFile, unsigned int unref__ ioctlCmd, unsig
 	}
 
 unlock_and_return:
-	LinuxUnLockMutex(&gPVRSRVLock);
+	mutex_unlock(&gPVRSRVLock);
 	return err;
 }

@@ -53,7 +53,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_debug.h"
 #include "srvkm.h"
 #include "proc.h"
-#include "mutex.h"
 #include "linkage.h"
 #include "pvr_uaccess.h"
 
@@ -94,7 +93,7 @@ static char gszBufferIRQ[PVR_MAX_MSG_LEN + 1];
 
 #if !defined(PVR_DEBUG_ALWAYS_USE_SPINLOCK)
 /* The lock is used to control access to gszBufferNonIRQ */
-static PVRSRV_LINUX_MUTEX gsDebugMutexNonIRQ;
+static struct mutex gsDebugMutexNonIRQ;
 #endif
 
 static DEFINE_SPINLOCK(gsDebugLockIRQ);
@@ -116,7 +115,7 @@ static inline void GetBufferLock(unsigned long *pulLockFlags)
 #if !defined(PVR_DEBUG_ALWAYS_USE_SPINLOCK)
 	else
 	{
-		LinuxLockMutex(&gsDebugMutexNonIRQ);
+		mutex_lock(&gsDebugMutexNonIRQ);
 	}
 #endif
 }
@@ -132,7 +131,7 @@ static inline void ReleaseBufferLock(unsigned long ulLockFlags)
 #if !defined(PVR_DEBUG_ALWAYS_USE_SPINLOCK)
 	else
 	{
-		LinuxUnLockMutex(&gsDebugMutexNonIRQ);
+		mutex_unlock(&gsDebugMutexNonIRQ);
 	}
 #endif
 }
@@ -182,7 +181,7 @@ static bool VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz, const char* pszFormat,
 IMG_VOID PVRDPFInit(IMG_VOID)
 {
 #if !defined(PVR_DEBUG_ALWAYS_USE_SPINLOCK)
-    LinuxInitMutex(&gsDebugMutexNonIRQ);
+    mutex_init(&gsDebugMutexNonIRQ);
 #endif
 }
 

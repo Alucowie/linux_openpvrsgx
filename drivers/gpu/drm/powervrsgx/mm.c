@@ -46,7 +46,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <linux/kernel.h>
 #include <asm/atomic.h>
 #include <linux/list.h>
-#include <linux/mutex.h>
 #include <linux/mm.h>
 #include <linux/vmalloc.h>
 #include <asm/io.h>
@@ -69,7 +68,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "osfunc.h"
 #include "pvr_debug.h"
 #include "proc.h"
-#include "mutex.h"
 #include "lock.h"
 
 #include "lists.h"
@@ -188,7 +186,7 @@ static void ProcSeqShowMemArea(struct seq_file *sfile,void* el);
 static void* ProcSeqOff2ElementMemArea(struct seq_file *sfile, loff_t off);
 
 
-static PVRSRV_LINUX_MUTEX g_sDebugMutex;
+static struct mutex g_sDebugMutex;
 
 static void ProcSeqStartstopDebugMutex(struct seq_file *sfile,bool start);
 
@@ -266,7 +264,7 @@ DebugMemAllocRecordAdd(DEBUG_MEM_ALLOC_TYPE eAllocType,
 {
     DEBUG_MEM_ALLOC_REC *psRecord;
 
-    LinuxLockMutex(&g_sDebugMutex);
+    mutex_lock(&g_sDebugMutex);
 
     psRecord = kmalloc(sizeof(DEBUG_MEM_ALLOC_REC), GFP_KERNEL);
 
@@ -313,7 +311,7 @@ DebugMemAllocRecordAdd(DEBUG_MEM_ALLOC_TYPE eAllocType,
         }
     }
 
-    LinuxUnLockMutex(&g_sDebugMutex);
+    mutex_unlock(&g_sDebugMutex);
 }
 
 
@@ -361,7 +359,7 @@ DebugMemAllocRecordRemove(DEBUG_MEM_ALLOC_TYPE eAllocType, IMG_VOID *pvKey, char
 {
 /*    DEBUG_MEM_ALLOC_REC **ppsCurrentRecord;*/
 
-    LinuxLockMutex(&g_sDebugMutex);
+    mutex_lock(&g_sDebugMutex);
 
     /* Locate the corresponding allocation entry */
 	if (!List_DEBUG_MEM_ALLOC_REC_bool_Any_va(g_MemoryRecords,
@@ -374,7 +372,7 @@ DebugMemAllocRecordRemove(DEBUG_MEM_ALLOC_TYPE eAllocType, IMG_VOID *pvKey, char
 		pszFileName, ui32Line));
 	}
 
-    LinuxUnLockMutex(&g_sDebugMutex);
+    mutex_unlock(&g_sDebugMutex);
 }
 
 
@@ -1487,7 +1485,7 @@ DebugLinuxMemAreaRecordAdd(LinuxMemArea *psLinuxMemArea, IMG_UINT32 ui32Flags)
     DEBUG_LINUX_MEM_AREA_REC *psNewRecord;
     const char *pi8FlagsString;
     
-    LinuxLockMutex(&g_sDebugMutex);
+    mutex_lock(&g_sDebugMutex);
 
     if (psLinuxMemArea->eAreaType != LINUX_MEM_AREA_SUB_ALLOC)
     {
@@ -1529,7 +1527,7 @@ DebugLinuxMemAreaRecordAdd(LinuxMemArea *psLinuxMemArea, IMG_UINT32 ui32Flags)
         //dump_stack();
     }
 
-    LinuxUnLockMutex(&g_sDebugMutex);
+    mutex_unlock(&g_sDebugMutex);
 }
 
 
@@ -1556,13 +1554,13 @@ DebugLinuxMemAreaRecordFind(LinuxMemArea *psLinuxMemArea)
 {
     DEBUG_LINUX_MEM_AREA_REC *psCurrentRecord;
 
-    LinuxLockMutex(&g_sDebugMutex);
+    mutex_lock(&g_sDebugMutex);
 	psCurrentRecord = List_DEBUG_LINUX_MEM_AREA_REC_Any_va(g_LinuxMemAreaRecords,
 														MatchLinuxMemArea_AnyVaCb,
 														psLinuxMemArea);
 	
 /*exit_unlock:*/
-    LinuxUnLockMutex(&g_sDebugMutex);
+    mutex_unlock(&g_sDebugMutex);
 
     return psCurrentRecord;
 }
@@ -1573,7 +1571,7 @@ DebugLinuxMemAreaRecordRemove(LinuxMemArea *psLinuxMemArea)
 {
     DEBUG_LINUX_MEM_AREA_REC *psCurrentRecord;
 
-    LinuxLockMutex(&g_sDebugMutex);
+    mutex_lock(&g_sDebugMutex);
 
     if (psLinuxMemArea->eAreaType != LINUX_MEM_AREA_SUB_ALLOC)
     {
@@ -1597,7 +1595,7 @@ DebugLinuxMemAreaRecordRemove(LinuxMemArea *psLinuxMemArea)
         	     __FUNCTION__, psLinuxMemArea));
 	}
 
-    LinuxUnLockMutex(&g_sDebugMutex);
+    mutex_unlock(&g_sDebugMutex);
 }
 
 
@@ -1766,11 +1764,11 @@ static void ProcSeqStartstopDebugMutex(struct seq_file *sfile, bool start)
 {
 	if (start) 
 	{
-	    LinuxLockMutex(&g_sDebugMutex);		
+	    mutex_lock(&g_sDebugMutex);		
 	}
 	else
 	{
-	    LinuxUnLockMutex(&g_sDebugMutex);
+	    mutex_unlock(&g_sDebugMutex);
 	}
 }
 
@@ -2353,7 +2351,7 @@ LinuxMMCleanup(IMG_VOID)
 PVRSRV_ERROR
 LinuxMMInit(IMG_VOID)
 {
-	LinuxInitMutex(&g_sDebugMutex);
+	mutex_init(&g_sDebugMutex);
 
     {
 		g_SeqFileMemArea = CreateProcReadEntrySeq(
