@@ -911,9 +911,9 @@ typedef struct {
 typedef struct _PVRSRV_REGISTRY_INFO_
 {
     IMG_UINT32		ui32DevCookie;
-    IMG_PCHAR		pszKey;
-    IMG_PCHAR		pszValue;
-    IMG_PCHAR		pszBuf;
+    char		*pszKey;
+    char		*pszValue;
+    char		*pszBuf;
     IMG_UINT32		ui32BufSize;
 } PVRSRV_REGISTRY_INFO, *PPVRSRV_REGISTRY_INFO;
 

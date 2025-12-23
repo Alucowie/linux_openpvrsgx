@@ -245,8 +245,8 @@ typedef struct PVRSRV_BRIDGE_IN_READREGDWORD_TAG
 {
 	IMG_UINT32				ui32BridgeFlags; /* Must be first member of structure */
 	IMG_HANDLE				hDevCookie;
-    IMG_PCHAR				pszKey;
-    IMG_PCHAR				pszValue;
+    char				*pszKey;
+    char				*pszValue;
 }PVRSRV_BRIDGE_IN_READREGDWORD;
 
 /*!

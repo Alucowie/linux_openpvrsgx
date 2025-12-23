@@ -323,7 +323,7 @@ typedef struct _SGX_KICKTA_DUMP_ROFF_
 	IMG_UINT32			uiAllocIndex;						/*< Alloc index for LDDM */
 	IMG_UINT32			ui32Offset;							/*< Byte offset to value to dump */
 	IMG_UINT32			ui32Value;							/*< Actual value to dump */
-	IMG_PCHAR			pszName;							/*< Name of buffer */
+	char			*pszName;							/*< Name of buffer */
 } SGX_KICKTA_DUMP_ROFF, *PSGX_KICKTA_DUMP_ROFF;
 
 typedef struct _SGX_KICKTA_DUMP_BUFFER_
@@ -340,7 +340,7 @@ typedef struct _SGX_KICKTA_DUMP_BUFFER_
 																circular buffer */
 	IMG_DEV_VIRTADDR	sCtrlDevVAddr;						/*< Device virtual address of the memory in the 
 																control structure to be checked */
-	IMG_PCHAR			pszName;							/*< Name of buffer */
+	char			*pszName;							/*< Name of buffer */
 } SGX_KICKTA_DUMP_BUFFER, *PSGX_KICKTA_DUMP_BUFFER;
 
 #define SGX_MAX_TRANSFER_STATUS_VALS	2
