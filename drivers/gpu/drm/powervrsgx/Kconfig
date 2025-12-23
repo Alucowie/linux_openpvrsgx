@@ -2,10 +2,14 @@
 
 config DRM_POWERVRSGX
 	tristate "PowerVR SGX (DRM support for PowerVR Serie 5 SGX GPUs)"
-	depends on DRM
 	depends on ARM || COMPILE_TEST
+	depends on DRM
 	depends on MMU
-	select DRM_SCHED
+	depends on PM
+	select DRM_EXEC
 	select DRM_GEM_SHMEM_HELPER
+	select DRM_SCHED
+	select DRM_GPUVM
+	select FW_LOADER
 	help
 	  DRM driver for PowerVR Serie 5 SGX GPUs.
