@@ -3750,7 +3750,7 @@ int BridgedDispatchKM(PVRSRV_PER_PROCESS_DATA * psPerProc,
 
 		/* We have already set up some static buffers to store our ioctl data... */
 		psBridgeIn = ((ENV_DATA *)psSysData->pvEnvSpecificData)->pvBridgeData;
-		psBridgeOut = (IMG_PVOID)((IMG_PBYTE)psBridgeIn + PVRSRV_MAX_BRIDGE_IN_SIZE);
+		psBridgeOut = (IMG_PVOID)((u8 *)psBridgeIn + PVRSRV_MAX_BRIDGE_IN_SIZE);
 
 		/* check we are not using a bigger bridge than allocated */
 		if((psBridgePackageKM->ui32InBufferSize > PVRSRV_MAX_BRIDGE_IN_SIZE) || 

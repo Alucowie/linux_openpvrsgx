@@ -135,7 +135,7 @@ static IMG_CHAR *SysCreateVersionString(void)
 		return IMG_NULL;
 	}
 
-	ui32SGXRevision = OSReadHWReg((IMG_PVOID)((IMG_PBYTE)pvRegsLinAddr),
+	ui32SGXRevision = OSReadHWReg((IMG_PVOID)((u8 *)pvRegsLinAddr),
 								  EUR_CR_CORE_REVISION);
 
 	SysAcquireData(&psSysData);

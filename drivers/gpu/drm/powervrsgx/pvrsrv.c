@@ -1579,7 +1579,7 @@ IMG_VOID IMG_CALLCONV PVRSRVProcessDisconnect(IMG_UINT32	ui32PID)
 	Function to save or restore Resources Live segments
 
 ******************************************************************************/
-PVRSRV_ERROR IMG_CALLCONV PVRSRVSaveRestoreLiveSegments(IMG_HANDLE hArena, IMG_PBYTE pbyBuffer,
+PVRSRV_ERROR IMG_CALLCONV PVRSRVSaveRestoreLiveSegments(IMG_HANDLE hArena, u8 *pbyBuffer,
 														IMG_SIZE_T *puiBufSize, bool bSave)
 {
 	IMG_SIZE_T         uiBytesSaved = 0;
