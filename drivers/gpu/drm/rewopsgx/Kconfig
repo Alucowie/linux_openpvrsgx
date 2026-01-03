@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: GPL-2.0
+
+config DRM_REWOPSGX
+	tristate "RewopSGX (DRM support for PowerVR Series5 SGX GPUs)"
+	depends on DRM
+	depends on ARM || COMPILE_TEST
+	depends on MMU
+	select DRM_SCHED
+	select DRM_GEM_SHMEM_HELPER
+	help
+	  DRM driver for PowerVR Series5 (SGX5xx) GPUs.

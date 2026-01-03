@@ -211,6 +211,7 @@ obj-$(CONFIG_DRM_PANFROST) += panfrost/
 obj-$(CONFIG_DRM_PANTHOR) += panthor/
 obj-y			+= pvrsgx/
 obj-$(CONFIG_DRM_POWERVRSGX) += powervrsgx/
+obj-$(CONFIG_DRM_REWOPSGX) += rewopsgx/
 obj-$(CONFIG_DRM_ASPEED_GFX) += aspeed/
 obj-$(CONFIG_DRM_MCDE) += mcde/
 obj-$(CONFIG_DRM_TIDSS) += tidss/
