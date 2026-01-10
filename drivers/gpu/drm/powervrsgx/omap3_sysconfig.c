@@ -196,7 +196,7 @@ PVRSRV_ERROR SysInitialise(IMG_VOID)
 	for(i=0; i<SYS_DEVICE_COUNT; i++)
 	{
 		gpsSysData->sDeviceID[i].uiID = i;
-		gpsSysData->sDeviceID[i].bInUse = false;
+		gpsSysData->sDeviceID[i].bInUse = IMG_FALSE;
 	}
 
 	gpsSysData->psDeviceNodeList = IMG_NULL;
@@ -383,7 +383,7 @@ PVRSRV_ERROR SysFinalise(IMG_VOID)
 
 	DisableSGXClocks(gpsSysData);
 
-	gpsSysSpecificData->bSGXInitComplete = true;
+	gpsSysSpecificData->bSGXInitComplete = IMG_TRUE;
 
 	return eError;
 }
@@ -471,7 +471,7 @@ PVRSRV_ERROR SysDeinitialise (SYS_DATA *psSysData)
 	SysDeinitialiseCommon(gpsSysData);
 
 	gpsSysSpecificData->ui32SysSpecificData = 0;
-	gpsSysSpecificData->bSGXInitComplete = false;
+	gpsSysSpecificData->bSGXInitComplete = IMG_FALSE;
 
 	gpsSysData = IMG_NULL;
 
@@ -622,7 +622,7 @@ PVRSRV_ERROR SysSystemPrePowerState(PVRSRV_SYS_POWER_STATE eNewPowerState)
 
 		if (SYS_SPECIFIC_DATA_TEST(&gsSysSpecificData, SYS_SPECIFIC_DATA_ENABLE_LISR))
 		{
-			bool bWrapped = WrapSystemPowerChange(&gsSysSpecificData);
+			IMG_BOOL bWrapped = WrapSystemPowerChange(&gsSysSpecificData);
 			eError = OSUninstallDeviceLISR(gpsSysData);
 			if (bWrapped)
 			{
@@ -672,7 +672,7 @@ PVRSRV_ERROR SysSystemPostPowerState(PVRSRV_SYS_POWER_STATE eNewPowerState)
 
 		if (SYS_SPECIFIC_DATA_TEST(&gsSysSpecificData, SYS_SPECIFIC_DATA_PM_UNINSTALL_LISR))
 		{
-			bool bWrapped = WrapSystemPowerChange(&gsSysSpecificData);
+			IMG_BOOL bWrapped = WrapSystemPowerChange(&gsSysSpecificData);
 
 			eError = OSInstallDeviceLISR(gpsSysData, gsSGXDeviceMap.ui32IRQ, "SGX ISR", gpsSGXDevNode);
 			if (bWrapped)

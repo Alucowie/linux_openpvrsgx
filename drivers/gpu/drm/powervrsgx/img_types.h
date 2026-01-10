@@ -42,8 +42,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __IMG_TYPES_H__
 #define __IMG_TYPES_H__
 
-#include <linux/types.h>
-
 /* define all address space bit depths: */
 /* CPU virtual address space defaults to 32bits */
 #if !defined(IMG_ADDRSPACE_CPUVADDR_BITS)
@@ -70,6 +68,13 @@ typedef signed long		IMG_INT32,	*IMG_PINT32;
 
 typedef unsigned long long		IMG_UINT64,	*IMG_PUINT64;
 typedef long long			IMG_INT64,	*IMG_PINT64;
+
+typedef	enum tag_img_bool
+{
+	IMG_FALSE		= 0,
+	IMG_TRUE		= 1,
+	IMG_FORCE_ALIGN = 0x7FFFFFFF
+} IMG_BOOL, *IMG_PBOOL;
 
 typedef void            IMG_VOID, *IMG_PVOID;
 

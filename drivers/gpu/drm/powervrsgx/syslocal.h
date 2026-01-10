@@ -82,12 +82,12 @@ typedef struct _SYS_SPECIFIC_DATA_TAG_
 {
 	IMG_UINT32	ui32SysSpecificData;
 	PVRSRV_DEVICE_NODE *psSGXDevNode;
-	bool	bSGXInitComplete;
+	IMG_BOOL	bSGXInitComplete;
 #if defined(PVR_OMAP_TIMER_BASE_IN_SYS_SPEC_DATA)
 	IMG_CPU_PHYADDR	sTimerRegPhysBase;
 #endif
 	IMG_UINT32	ui32SrcClockDiv;
-	bool	bSysClocksOneTimeInit;
+	IMG_BOOL	bSysClocksOneTimeInit;
 	atomic_t	sSGXClocksEnabled;
 	struct mutex	sPowerLock;
 	struct clk      *psCORE_CK;
@@ -106,7 +106,7 @@ extern SYS_SPECIFIC_DATA *gpsSysSpecificData;
 #define	SysEnableSGXInterrupts(psSysData)
 #define SysDisableSGXInterrupts(psSysData)
 
-bool WrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
+IMG_BOOL WrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
 IMG_VOID UnwrapSystemPowerChange(SYS_SPECIFIC_DATA *psSysSpecData);
 
 PVRSRV_ERROR SysPMRuntimeRegister(void);

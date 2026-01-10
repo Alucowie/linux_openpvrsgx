@@ -122,10 +122,10 @@ MMU_Delete (MMU_HEAP *pMMUHeap);
                 In:  uFlags - Allocation flags.
                 In:  uDevVAddrAlignment - Required alignment.
                 Out: pDevVAddr - Receives base address of allocation.
-    RETURNS:	true - Success
-                false - Failure
+    RETURNS:	IMG_TRUE - Success
+                IMG_FALSE - Failure
 ******************************************************************************/
-bool
+IMG_BOOL
 MMU_Alloc (MMU_HEAP *pMMUHeap,
            IMG_SIZE_T uSize,
            IMG_SIZE_T *pActualSize,
@@ -139,8 +139,8 @@ MMU_Alloc (MMU_HEAP *pMMUHeap,
     PURPOSE:    Frees space in an mmu's virtual address space.
     PARAMETERS:	In: pMMUHeap - MMU to free on.
                 In: DevVAddr - Base address of allocation.
-    RETURNS:	true - Success
-                false - Failure
+    RETURNS:	IMG_TRUE - Success
+                IMG_FALSE - Failure
 ******************************************************************************/
 IMG_VOID
 MMU_Free (MMU_HEAP *pMMUHeap,
@@ -220,7 +220,7 @@ MMU_MapPagesSparse (MMU_HEAP *pMMUHeap,
 					IMG_UINT32 ui32ChunkSize,
 					IMG_UINT32 ui32NumVirtChunks,
 					IMG_UINT32 ui32NumPhysChunks,
-					bool *pabMapChunk,
+					IMG_BOOL *pabMapChunk,
 					IMG_UINT32 ui32MemFlags,
 					IMG_HANDLE hUniqueTag);
 
@@ -283,7 +283,7 @@ MMU_MapShadowSparse (MMU_HEAP          * pMMUHeap,
 					 IMG_UINT32          ui32ChunkSize,
 					 IMG_UINT32          ui32NumVirtChunks,
 					 IMG_UINT32          ui32NumPhysChunks,
-					 bool          * pabMapChunk,
+					 IMG_BOOL          * pabMapChunk,
 					 IMG_CPU_VIRTADDR    CpuVAddr,
 					 IMG_HANDLE          hOSMemHandle,
 					 IMG_DEV_VIRTADDR  * pDevVAddr,
@@ -398,7 +398,7 @@ IMG_VOID MMU_BIFResetPDFree(PVRSRV_SGXDEV_INFO *psDevInfo);
 	PARAMETERS: In: pMMU_Heap
 	RETURNS:    true if heap is shared
 ******************************************************************************/
-bool MMU_IsHeapShared(MMU_HEAP* pMMU_Heap);
+IMG_BOOL MMU_IsHeapShared(MMU_HEAP* pMMU_Heap);
 
 IMG_VOID MMU_CheckFaultAddr(PVRSRV_SGXDEV_INFO *psDevInfo, IMG_UINT32 ui32PDDevPAddr, IMG_UINT32 ui32RegVal);
 

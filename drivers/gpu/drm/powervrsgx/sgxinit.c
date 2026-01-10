@@ -75,11 +75,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			VAR(NAME), \
 			psDevInfo->sSGXStructSizes.ui32Sizeof_##NAME, \
 			psSGXStructSizes->ui32Sizeof_##NAME )); \
-		bStructSizesFailed = true; \
+		bStructSizesFailed = IMG_TRUE; \
 	}	\
 }
 
-bool SGX_ISRHandler(IMG_VOID *pvData);
+IMG_BOOL SGX_ISRHandler(IMG_VOID *pvData);
 
 
 static
@@ -112,7 +112,7 @@ static IMG_VOID SGXCommandComplete(PVRSRV_DEVICE_NODE *psDeviceNode)
 		 * will test the following flag, and call
 		 * SGXScheduleProcessQueuesKM if the flag is set.
 		 */
-		psDeviceNode->bReProcessDeviceCommandComplete = true;
+		psDeviceNode->bReProcessDeviceCommandComplete = IMG_TRUE;
 	}
 	else
 	{
@@ -233,7 +233,7 @@ static PVRSRV_ERROR InitDevInfo(PVRSRV_PER_PROCESS_DATA *psPerProc,
 	OSMemCopy(psDevInfo->aui32HostKickAddr, psInitInfo->aui32HostKickAddr,
 			  SGXMKIF_CMD_MAX * sizeof(psDevInfo->aui32HostKickAddr[0]));
 
- 	psDevInfo->bForcePTOff = false;
+ 	psDevInfo->bForcePTOff = IMG_FALSE;
 
 	psDevInfo->ui32CacheControl = psInitInfo->ui32CacheControl;
 
@@ -315,12 +315,12 @@ static PVRSRV_ERROR SGXRunScript(PVRSRV_SGXDEV_INFO *psDevInfo, SGX_INIT_COMMAND
 
 ******************************************************************************/
 PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
-						   bool				bHardwareRecovery)
+						   IMG_BOOL				bHardwareRecovery)
 {
 	PVRSRV_ERROR			eError;
 	PVRSRV_KERNEL_MEM_INFO	*psSGXHostCtlMemInfo = psDevInfo->psKernelSGXHostCtlMemInfo;
 	SGXMKIF_HOST_CTL		*psSGXHostCtl = psSGXHostCtlMemInfo->pvLinAddrKM;
-	static bool			bFirstTime = true;
+	static IMG_BOOL			bFirstTime = IMG_TRUE;
 
 	SGXInitClocks(psDevInfo);
 
@@ -389,11 +389,11 @@ PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 					   PVRSRV_USSE_EDM_INIT_COMPLETE,
 					   MAX_HW_TIME_US,
 					   MAX_HW_TIME_US/WAIT_TRY_COUNT,
-					   false) != PVRSRV_OK)
+					   IMG_FALSE) != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "SGXInitialise: Wait for uKernel initialisation failed"));
 
-		SGXDumpDebugInfo(psDevInfo, false);
+		SGXDumpDebugInfo(psDevInfo, IMG_FALSE);
 		PVR_DBG_BREAK;
 
 		return PVRSRV_ERROR_RETRY;
@@ -401,7 +401,7 @@ PVRSRV_ERROR SGXInitialise(PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 	PVR_ASSERT(psDevInfo->psKernelCCBCtl->ui32ReadOffset == psDevInfo->psKernelCCBCtl->ui32WriteOffset);
 
-	bFirstTime = false;
+	bFirstTime = IMG_FALSE;
 	
 	return PVRSRV_OK;
 }
@@ -847,7 +847,7 @@ static IMG_VOID SGXDumpDebugReg (PVRSRV_SGXDEV_INFO	*psDevInfo,
 
 ******************************************************************************/
 IMG_VOID SGXDumpDebugInfo (PVRSRV_SGXDEV_INFO	*psDevInfo,
-						   bool				bDumpSGXRegs)
+						   IMG_BOOL				bDumpSGXRegs)
 {
 	IMG_UINT32	ui32CoreNum;
 
@@ -1046,7 +1046,7 @@ IMG_VOID HWRecoveryResetSGX (PVRSRV_DEVICE_NODE *psDeviceNode,
 	/*
 		Ensure that hardware recovery is serialised with any power transitions.
 	*/
-	eError = PVRSRVPowerLock(ui32CallerID, false);
+	eError = PVRSRVPowerLock(ui32CallerID, IMG_FALSE);
 	if(eError != PVRSRV_OK)
 	{
 		/*
@@ -1076,15 +1076,15 @@ IMG_VOID HWRecoveryResetSGX (PVRSRV_DEVICE_NODE *psDeviceNode,
 		}
 	}else{
 		ui32Clockinus = ui32TempClockinus;
-		SGXDumpDebugInfo(psDeviceNode->pvDevice, true);
+		SGXDumpDebugInfo(psDeviceNode->pvDevice, IMG_TRUE);
 		ui32HWRecoveryCount = 0;
 	}
 #else	
-	SGXDumpDebugInfo(psDeviceNode->pvDevice, true);
+	SGXDumpDebugInfo(psDeviceNode->pvDevice, IMG_TRUE);
 #endif
 
 	/* Reset and re-initialise SGX. */
-	eError = SGXInitialise(psDevInfo, true);
+	eError = SGXInitialise(psDevInfo, IMG_TRUE);
 	if (eError != PVRSRV_OK)
 	{
 		PVR_DPF((PVR_DBG_ERROR,"HWRecoveryResetSGX: SGXInitialise failed (%d)", eError));
@@ -1096,7 +1096,7 @@ IMG_VOID HWRecoveryResetSGX (PVRSRV_DEVICE_NODE *psDeviceNode,
 	SGXScheduleProcessQueuesKM(psDeviceNode);
 
 	/* Flush any old commands from the queues. */
-	PVRSRVProcessQueues(true);
+	PVRSRVProcessQueues(IMG_TRUE);
 }
 
 
@@ -1124,13 +1124,13 @@ IMG_VOID SGXOSTimer(IMG_VOID *pvData)
 	static IMG_UINT32	ui32NumResets = 0;
 	IMG_UINT32		ui32CurrentEDMTasks;
 	IMG_UINT32		ui32CurrentOpenCLDelayCounter=0;
-	bool		bLockup = false;
-	bool		bPoweredDown;
+	IMG_BOOL		bLockup = IMG_FALSE;
+	IMG_BOOL		bPoweredDown;
 
 	/* increment a timestamp */
 	psDevInfo->ui32TimeStamp++;
 
-	bPoweredDown = (SGXIsDevicePowered(psDeviceNode)) ? false : true;
+	bPoweredDown = (SGXIsDevicePowered(psDeviceNode)) ? IMG_FALSE : IMG_TRUE;
 
 	/*
 	 * Check whether EDM timer tasks are getting scheduled. If not, assume
@@ -1173,7 +1173,7 @@ IMG_VOID SGXOSTimer(IMG_VOID *pvData)
 				{
 					PVR_DPF((PVR_DBG_ERROR, "SGXOSTimer() detected SGX lockup (0x%x tasks)", ui32EDMTasks));
 
-					bLockup = true;
+					bLockup = IMG_TRUE;
 					(psDevInfo->psSGXHostCtl)->ui32OpenCLDelayCount = 0;
 				}
 			}
@@ -1204,9 +1204,9 @@ SGX_NoUKernel_LockUp:
 /*
 	SGX ISR Handler
 */
-bool SGX_ISRHandler (IMG_VOID *pvData)
+IMG_BOOL SGX_ISRHandler (IMG_VOID *pvData)
 {
-	bool bInterruptProcessed = false;
+	IMG_BOOL bInterruptProcessed = IMG_FALSE;
 
 
 	/* Real Hardware */
@@ -1244,7 +1244,7 @@ bool SGX_ISRHandler (IMG_VOID *pvData)
 
 		if (ui32EventClear || ui32EventClear2)
 		{
-			bInterruptProcessed = true;
+			bInterruptProcessed = IMG_TRUE;
 
 			/* Clear master interrupt bit */
 			ui32EventClear |= EUR_CR_EVENT_HOST_CLEAR_MASTER_INTERRUPT_MASK;
@@ -1625,7 +1625,7 @@ PVRSRV_ERROR SGXGetClientInfoKM(IMG_HANDLE					hDevCookie,
 IMG_VOID SGXPanic(PVRSRV_SGXDEV_INFO	*psDevInfo)
 {
 	PVR_LOG(("SGX panic"));
-	SGXDumpDebugInfo(psDevInfo, false);
+	SGXDumpDebugInfo(psDevInfo, IMG_FALSE);
 	OSPanic();
 }
 
@@ -1654,10 +1654,10 @@ PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode)
 	PVRSRV_SGX_MISCINFO_INFO		*psSGXMiscInfoInt; 	/*!< internal misc info for ukernel */
 	PVRSRV_SGX_MISCINFO_FEATURES	*psSGXFeatures;
 	SGX_MISCINFO_STRUCT_SIZES		*psSGXStructSizes;	/*!< microkernel structure sizes */
-	bool						bStructSizesFailed;
+	IMG_BOOL						bStructSizesFailed;
 
 	/* Exceptions list for core rev check, format is pairs of (hw rev, sw rev) */
-	bool	bCheckCoreRev;
+	IMG_BOOL	bCheckCoreRev;
 	const IMG_UINT32 aui32CoreRevExceptions[] =
 	{
 		0x10100, 0x10101
@@ -1760,7 +1760,7 @@ PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode)
 		/* For some cores the hw/sw core revisions are expected not to match. For these
 		 * exceptional cases the core rev compatibility check should be skipped.
 		 */
-		bCheckCoreRev = true;
+		bCheckCoreRev = IMG_TRUE;
 		for(i=0; i<ui32NumCoreExceptions; i+=2)
 		{
 			if( (psSGXFeatures->ui32CoreRev==aui32CoreRevExceptions[i]) &&
@@ -1769,7 +1769,7 @@ PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode)
 				PVR_LOG(("SGXInit: HW core rev (%x), SW core rev (%x) check skipped.",
 						psSGXFeatures->ui32CoreRev,
 						psSGXFeatures->ui32CoreRevSW));
-				bCheckCoreRev = false;
+				bCheckCoreRev = IMG_FALSE;
 			}
 		}
 
@@ -1795,7 +1795,7 @@ PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode)
 	 */
 	psSGXStructSizes = &((PVRSRV_SGX_MISCINFO_INFO*)(psMemInfo->pvLinAddrKM))->sSGXStructSizes;
 
-	bStructSizesFailed = false;
+	bStructSizesFailed = IMG_FALSE;
 
 	CHECK_SIZE(HOST_CTL);
 	CHECK_SIZE(COMMAND);
@@ -1812,7 +1812,7 @@ PVRSRV_ERROR SGXDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode)
 	CHECK_SIZE(HWRTDATASET);
 	CHECK_SIZE(HWTRANSFERCONTEXT);
 
-	if (bStructSizesFailed == true)
+	if (bStructSizesFailed == IMG_TRUE)
 	{
 		PVR_LOG(("(FAIL) SGXInit: Mismatch in SGXMKIF structure sizes."));
 		eError = PVRSRV_ERROR_BUILD_MISMATCH;
@@ -1908,7 +1908,7 @@ PVRSRV_ERROR SGXGetMiscInfoUkernel(PVRSRV_SGXDEV_INFO	*psDevInfo,
 									 &sCommandData,
 									 KERNEL_ID,
 									 hDevMemContext,
-									 false);
+									 IMG_FALSE);
 
 	if (eError != PVRSRV_OK)
 	{
@@ -1920,14 +1920,14 @@ PVRSRV_ERROR SGXGetMiscInfoUkernel(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	 * E.g. could use getMiscInfo to obtain register values for diagnostics? */
 
 	{
-		bool bExit;
+		IMG_BOOL bExit;
 
-		bExit = false;
+		bExit = IMG_FALSE;
 		LOOP_UNTIL_TIMEOUT(MAX_HW_TIME_US)
 		{
 			if ((psSGXMiscInfoInt->ui32MiscInfoFlags & PVRSRV_USSE_MISCINFO_READY) != 0)
 			{
-				bExit = true;
+				bExit = IMG_TRUE;
 				break;
 			}
 		} END_LOOP_UNTIL_TIMEOUT();
@@ -2081,7 +2081,7 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 											 &sCommandData,
 											 KERNEL_ID,
 											 hDevMemContext,
-											 false);
+											 IMG_FALSE);
 			return eError;
 		}
 
@@ -2090,7 +2090,7 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			PVR_LOG(("User requested SGX debug info"));
 
 			/* Dump SGX debug data to the kernel log. */
-			SGXDumpDebugInfo(psDeviceNode->pvDevice, false);
+			SGXDumpDebugInfo(psDeviceNode->pvDevice, IMG_FALSE);
 
 			return PVRSRV_OK;
 		}
@@ -2100,7 +2100,7 @@ PVRSRV_ERROR SGXGetMiscInfoKM(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			PVR_LOG(("User requested SGX debug info"));
 
 			/* Dump SGX debug data to the kernel log. */
-			SGXDumpDebugInfo(psDeviceNode->pvDevice, true);
+			SGXDumpDebugInfo(psDeviceNode->pvDevice, IMG_TRUE);
 
 			return PVRSRV_OK;
 		}

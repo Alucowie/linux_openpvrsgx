@@ -77,7 +77,7 @@ static struct proc_dir_entry *g_ProcBridgeStats =0;
 static void* ProcSeqNextBridgeStats(struct seq_file *sfile,void* el,loff_t off);
 static void ProcSeqShowBridgeStats(struct seq_file *sfile,void* el);
 static void* ProcSeqOff2ElementBridgeStats(struct seq_file * sfile, loff_t off);
-static void ProcSeqStartstopBridgeStats(struct seq_file *sfile,bool start);
+static void ProcSeqStartstopBridgeStats(struct seq_file *sfile,IMG_BOOL start);
 
 extern struct mutex gPVRSRVLock;
 
@@ -118,7 +118,7 @@ LinuxBridgeDeInit(IMG_VOID)
  * start : TRUE if it's start, FALSE if it's stop
  *  
  */
-static void ProcSeqStartstopBridgeStats(struct seq_file *sfile,bool start) 
+static void ProcSeqStartstopBridgeStats(struct seq_file *sfile,IMG_BOOL start) 
 {
 	if(start) 
 	{

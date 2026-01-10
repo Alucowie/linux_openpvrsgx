@@ -305,7 +305,7 @@ static void *pvr_proc_seq_start (struct seq_file *proc_seq_file, loff_t *pos)
 {
 	PVR_PROC_SEQ_HANDLERS *handlers = (PVR_PROC_SEQ_HANDLERS*)proc_seq_file->private;
 	if(handlers->startstop != NULL)
-		handlers->startstop(proc_seq_file, true);
+		handlers->startstop(proc_seq_file, IMG_TRUE);
 	return handlers->off2element(proc_seq_file, *pos);
 }
 
@@ -329,7 +329,7 @@ static void pvr_proc_seq_stop (struct seq_file *proc_seq_file, void *v)
 	PVR_UNREFERENCED_PARAMETER(v);
 
 	if(handlers->startstop != NULL)
-		handlers->startstop(proc_seq_file, false);
+		handlers->startstop(proc_seq_file, IMG_FALSE);
 }
 
 /*!

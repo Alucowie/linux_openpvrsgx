@@ -204,13 +204,13 @@ struct _MMU_HEAP_
 	DEV_ARENA_DESCRIPTOR *psDevArena;
 
 	/* If we have sparse mappings then we can't do PT level sanity checks */
-	bool bHasSparseMappings;
+	IMG_BOOL bHasSparseMappings;
 };
 
 
 /* local prototypes: */
 static IMG_VOID
-_DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, bool bOSFreePT);
+_DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, IMG_BOOL bOSFreePT);
 
 static INLINE IMG_VOID CheckPT(MMU_PT_INFO *psPTInfoList)
 {
@@ -374,20 +374,20 @@ static INLINE IMG_VOID MakeKernelPageReadOnly(IMG_PVOID ulCPUVAddr)
 	PARAMETERS: In: pMMU_Heap
 	RETURNS:    true if heap is shared
 ******************************************************************************/
-bool MMU_IsHeapShared(MMU_HEAP* pMMUHeap)
+IMG_BOOL MMU_IsHeapShared(MMU_HEAP* pMMUHeap)
 {
 	switch(pMMUHeap->psDevArena->DevMemHeapType)
 	{
 		case DEVICE_MEMORY_HEAP_SHARED :
 		case DEVICE_MEMORY_HEAP_SHARED_EXPORTED :
-			return true;
+			return IMG_TRUE;
 		case DEVICE_MEMORY_HEAP_PERCONTEXT :
 		case DEVICE_MEMORY_HEAP_KERNEL :
-			return false;
+			return IMG_FALSE;
 		default:
 		{
 			PVR_DPF((PVR_DBG_ERROR, "MMU_IsHeapShared: ERROR invalid heap type"));
-			return false;
+			return IMG_FALSE;
 		}
 	}
 }
@@ -433,10 +433,10 @@ static IMG_VOID MMU_InvalidatePageTableCache(PVRSRV_SGXDEV_INFO *psDevInfo)
 	PARAMETERS: In: pMMUHeap - the mmu
 				In: psPTInfoList - PT info
 				Out: psDevPAddr - device physical address for new PT
-	RETURNS:    true - Success
-	            false - Failed
+	RETURNS:    IMG_TRUE - Success
+	            IMG_FALSE - Failed
 ******************************************************************************/
-static bool
+static IMG_BOOL
 _AllocPageTableMemory (MMU_HEAP *pMMUHeap,
 						MMU_PT_INFO *psPTInfoList,
 						IMG_DEV_PHYADDR	*psDevPAddr)
@@ -461,7 +461,7 @@ _AllocPageTableMemory (MMU_HEAP *pMMUHeap,
 						 &psPTInfoList->hPTPageOSMemHandle) != PVRSRV_OK)
 		{
 			PVR_DPF((PVR_DBG_ERROR, "_AllocPageTableMemory: ERROR call to OSAllocPages failed"));
-			return false;
+			return IMG_FALSE;
 		}
 
 		/*
@@ -503,10 +503,10 @@ _AllocPageTableMemory (MMU_HEAP *pMMUHeap,
 					0,
 					IMG_NULL,
 					0,
-					&(sSysPAddr.uiAddr))!= true)
+					&(sSysPAddr.uiAddr))!= IMG_TRUE)
 		{
 			PVR_DPF((PVR_DBG_ERROR, "_AllocPageTableMemory: ERROR call to RA_Alloc failed"));
-			return false;
+			return IMG_FALSE;
 		}
 
 		/* derive the CPU virtual address */
@@ -519,7 +519,7 @@ _AllocPageTableMemory (MMU_HEAP *pMMUHeap,
 		if(!psPTInfoList->PTPageCpuVAddr)
 		{
 			PVR_DPF((PVR_DBG_ERROR, "_AllocPageTableMemory: ERROR failed to map page tables"));
-			return false;
+			return IMG_FALSE;
 		}
 
 		/* translate address to device physical */
@@ -534,7 +534,7 @@ _AllocPageTableMemory (MMU_HEAP *pMMUHeap,
 	/* return the DevPAddr */
 	*psDevPAddr = sDevPAddr;
 
-	return true;
+	return IMG_TRUE;
 }
 
 
@@ -588,7 +588,7 @@ _FreePageTableMemory (MMU_HEAP *pMMUHeap, MMU_PT_INFO *psPTInfoList)
 			just free from the first local memory arena
 			(unlikely to be more than one local mem area(?))
 		*/
-		RA_Free (pMMUHeap->psDevArena->psDeviceMemoryHeapInfo->psLocalDevMemArena, sSysPAddr.uiAddr, false);
+		RA_Free (pMMUHeap->psDevArena->psDeviceMemoryHeapInfo->psLocalDevMemArena, sSysPAddr.uiAddr, IMG_FALSE);
 	}
 }
 
@@ -606,7 +606,7 @@ _FreePageTableMemory (MMU_HEAP *pMMUHeap, MMU_PT_INFO *psPTInfoList)
 	RETURNS:    None
 ******************************************************************************/
 static IMG_VOID
-_DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, bool bOSFreePT)
+_DeferredFreePageTable (MMU_HEAP *pMMUHeap, IMG_UINT32 ui32PTIndex, IMG_BOOL bOSFreePT)
 {
 	IMG_UINT32 *pui32PDEntry;
 	IMG_UINT32 i;
@@ -748,7 +748,7 @@ _DeferredFreePageTables (MMU_HEAP *pMMUHeap)
 	IMG_UINT32 i;
 	for(i=0; i<pMMUHeap->ui32PageTableCount; i++)
 	{
-		_DeferredFreePageTable(pMMUHeap, i, true);
+		_DeferredFreePageTable(pMMUHeap, i, IMG_TRUE);
 	}
 	MMU_InvalidateDirectoryCache(pMMUHeap->psMMUContext->psDevInfo);
 }
@@ -763,10 +763,10 @@ _DeferredFreePageTables (MMU_HEAP *pMMUHeap)
 	PARAMETERS: In:  pMMUHeap - the mmu heap
 					 DevVAddr - devVAddr of allocation
 					 ui32Size - size of allocation
-	RETURNS:    true - Success
-	            false - Failed
+	RETURNS:    IMG_TRUE - Success
+	            IMG_FALSE - Failed
 ******************************************************************************/
-static bool
+static IMG_BOOL
 _DeferredAllocPagetables(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT32 ui32Size)
 {
 	IMG_UINT32 ui32PageTableCount;
@@ -829,7 +829,7 @@ _DeferredAllocPagetables(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT
 			if (ppsPTInfoList[i] == IMG_NULL)
 			{
 				PVR_DPF((PVR_DBG_ERROR, "_DeferredAllocPagetables: ERROR call to OSAllocMem failed"));
-				return false;
+				return IMG_FALSE;
 			}
 			OSMemSet (ppsPTInfoList[i], 0, sizeof(MMU_PT_INFO));
 		}
@@ -839,10 +839,10 @@ _DeferredAllocPagetables(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT
 			IMG_DEV_PHYADDR	sDevPAddr;
 			/* no page table has been allocated so allocate one */
 			PVR_ASSERT(pui32PDEntry[i] == 0);
-			if(_AllocPageTableMemory (pMMUHeap, ppsPTInfoList[i], &sDevPAddr) != true)
+			if(_AllocPageTableMemory (pMMUHeap, ppsPTInfoList[i], &sDevPAddr) != IMG_TRUE)
 			{
 				PVR_DPF((PVR_DBG_ERROR, "_DeferredAllocPagetables: ERROR call to _AllocPageTableMemory failed"));
-				return false;
+				return IMG_FALSE;
 			}
 			switch(pMMUHeap->psDevArena->DevMemHeapType)
 			{
@@ -883,7 +883,7 @@ _DeferredAllocPagetables(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT
 				default:
 				{
 					PVR_DPF((PVR_DBG_ERROR, "_DeferredAllocPagetables: ERROR invalid heap type"));
-					return false;
+					return IMG_FALSE;
 				}
 			}
 
@@ -901,7 +901,7 @@ _DeferredAllocPagetables(MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT
 		}
 	}
 
-	return true;
+	return IMG_TRUE;
 }
 
 
@@ -992,7 +992,7 @@ MMU_Initialise (PVRSRV_DEVICE_NODE *psDeviceNode, MMU_CONTEXT **ppsMMUContext, I
 					0,
 					IMG_NULL,
 					0,
-					&(sSysPAddr.uiAddr))!= true)
+					&(sSysPAddr.uiAddr))!= IMG_TRUE)
 		{
 			PVR_DPF((PVR_DBG_ERROR, "MMU_Initialise: ERROR call to RA_Alloc failed"));
 			return PVRSRV_ERROR_FAILED_TO_ALLOC_VIRT_MEMORY;
@@ -1113,7 +1113,7 @@ MMU_Finalise (MMU_CONTEXT *psMMUContext)
                             PVRSRV_HAP_WRITECOMBINE|PVRSRV_HAP_KERNEL_ONLY,
 							psMMUContext->hPDOSMemHandle);
 		/* and free the memory */
-		RA_Free (psMMUContext->psDeviceNode->psLocalDevMemArena, sSysPAddr.uiAddr, false);
+		RA_Free (psMMUContext->psDeviceNode->psLocalDevMemArena, sSysPAddr.uiAddr, IMG_FALSE);
 	}
 
 	PVR_DPF ((PVR_DBG_MESSAGE, "MMU_Finalise"));
@@ -1156,7 +1156,7 @@ MMU_InsertHeap(MMU_CONTEXT *psMMUContext, MMU_HEAP *psMMUHeap)
 	IMG_UINT32 *pui32PDCpuVAddr = (IMG_UINT32 *) psMMUContext->pvPDCpuVAddr;
 	IMG_UINT32 *pui32KernelPDCpuVAddr = (IMG_UINT32 *) psMMUHeap->psMMUContext->pvPDCpuVAddr;
 	IMG_UINT32 ui32PDEntry;
-	bool bInvalidateDirectoryCache = false;
+	IMG_BOOL bInvalidateDirectoryCache = IMG_FALSE;
 
 	/* advance to the first entry */
 	pui32PDCpuVAddr += psMMUHeap->psDevArena->BaseDevVAddr.uiAddr >> psMMUHeap->ui32PDShift;
@@ -1185,7 +1185,7 @@ MMU_InsertHeap(MMU_CONTEXT *psMMUContext, MMU_HEAP *psMMUHeap)
 			 *		WRW (PTE->data page)
 			 *		LDB (init data page) -- could be useful to ensure page is initialised
 			 */
-			bInvalidateDirectoryCache = true;
+			bInvalidateDirectoryCache = IMG_TRUE;
 		}
 	}
 
@@ -1225,7 +1225,7 @@ MMU_UnmapPagesAndFreePTs (MMU_HEAP *psMMUHeap,
 	IMG_UINT32			ui32PDIndex;
 	IMG_UINT32			ui32PTIndex;
 	IMG_UINT32			*pui32Tmp;
-	bool			bInvalidateDirectoryCache = false;
+	IMG_BOOL			bInvalidateDirectoryCache = IMG_FALSE;
 
 	PVR_UNREFERENCED_PARAMETER(hUniqueTag);
 	/* setup tmp devvaddr to base of allocation */
@@ -1305,8 +1305,8 @@ MMU_UnmapPagesAndFreePTs (MMU_HEAP *psMMUHeap,
 		if (ppsPTInfoList[0] && (ppsPTInfoList[0]->ui32ValidPTECount == 0)
 			)
 		{
-			_DeferredFreePageTable(psMMUHeap, ui32PDIndex - psMMUHeap->ui32PDBaseIndex, true);
-			bInvalidateDirectoryCache = true;
+			_DeferredFreePageTable(psMMUHeap, ui32PDIndex - psMMUHeap->ui32PDBaseIndex, IMG_TRUE);
+			bInvalidateDirectoryCache = IMG_TRUE;
 		}
 
 		/* advance the sTmpDevVAddr by one page */
@@ -1539,10 +1539,10 @@ MMU_Delete (MMU_HEAP *pMMUHeap)
 	            In:  uFlags - Allocation flags.
 	            In:  uDevVAddrAlignment - Required alignment.
 	            Out: DevVAddr - Receives base address of allocation.
-	RETURNS:	true - Success
-	            false - Failure
+	RETURNS:	IMG_TRUE - Success
+	            IMG_FALSE - Failure
 ******************************************************************************/
-bool
+IMG_BOOL
 MMU_Alloc (MMU_HEAP *pMMUHeap,
 		   IMG_SIZE_T uSize,
 		   IMG_SIZE_T *pActualSize,
@@ -1550,7 +1550,7 @@ MMU_Alloc (MMU_HEAP *pMMUHeap,
 		   IMG_UINT32 uDevVAddrAlignment,
 		   IMG_DEV_VIRTADDR *psDevVAddr)
 {
-	bool bStatus;
+	IMG_BOOL bStatus;
 
 	PVR_DPF ((PVR_DBG_MESSAGE,
 		"MMU_Alloc: uSize=0x%x, flags=0x%x, align=0x%x",
@@ -1598,7 +1598,7 @@ MMU_Alloc (MMU_HEAP *pMMUHeap,
 		if((uFlags & PVRSRV_MEM_USER_SUPPLIED_DEVVADDR) == 0)
 		{
 			/* free the VM address */
-			RA_Free (pMMUHeap->psVMArena, psDevVAddr->uiAddr, false);
+			RA_Free (pMMUHeap->psVMArena, psDevVAddr->uiAddr, IMG_FALSE);
 		}
 	}
 
@@ -1632,7 +1632,7 @@ MMU_Free (MMU_HEAP *pMMUHeap, IMG_DEV_VIRTADDR DevVAddr, IMG_UINT32 ui32Size)
 	if((DevVAddr.uiAddr >= pMMUHeap->psDevArena->BaseDevVAddr.uiAddr) &&
 		(DevVAddr.uiAddr + ui32Size <= pMMUHeap->psDevArena->BaseDevVAddr.uiAddr + pMMUHeap->psDevArena->ui32Size))
 	{
-		RA_Free (pMMUHeap->psVMArena, DevVAddr.uiAddr, true);
+		RA_Free (pMMUHeap->psVMArena, DevVAddr.uiAddr, IMG_TRUE);
 		return;
 	}
 
@@ -1927,7 +1927,7 @@ MMU_MapPagesSparse (MMU_HEAP *pMMUHeap,
 					IMG_UINT32 ui32ChunkSize,
 					IMG_UINT32 ui32NumVirtChunks,
 					IMG_UINT32 ui32NumPhysChunks,
-					bool *pabMapChunk,
+					IMG_BOOL *pabMapChunk,
 					IMG_UINT32 ui32MemFlags,
 					IMG_HANDLE hUniqueTag)
 {
@@ -1979,7 +1979,7 @@ MMU_MapPagesSparse (MMU_HEAP *pMMUHeap,
 		}
 		DevVAddr.uiAddr += ui32VAdvance;
 	}
-	pMMUHeap->bHasSparseMappings = true;
+	pMMUHeap->bHasSparseMappings = IMG_TRUE;
 }
 
 /*!
@@ -2122,7 +2122,7 @@ MMU_MapShadowSparse (MMU_HEAP          *pMMUHeap,
 					 IMG_UINT32         ui32ChunkSize,
 					 IMG_UINT32         ui32NumVirtChunks,
 					 IMG_UINT32         ui32NumPhysChunks,
-					 bool          *pabMapChunk,
+					 IMG_BOOL          *pabMapChunk,
 					 IMG_CPU_VIRTADDR   CpuVAddr,
 					 IMG_HANDLE         hOSMemHandle,
 					 IMG_DEV_VIRTADDR  *pDevVAddr,
@@ -2207,7 +2207,7 @@ MMU_MapShadowSparse (MMU_HEAP          *pMMUHeap,
 		}
 	}
 
-	pMMUHeap->bHasSparseMappings = true;
+	pMMUHeap->bHasSparseMappings = IMG_TRUE;
 }
 
 /*!
@@ -2500,7 +2500,7 @@ PVRSRV_ERROR MMU_BIFResetPDAlloc(PVRSRV_SGXDEV_INFO *psDevInfo)
 					0,
 					IMG_NULL,
 					0,
-					&(sMemBlockSysPAddr.uiAddr)) != true)
+					&(sMemBlockSysPAddr.uiAddr)) != IMG_TRUE)
 		{
 			PVR_DPF((PVR_DBG_ERROR, "MMU_BIFResetPDAlloc: ERROR call to RA_Alloc failed"));
 			return PVRSRV_ERROR_OUT_OF_MEMORY;
@@ -2572,7 +2572,7 @@ IMG_VOID MMU_BIFResetPDFree(PVRSRV_SGXDEV_INFO *psDevInfo)
                          psDevInfo->hBIFResetPDOSMemHandle);
 
 		sPDSysPAddr = SysDevPAddrToSysPAddr(PVRSRV_DEVICE_TYPE_SGX, psDevInfo->sBIFResetPDDevPAddr);
-		RA_Free(psLocalDevMemArena, sPDSysPAddr.uiAddr, false);
+		RA_Free(psLocalDevMemArena, sPDSysPAddr.uiAddr, IMG_FALSE);
 	}
 }
 

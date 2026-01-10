@@ -65,8 +65,8 @@ PVRSRV_ERROR PVRPMapKMem(IMG_HANDLE hModule, IMG_VOID **ppvLinAddr, IMG_VOID *pv
  @param		hMappingInfo - mapping information handle
  @param		hMHandle - handle associated with memory to be mapped
 
- @return	bool indicating success or otherwise.
+ @return	IMG_BOOL indicating success or otherwise.
  ***************************************************************************/
-bool PVRUnMapKMem(IMG_HANDLE hModule, IMG_HANDLE hMappingInfo, IMG_HANDLE hMHandle);
+IMG_BOOL PVRUnMapKMem(IMG_HANDLE hModule, IMG_HANDLE hMappingInfo, IMG_HANDLE hMHandle);
 
 #endif /* _PVRMMAP_H_ */

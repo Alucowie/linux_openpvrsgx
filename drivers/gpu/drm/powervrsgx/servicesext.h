@@ -351,10 +351,10 @@ typedef PVRSRV_ERROR (*PFN_POST_POWER) (IMG_HANDLE				hDevHandle,
 
 /* Clock speed handler prototypes */
 typedef PVRSRV_ERROR (*PFN_PRE_CLOCKSPEED_CHANGE) (IMG_HANDLE				hDevHandle,
-												   bool					bIdleDevice,
+												   IMG_BOOL					bIdleDevice,
 												   PVRSRV_DEV_POWER_STATE	eCurrentPowerState);
 typedef PVRSRV_ERROR (*PFN_POST_CLOCKSPEED_CHANGE) (IMG_HANDLE				hDevHandle,
-													bool				bIdleDevice,
+													IMG_BOOL				bIdleDevice,
 													PVRSRV_DEV_POWER_STATE	eCurrentPowerState);
 
 
@@ -767,8 +767,8 @@ typedef IMG_VOID (*PFN_CMD_COMPLETE) (IMG_HANDLE);
 typedef IMG_VOID (**PPFN_CMD_COMPLETE) (IMG_HANDLE);
 
 /* private command handler prototype */
-typedef bool (*PFN_CMD_PROC) (IMG_HANDLE, IMG_UINT32, IMG_VOID*);
-typedef bool (**PPFN_CMD_PROC) (IMG_HANDLE, IMG_UINT32, IMG_VOID*);
+typedef IMG_BOOL (*PFN_CMD_PROC) (IMG_HANDLE, IMG_UINT32, IMG_VOID*);
+typedef IMG_BOOL (**PPFN_CMD_PROC) (IMG_HANDLE, IMG_UINT32, IMG_VOID*);
 
 
 /*
@@ -798,7 +798,7 @@ typedef PVRSRV_ERROR (*PFN_GET_BUFFER_ADDR)(IMG_HANDLE,
 											IMG_SIZE_T*,
 											IMG_VOID**,
 											IMG_HANDLE*,
-											bool*,
+											IMG_BOOL*,
 											IMG_UINT32*);
 
 

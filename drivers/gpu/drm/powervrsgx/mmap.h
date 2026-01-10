@@ -98,7 +98,7 @@ typedef struct KV_OFFSET_STRUCT_TAG
      * driver mmap entry point.  This flag indicates the structure is
      * on the list.
      */
-    bool			bOnMMapList;
+    IMG_BOOL			bOnMMapList;
 
     /* Reference count for this structure */
     IMG_UINT32			ui32RefCount;
@@ -209,7 +209,7 @@ PVRSRV_ERROR PVRMMapOSMemHandleToMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
 PVRSRV_ERROR
 PVRMMapReleaseMMapData(PVRSRV_PER_PROCESS_DATA *psPerProc,
 				IMG_HANDLE hMHandle,
-				bool *pbMUnmap,
+				IMG_BOOL *pbMUnmap,
 				IMG_UINT32 *pui32RealByteSize,
                                 IMG_UINT32 *pui32UserVAddr);
 

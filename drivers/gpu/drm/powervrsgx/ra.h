@@ -121,7 +121,7 @@ RA_Create (char *name,
            IMG_SIZE_T uSize,
            BM_MAPPING *psMapping,
            IMG_SIZE_T uQuantum, 
-           bool (*imp_alloc)(IMG_VOID *_h,
+           IMG_BOOL (*imp_alloc)(IMG_VOID *_h,
                                 IMG_SIZE_T uSize,
                                 IMG_SIZE_T *pActualSize,
                                 BM_MAPPING **ppsMapping,
@@ -161,9 +161,9 @@ RA_Delete (RA_ARENA *pArena);
  *	have not been freed, the RA must not be deleted.
  *                  
  *  @Input  pArena - the arena to test.
- *  @Return bool - true if is safe to go on and call RA_Delete.
+ *  @Return IMG_BOOL - IMG_TRUE if is safe to go on and call RA_Delete.
  */
-bool
+IMG_BOOL
 RA_TestDelete (RA_ARENA *pArena);
 
 /**
@@ -177,9 +177,9 @@ RA_TestDelete (RA_ARENA *pArena);
  *  @Input pArena - the arena to add a span into.
  *  @Input base - the base of the span.
  *  @Input uSize - the extent of the span.
- *  @Return true - success, false - failure
+ *  @Return IMG_TRUE - success, IMG_FALSE - failure
  */
-bool
+IMG_BOOL
 RA_Add (RA_ARENA *pArena, IMG_UINTPTR_T base, IMG_SIZE_T uSize);
 
 /**
@@ -203,9 +203,9 @@ RA_Add (RA_ARENA *pArena, IMG_UINTPTR_T base, IMG_SIZE_T uSize);
  *  @Input  ui32PrivData - length of private data
  *
  *  @Output pBase - allocated base resource
- *  @Return true - success, false - failure
+ *  @Return IMG_TRUE - success, IMG_FALSE - failure
  */
-bool
+IMG_BOOL
 RA_Alloc (RA_ARENA *pArena, 
           IMG_SIZE_T uSize,
           IMG_SIZE_T *pActualSize,
@@ -229,7 +229,7 @@ RA_Alloc (RA_ARENA *pArena,
  *  @Return None
  */
 IMG_VOID 
-RA_Free (RA_ARENA *pArena, IMG_UINTPTR_T base, bool bFreeBackingStore);
+RA_Free (RA_ARENA *pArena, IMG_UINTPTR_T base, IMG_BOOL bFreeBackingStore);
 
 
 #ifdef RA_STATS
@@ -260,9 +260,9 @@ RA_Free (RA_ARENA *pArena, IMG_UINTPTR_T base, bool bFreeBackingStore);
  * @Input       pArena - the arena the segment was originally allocated from.
  * @Output      psSegDetails - rtn details of segments
  * 
- * @Return      true if operation succeeded
+ * @Return      IMG_TRUE if operation succeeded
  */
-bool RA_GetNextLiveSegment(IMG_HANDLE hArena, RA_SEGMENT_DETAILS *psSegDetails);
+IMG_BOOL RA_GetNextLiveSegment(IMG_HANDLE hArena, RA_SEGMENT_DETAILS *psSegDetails);
 
 
 /**

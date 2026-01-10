@@ -170,7 +170,7 @@ static IMG_VOID SGXResetSleep(PVRSRV_SGXDEV_INFO	*psDevInfo)
 
 ******************************************************************************/
 static IMG_VOID SGXResetSoftReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
-								  bool				bResetBIF)
+								  IMG_BOOL				bResetBIF)
 {
 	IMG_UINT32 ui32SoftResetRegVal;
 
@@ -282,7 +282,7 @@ static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo)
 							EUR_CR_BIF_MEM_REQ_STAT_READS_MASK,
 							MAX_HW_TIME_US,
 							MAX_HW_TIME_US/WAIT_TRY_COUNT,
-							false) != PVRSRV_OK)
+							IMG_FALSE) != PVRSRV_OK)
 		{
 			PVR_DPF((PVR_DBG_ERROR,"Wait for DC invalidate failed."));
 			PVR_DBG_BREAK;
@@ -308,7 +308,7 @@ static IMG_VOID SGXResetInvalDC(PVRSRV_SGXDEV_INFO	*psDevInfo)
 
 ******************************************************************************/
 IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
-				  bool				bHardwareRecovery)
+				  IMG_BOOL				bHardwareRecovery)
 {
 	IMG_UINT32 ui32RegVal;
 #if defined(EUR_CR_BIF_INT_STAT_FAULT_REQ_MASK)
@@ -318,7 +318,7 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 #endif
 
 	/* Reset all including BIF */
-	SGXResetSoftReset(psDevInfo, true);
+	SGXResetSoftReset(psDevInfo, IMG_TRUE);
 
 	SGXResetSleep(psDevInfo);
 
@@ -353,7 +353,7 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 		SGXResetSleep(psDevInfo);
 
 		/* Bring BIF out of reset. */
-		SGXResetSoftReset(psDevInfo, false);
+		SGXResetSoftReset(psDevInfo, IMG_FALSE);
 		SGXResetSleep(psDevInfo);
 
 		SGXResetInvalDC(psDevInfo);
@@ -382,7 +382,7 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			ui32PTIndex = (sBifFault.uiAddr & SGX_MMU_PT_MASK) >> SGX_MMU_PAGE_SHIFT;
 
 			/* Put the BIF into reset. */
-			SGXResetSoftReset(psDevInfo, true);
+			SGXResetSoftReset(psDevInfo, IMG_TRUE);
 
 			/* Map in the dummy page. */
 			psDevInfo->pui32BIFResetPD[ui32PDIndex] = (psDevInfo->sBIFResetPTDevPAddr.uiAddr
@@ -402,7 +402,7 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 			SGXResetSleep(psDevInfo);
 
 			/* Bring the BIF out of reset. */
-			SGXResetSoftReset(psDevInfo, false);
+			SGXResetSoftReset(psDevInfo, IMG_FALSE);
 			SGXResetSleep(psDevInfo);
 
 			/* Invalidate Directory Cache. */
@@ -416,7 +416,7 @@ IMG_VOID SGXReset(PVRSRV_SGXDEV_INFO	*psDevInfo,
 	else
 	{
 		/* Bring BIF out of reset. */
-		SGXResetSoftReset(psDevInfo, false);
+		SGXResetSoftReset(psDevInfo, IMG_FALSE);
 		SGXResetSleep(psDevInfo);
 	}	
 

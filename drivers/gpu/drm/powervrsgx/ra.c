@@ -181,7 +181,7 @@ struct _RA_ARENA_
 	IMG_SIZE_T uQuantum;
 
 	/* import interface, if provided */
-	bool (*pImportAlloc)(IMG_VOID *,
+	IMG_BOOL (*pImportAlloc)(IMG_VOID *,
 							 IMG_SIZE_T uSize,
 							 IMG_SIZE_T *pActualSize,
 							 BM_MAPPING **ppsMapping,
@@ -242,9 +242,9 @@ IMG_VOID CheckBMFreespace(IMG_VOID);
 	@Input          _ui32PrivDataLength - private data length
 	@Input          _pBase - receives allocated base
 
-	@Return         false, this function always fails to allocate.
+	@Return         IMG_FALSE, this function always fails to allocate.
 ******************************************************************************/
-static bool
+static IMG_BOOL
 _RequestAllocFail (IMG_VOID *_h,
 				  IMG_SIZE_T _uSize,
 				  IMG_SIZE_T *_pActualSize,
@@ -263,7 +263,7 @@ _RequestAllocFail (IMG_VOID *_h,
 	PVR_UNREFERENCED_PARAMETER (_pvPrivData);
 	PVR_UNREFERENCED_PARAMETER (_ui32PrivDataLength);
 
-	return false;
+	return IMG_FALSE;
 }
 
 /*!
@@ -789,7 +789,7 @@ _InsertResourceSpan (RA_ARENA *pArena, IMG_UINTPTR_T base, IMG_SIZE_T uSize)
 	@Return         None
 ******************************************************************************/
 static IMG_VOID
-_FreeBT (RA_ARENA *pArena, BT *pBT, bool bFreeBackingStore)
+_FreeBT (RA_ARENA *pArena, BT *pBT, IMG_BOOL bFreeBackingStore)
 {
 	BT *pNeighbour;
 	IMG_UINTPTR_T uOrigBase;
@@ -916,10 +916,10 @@ _FreeBT (RA_ARENA *pArena, BT *pBT, bool bFreeBackingStore)
 	@Input          uAlignmentOffset
 	@Output         base - allocated resource base
 
-	@Return         false failure
-                    true success
+	@Return         IMG_FALSE failure
+                    IMG_TRUE success
 ******************************************************************************/
-static bool
+static IMG_BOOL
 _AttemptAllocAligned (RA_ARENA *pArena,
 					  IMG_SIZE_T uSize,
 					  BM_MAPPING **ppsMapping,
@@ -933,7 +933,7 @@ _AttemptAllocAligned (RA_ARENA *pArena,
 	if (pArena == IMG_NULL)
 	{
 		PVR_DPF ((PVR_DBG_ERROR,"_AttemptAllocAligned: invalid parameter - pArena"));
-		return false;
+		return IMG_FALSE;
 	}
 
 	if (uAlignment>1)
@@ -993,7 +993,7 @@ _AttemptAllocAligned (RA_ARENA *pArena,
 								PVR_DPF ((PVR_DBG_ERROR,"_AttemptAllocAligned: Front split failed"));
 								/* Put pBT back in the list */
 								_FreeListInsert (pArena, pBT);
-								return false;
+								return IMG_FALSE;
 							}
 
 							_FreeListInsert (pArena, pBT);
@@ -1015,7 +1015,7 @@ _AttemptAllocAligned (RA_ARENA *pArena,
 								PVR_DPF ((PVR_DBG_ERROR,"_AttemptAllocAligned: Back split failed"));
 								/* Put pBT back in the list */
 								_FreeListInsert (pArena, pBT);
-								return false;
+								return IMG_FALSE;
 							}
 
 							_FreeListInsert (pArena, pNeighbour);
@@ -1044,8 +1044,8 @@ _AttemptAllocAligned (RA_ARENA *pArena,
 #endif
 						if (!HASH_Insert (pArena->pSegmentHash, pBT->base, (IMG_UINTPTR_T) pBT))
 						{
-							_FreeBT (pArena, pBT, false);
-							return false;
+							_FreeBT (pArena, pBT, IMG_FALSE);
+							return IMG_FALSE;
 						}
 
 						if (ppsMapping!=IMG_NULL)
@@ -1053,7 +1053,7 @@ _AttemptAllocAligned (RA_ARENA *pArena,
 
 						*base = pBT->base;
 
-						return true;
+						return IMG_TRUE;
 					}
 					else
 					{
@@ -1069,7 +1069,7 @@ _AttemptAllocAligned (RA_ARENA *pArena,
 		uIndex++;
 	}
 
-	return false;
+	return IMG_FALSE;
 }
 
 
@@ -1097,7 +1097,7 @@ RA_Create (char *name,
 		   IMG_SIZE_T uSize,
 		   BM_MAPPING *psMapping,
 		   IMG_SIZE_T uQuantum,
-		   bool (*imp_alloc)(IMG_VOID *, IMG_SIZE_T uSize, IMG_SIZE_T *pActualSize,
+		   IMG_BOOL (*imp_alloc)(IMG_VOID *, IMG_SIZE_T uSize, IMG_SIZE_T *pActualSize,
 								 BM_MAPPING **ppsMapping, IMG_UINT32 _flags,
 								 IMG_PVOID pvPrivData, IMG_UINT32 ui32PrivDataLength,
 								 IMG_UINTPTR_T *pBase),
@@ -1234,9 +1234,9 @@ RA_Delete (RA_ARENA *pArena)
 
 	@Input          pArena - the arena to test.
 
-	@Return         bool - true if is safe to go on and call RA_Delete.
+	@Return         IMG_BOOL - IMG_TRUE if is safe to go on and call RA_Delete.
 ******************************************************************************/
-bool
+IMG_BOOL
 RA_TestDelete (RA_ARENA *pArena)
 {
 	PVR_ASSERT(pArena != IMG_NULL);
@@ -1250,12 +1250,12 @@ RA_TestDelete (RA_ARENA *pArena)
 			{
 				PVR_DPF ((PVR_DBG_ERROR,"RA_TestDelete: detected resource leak!"));
 				PVR_DPF ((PVR_DBG_ERROR,"RA_TestDelete: base = 0x%x size=0x%x", pBT->base, pBT->uSize));
-				return false;
+				return IMG_FALSE;
 			}
 		}
 	}
 
-	return true;
+	return IMG_TRUE;
 }
 
 /*!
@@ -1269,10 +1269,10 @@ RA_TestDelete (RA_ARENA *pArena)
 	@Input          base - the base of the span.
 	@Input          uSize - the extent of the span.
 
-	@Return         true - Success
-                    false - failure
+	@Return         IMG_TRUE - Success
+                    IMG_FALSE - failure
 ******************************************************************************/
-bool
+IMG_BOOL
 RA_Add (RA_ARENA *pArena, IMG_UINTPTR_T base, IMG_SIZE_T uSize)
 {
 	PVR_ASSERT (pArena != IMG_NULL);
@@ -1280,14 +1280,14 @@ RA_Add (RA_ARENA *pArena, IMG_UINTPTR_T base, IMG_SIZE_T uSize)
 	if (pArena == IMG_NULL)
 	{
 		PVR_DPF ((PVR_DBG_ERROR,"RA_Add: invalid parameter - pArena"));
-		return false;
+		return IMG_FALSE;
 	}
 
 	PVR_DPF ((PVR_DBG_MESSAGE,
 			  "RA_Add: name='%s', base=0x%x, size=0x%x", pArena->name, base, uSize));
 
 	uSize = (uSize + pArena->uQuantum - 1) / pArena->uQuantum * pArena->uQuantum;
-	return ((bool)(_InsertResource (pArena, base, uSize) != IMG_NULL));
+	return ((IMG_BOOL)(_InsertResource (pArena, base, uSize) != IMG_NULL));
 }
 
 /*!
@@ -1310,10 +1310,10 @@ RA_Add (RA_ARENA *pArena, IMG_UINTPTR_T base, IMG_SIZE_T uSize)
 
 	@Output         base - allocated base resource
 
-	@Return         true - success
-                    false - failure
+	@Return         IMG_TRUE - success
+                    IMG_FALSE - failure
 ******************************************************************************/
-bool
+IMG_BOOL
 RA_Alloc (RA_ARENA *pArena,
 		  IMG_SIZE_T uRequestSize,
 		  IMG_SIZE_T *pActualSize,
@@ -1325,7 +1325,7 @@ RA_Alloc (RA_ARENA *pArena,
 		  IMG_UINT32 ui32PrivDataLength,
 		  IMG_UINTPTR_T *base)
 {
-	bool bResult;
+	IMG_BOOL bResult;
 	IMG_SIZE_T uSize = uRequestSize;
 
 	PVR_ASSERT (pArena!=IMG_NULL);
@@ -1333,7 +1333,7 @@ RA_Alloc (RA_ARENA *pArena,
 	if (pArena == IMG_NULL)
 	{
 		PVR_DPF ((PVR_DBG_ERROR,"RA_Alloc: invalid parameter - pArena"));
-		return false;
+		return IMG_FALSE;
 	}
 
 #if defined(VALIDATE_ARENA_TEST)
@@ -1396,7 +1396,7 @@ RA_Alloc (RA_ARENA *pArena,
 						  "RA_Alloc: name='%s', size=0x%x failed!",
 						  pArena->name, uSize));
 				/* RA_Dump (arena); */
-				return false;
+				return IMG_FALSE;
 			}
 			pBT->psMapping = psImportMapping;
 #ifdef RA_STATS
@@ -1613,7 +1613,7 @@ IMG_UINT32 ValidateArena(RA_ARENA *pArena)
 	@Return         None
 ******************************************************************************/
 IMG_VOID
-RA_Free (RA_ARENA *pArena, IMG_UINTPTR_T base, bool bFreeBackingStore)
+RA_Free (RA_ARENA *pArena, IMG_UINTPTR_T base, IMG_BOOL bFreeBackingStore)
 {
 	BT *pBT;
 
@@ -1680,9 +1680,9 @@ RA_Free (RA_ARENA *pArena, IMG_UINTPTR_T base, bool bFreeBackingStore)
 	@Input          pArena - the arena the segment was originally allocated from.
 	@InOut          psSegDetails - rtn details of segments
 
-	@Return         true if operation succeeded
+	@Return         IMG_TRUE if operation succeeded
 ******************************************************************************/
-bool RA_GetNextLiveSegment(IMG_HANDLE hArena, RA_SEGMENT_DETAILS *psSegDetails)
+IMG_BOOL RA_GetNextLiveSegment(IMG_HANDLE hArena, RA_SEGMENT_DETAILS *psSegDetails)
 {
 	BT        *pBT;
 
@@ -1705,7 +1705,7 @@ bool RA_GetNextLiveSegment(IMG_HANDLE hArena, RA_SEGMENT_DETAILS *psSegDetails)
 			psSegDetails->sCpuPhyAddr.uiAddr = pBT->base;
 			psSegDetails->hSegment = (IMG_HANDLE)pBT->pNextSegment;
 
-			return true;
+			return IMG_TRUE;
 		}
 
 		pBT = pBT->pNextSegment;
@@ -1715,7 +1715,7 @@ bool RA_GetNextLiveSegment(IMG_HANDLE hArena, RA_SEGMENT_DETAILS *psSegDetails)
 	psSegDetails->sCpuPhyAddr.uiAddr = 0;
 	psSegDetails->hSegment = (IMG_HANDLE)IMG_UNDEF;
 
-	return false;
+	return IMG_FALSE;
 }
 
 

@@ -86,7 +86,7 @@ struct _BM_MAPPING_
 	IMG_UINT32			ui32ChunkSize;
 	IMG_UINT32			ui32NumVirtChunks;
 	IMG_UINT32			ui32NumPhysChunks;
-	bool			*pabMapChunk;
+	IMG_BOOL			*pabMapChunk;
 };
 
 /*
@@ -219,7 +219,7 @@ IMG_HANDLE
 BM_CreateContext(PVRSRV_DEVICE_NODE			*psDeviceNode,
 				 IMG_DEV_PHYADDR			*psPDDevPAddr,
 				 PVRSRV_PER_PROCESS_DATA	*psPerProc,
-				 bool					*pbCreated);
+				 IMG_BOOL					*pbCreated);
 
 
 /**
@@ -233,7 +233,7 @@ BM_CreateContext(PVRSRV_DEVICE_NODE			*psDeviceNode,
  */
 PVRSRV_ERROR
 BM_DestroyContext (IMG_HANDLE hBMContext,
-					bool *pbCreated);
+					IMG_BOOL *pbCreated);
 
 
 /**
@@ -274,7 +274,7 @@ BM_DestroyHeap (IMG_HANDLE hDevMemHeap);
  *  @Return None
  */
 
-bool
+IMG_BOOL
 BM_Reinitialise (PVRSRV_DEVICE_NODE *psDeviceNode);
 
 /**
@@ -295,9 +295,9 @@ BM_Reinitialise (PVRSRV_DEVICE_NODE *psDeviceNode);
  *  @Input ui32NumPhysChunks - Number of physical chunks
  *  @Input pabMapChunk - Chunk mapping array
  *  @Output phBuf - receives the buffer handle.
- *  @Return true - Success, false - Failed.
+ *  @Return IMG_TRUE - Success, IMG_FALSE - Failed.
  */
-bool
+IMG_BOOL
 BM_Alloc (IMG_HANDLE			hDevMemHeap,
 			IMG_DEV_VIRTADDR	*psDevVAddr,
 			IMG_SIZE_T			uSize,
@@ -308,7 +308,7 @@ BM_Alloc (IMG_HANDLE			hDevMemHeap,
 			IMG_UINT32			ui32ChunkSize,
 			IMG_UINT32			ui32NumVirtChunks,
 			IMG_UINT32			ui32NumPhysChunks,
-			bool			*pabMapChunk,
+			IMG_BOOL			*pabMapChunk,
 			BM_HANDLE			*phBuf);
 
 /**
@@ -327,13 +327,13 @@ BM_Alloc (IMG_HANDLE			hDevMemHeap,
  *	@Input pvCPUVAddr - optional CPU kernel virtual address (Page aligned) of memory to wrap.
  *  @Input uFlags - bit mask of buffer property flags.
  *  @Input phBuf - receives the buffer handle.
- *  @Return true - Success, false - Failed
+ *  @Return IMG_TRUE - Success, IMG_FALSE - Failed
  */
-bool
+IMG_BOOL
 BM_Wrap (	IMG_HANDLE hDevMemHeap,
 		    IMG_SIZE_T ui32Size,
 			IMG_SIZE_T ui32Offset,
-			bool bPhysContig,
+			IMG_BOOL bPhysContig,
 			IMG_SYS_PHYADDR *psSysAddr,
 			IMG_VOID *pvCPUVAddr,
 			IMG_UINT32 *pui32Flags,
@@ -547,9 +547,9 @@ IMG_UINT32 BM_GetVirtualSize(IMG_HANDLE hBMHandle);
 
  @Input     ui32Offset - Offset into import
 
- @Return	true if the page should be mapped
+ @Return	IMG_TRUE if the page should be mapped
 **************************************************************************/
-bool BM_MapPageAtOffset(IMG_HANDLE hBMHandle, IMG_UINT32 ui32Offset);
+IMG_BOOL BM_MapPageAtOffset(IMG_HANDLE hBMHandle, IMG_UINT32 ui32Offset);
 
 /*!
 ******************************************************************************
@@ -564,9 +564,9 @@ bool BM_MapPageAtOffset(IMG_HANDLE hBMHandle, IMG_UINT32 ui32Offset);
  
  @Output    pui32PhysOffset - Physical offset
 
- @Return	true if the virtual offset is physically backed
+ @Return	IMG_TRUE if the virtual offset is physically backed
 **************************************************************************/
-bool BM_VirtOffsetToPhysical(IMG_HANDLE hBMHandle,
+IMG_BOOL BM_VirtOffsetToPhysical(IMG_HANDLE hBMHandle,
 								   IMG_UINT32 ui32VirtOffset,
 								   IMG_UINT32 *pui32PhysOffset);
 

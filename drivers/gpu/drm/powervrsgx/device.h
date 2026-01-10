@@ -216,7 +216,7 @@ typedef struct _PVRSRV_DEVICE_NODE_
 	IMG_VOID				(*pfnMMUInsertHeap)(MMU_CONTEXT*, MMU_HEAP*);
 	MMU_HEAP*				(*pfnMMUCreate)(MMU_CONTEXT*,DEV_ARENA_DESCRIPTOR*,RA_ARENA**,PDUMP_MMU_ATTRIB **ppsMMUAttrib);
 	IMG_VOID				(*pfnMMUDelete)(MMU_HEAP*);
-	bool				(*pfnMMUAlloc)(MMU_HEAP*pMMU,
+	IMG_BOOL				(*pfnMMUAlloc)(MMU_HEAP*pMMU,
 										   IMG_SIZE_T uSize,
 										   IMG_SIZE_T *pActualSize,
 										   IMG_UINT32 uFlags,
@@ -237,7 +237,7 @@ typedef struct _PVRSRV_DEVICE_NODE_
 													IMG_UINT32 ui32ChunkSize,
 													IMG_UINT32 ui32NumVirtChunks,
 													IMG_UINT32 ui32NumPhysChunks,
-													bool *pabMapChunk,
+													IMG_BOOL *pabMapChunk,
 													IMG_UINT32 ui32MemFlags,
 													IMG_HANDLE hUniqueTag);
 
@@ -254,7 +254,7 @@ typedef struct _PVRSRV_DEVICE_NODE_
 													 IMG_UINT32          ui32ChunkSize,
 													 IMG_UINT32          ui32NumVirtChunks,
 													 IMG_UINT32          ui32NumPhysChunks,
-													 bool            *pabMapChunk,
+													 IMG_BOOL            *pabMapChunk,
 													 IMG_CPU_VIRTADDR    CpuVAddr,
 													 IMG_HANDLE          hOSMemHandle,
 													 IMG_DEV_VIRTADDR    *pDevVAddr,
@@ -286,7 +286,7 @@ typedef struct _PVRSRV_DEVICE_NODE_
 														IMG_UINT32 ui32RangeIndex);
 
 	/* LISR handler for device */
-	bool				(*pfnDeviceISR)(IMG_VOID*);
+	IMG_BOOL				(*pfnDeviceISR)(IMG_VOID*);
 	/* ISR data */
 	IMG_VOID				*pvISRData;
 	/* System/SOC specific interrupt bit relating to this device */
@@ -297,7 +297,7 @@ typedef struct _PVRSRV_DEVICE_NODE_
 	/* Software command complete callback for device */
 	IMG_VOID				(*pfnDeviceCommandComplete)(struct _PVRSRV_DEVICE_NODE_ *psDeviceNode);
 	/* Flag indicating that command complete callback needs to be reprocessed */
-	bool				bReProcessDeviceCommandComplete;
+	IMG_BOOL				bReProcessDeviceCommandComplete;
 
 	IMG_VOID				(*pfnCacheInvalidate)(struct _PVRSRV_DEVICE_NODE_ *psDeviceNode);
 
@@ -329,7 +329,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVRegisterDevice(PSYS_DATA psSysData,
 			 								  IMG_UINT32 *pui32DeviceIndex );
 
 PVRSRV_ERROR IMG_CALLCONV PVRSRVInitialiseDevice(IMG_UINT32 ui32DevIndex);
-PVRSRV_ERROR IMG_CALLCONV PVRSRVFinaliseSystem(bool bInitSuccesful);
+PVRSRV_ERROR IMG_CALLCONV PVRSRVFinaliseSystem(IMG_BOOL bInitSuccesful);
 
 PVRSRV_ERROR IMG_CALLCONV PVRSRVDevInitCompatCheck(PVRSRV_DEVICE_NODE *psDeviceNode);
 
@@ -358,7 +358,7 @@ IMG_IMPORT PVRSRV_ERROR IMG_CALLCONV PollForValueKM(volatile IMG_UINT32*  pui32L
                                                     IMG_UINT32            ui32Mask,
                                                     IMG_UINT32            ui32Timeoutus,
                                                     IMG_UINT32            ui32PollPeriodus,
-                                                    bool              bAllowPreemption);
+                                                    IMG_BOOL              bAllowPreemption);
 
 
 #if defined (USING_ISR_INTERRUPTS)
@@ -374,8 +374,8 @@ PVRSRV_ERROR IMG_CALLCONV PollForInterruptKM(IMG_UINT32 ui32Value,
  * place for them. */
 PVRSRV_ERROR IMG_CALLCONV PVRSRVInit(PSYS_DATA psSysData);
 IMG_VOID IMG_CALLCONV PVRSRVDeInit(PSYS_DATA psSysData);
-bool IMG_CALLCONV PVRSRVDeviceLISR(PVRSRV_DEVICE_NODE *psDeviceNode);
-bool IMG_CALLCONV PVRSRVSystemLISR(IMG_VOID *pvSysData);
+IMG_BOOL IMG_CALLCONV PVRSRVDeviceLISR(PVRSRV_DEVICE_NODE *psDeviceNode);
+IMG_BOOL IMG_CALLCONV PVRSRVSystemLISR(IMG_VOID *pvSysData);
 IMG_VOID IMG_CALLCONV PVRSRVMISR(IMG_VOID *pvSysData);
 
 #endif /* __DEVICE_H__ */

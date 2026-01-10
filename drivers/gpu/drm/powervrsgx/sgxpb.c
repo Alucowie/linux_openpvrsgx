@@ -57,15 +57,15 @@ static IMPLEMENT_LIST_REMOVE(PVRSRV_STUB_PBDESC)
 static PRESMAN_ITEM psResItemCreateSharedPB = IMG_NULL;
 static PVRSRV_PER_PROCESS_DATA *psPerProcCreateSharedPB = IMG_NULL;
 
-static PVRSRV_ERROR SGXCleanupSharedPBDescCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, bool bDummy);
-static PVRSRV_ERROR SGXCleanupSharedPBDescCreateLockCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, bool bDummy);
+static PVRSRV_ERROR SGXCleanupSharedPBDescCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, IMG_BOOL bDummy);
+static PVRSRV_ERROR SGXCleanupSharedPBDescCreateLockCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, IMG_BOOL bDummy);
 
 /* override level pointer indirection */
 /* PRQA S 5102 12 */
 IMG_EXPORT PVRSRV_ERROR
 SGXFindSharedPBDescKM(PVRSRV_PER_PROCESS_DATA	*psPerProc,
 					  IMG_HANDLE 				hDevCookie,
-					  bool 				bLockOnFailure,
+					  IMG_BOOL 				bLockOnFailure,
 					  IMG_UINT32 				ui32TotalPBSize,
 					  IMG_HANDLE 				*phSharedPBDesc,
 					  PVRSRV_KERNEL_MEM_INFO 	**ppsSharedPBDescKernelMemInfo,
@@ -232,7 +232,7 @@ SGXCleanupSharedPBDescKM(PVRSRV_STUB_PBDESC *psStubPBDescIn)
 	/*return PVRSRV_ERROR_INVALID_PARAMS;*/
 }
 
-static PVRSRV_ERROR SGXCleanupSharedPBDescCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, bool bDummy)
+static PVRSRV_ERROR SGXCleanupSharedPBDescCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, IMG_BOOL bDummy)
 {
 	PVRSRV_STUB_PBDESC *psStubPBDesc = (PVRSRV_STUB_PBDESC *)pvParam;
 
@@ -242,7 +242,7 @@ static PVRSRV_ERROR SGXCleanupSharedPBDescCallback(IMG_PVOID pvParam, IMG_UINT32
 	return SGXCleanupSharedPBDescKM(psStubPBDesc);
 }
 
-static PVRSRV_ERROR SGXCleanupSharedPBDescCreateLockCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, bool bDummy)
+static PVRSRV_ERROR SGXCleanupSharedPBDescCreateLockCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, IMG_BOOL bDummy)
 {
 	PVRSRV_PER_PROCESS_DATA *psPerProc = (PVRSRV_PER_PROCESS_DATA *)pvParam;
 	PVR_ASSERT(psPerProc == psPerProcCreateSharedPB);

@@ -151,10 +151,10 @@ HASH_Func_Default (IMG_SIZE_T uKeySize, IMG_VOID *pKey, IMG_UINT32 uHashTabLen)
 	@Input          uKeySize - the size of the hash key, in bytes.
 	@Input          pKey1 - pointer to first hash key to compare.
 	@Input          pKey2 - pointer to second hash key to compare.
-	@Return 	    true  - the keys match.
-                    false - the keys don't match.
+	@Return 	    IMG_TRUE  - the keys match.
+                    IMG_FALSE - the keys don't match.
 ******************************************************************************/
-bool
+IMG_BOOL
 HASH_Key_Comp_Default (IMG_SIZE_T uKeySize, IMG_VOID *pKey1, IMG_VOID *pKey2)
 {
 	IMG_UINTPTR_T *p1 = (IMG_UINTPTR_T *)pKey1;
@@ -167,10 +167,10 @@ HASH_Key_Comp_Default (IMG_SIZE_T uKeySize, IMG_VOID *pKey1, IMG_VOID *pKey2)
 	for (ui = 0; ui < uKeyLen; ui++)
 	{
 		if (*p1++ != *p2++)
-			return false;
+			return IMG_FALSE;
 	}
 
-	return true;
+	return IMG_TRUE;
 }
 
 /*!
@@ -258,10 +258,10 @@ _Rehash (HASH_TABLE *pHash,
 
 	@Input          pHash - Hash table to resize.
     @Input          uNewSize - Required table size.
-	@Return         true Success
-	            	false Failed
+	@Return         IMG_TRUE Success
+	            	IMG_FALSE Failed
 ******************************************************************************/
-static bool
+static IMG_BOOL
 _Resize (HASH_TABLE *pHash, IMG_UINT32 uNewSize)
 {
 	if (uNewSize != pHash->uSize)
@@ -278,14 +278,14 @@ _Resize (HASH_TABLE *pHash, IMG_UINT32 uNewSize)
                       (IMG_PVOID*)&ppNewTable, IMG_NULL,
 					  "Hash Table Buckets");
 		if (ppNewTable == IMG_NULL)
-            return false;
+            return IMG_FALSE;
 
         for (uIndex=0; uIndex<uNewSize; uIndex++)
             ppNewTable[uIndex] = IMG_NULL;
 
         if (_Rehash (pHash, pHash->ppBucketTable, pHash->uSize, ppNewTable, uNewSize) != PVRSRV_OK)
 		{
-			return false;
+			return IMG_FALSE;
 		}
 
         OSFreeMem (PVRSRV_PAGEABLE_SELECT, sizeof(BUCKET *)*pHash->uSize, pHash->ppBucketTable, IMG_NULL);
@@ -293,7 +293,7 @@ _Resize (HASH_TABLE *pHash, IMG_UINT32 uNewSize)
         pHash->ppBucketTable = ppNewTable;
         pHash->uSize = uNewSize;
     }
-    return true;
+    return IMG_TRUE;
 }
 
 
@@ -416,10 +416,10 @@ HASH_Delete (HASH_TABLE *pHash)
 	@Input          pKey - pointer to the key.
 	@Input          v - the value associated with the key.
 
-	@Return 	    true  - success
-	            	false  - failure
+	@Return 	    IMG_TRUE  - success
+	            	IMG_FALSE  - failure
 ******************************************************************************/
-bool
+IMG_BOOL
 HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v)
 {
 	BUCKET *pBucket;
@@ -433,7 +433,7 @@ HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v)
 	if (pHash == IMG_NULL)
 	{
 		PVR_DPF((PVR_DBG_ERROR, "HASH_Insert_Extended: invalid parameter"));
-		return false;
+		return IMG_FALSE;
 	}
 
 	if(OSAllocMem(PVRSRV_PAGEABLE_SELECT,
@@ -441,7 +441,7 @@ HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v)
 					(IMG_VOID **)&pBucket, IMG_NULL,
 					"Hash Table entry") != PVRSRV_OK)
 	{
-		return false;
+		return IMG_FALSE;
 	}
 
 	pBucket->v = v;
@@ -452,7 +452,7 @@ HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v)
 		OSFreeMem(PVRSRV_PAGEABLE_SELECT,
 				  sizeof(BUCKET) + pHash->uKeySize,
 				  pBucket, IMG_NULL);
-		return false;
+		return IMG_FALSE;
 	}
 
 	pHash->uCount++;
@@ -467,7 +467,7 @@ HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v)
     }
 
 
-	return true;
+	return IMG_TRUE;
 }
 
 /*!
@@ -481,10 +481,10 @@ HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v)
 	@Input          k - the key value.
 	@Input          v - the value associated with the key.
 
-	@Return	    true - success.
-		false - failure.
+	@Return 	    IMG_TRUE - success.
+	            	IMG_FALSE - failure.
 ******************************************************************************/
-bool
+IMG_BOOL
 HASH_Insert (HASH_TABLE *pHash, IMG_UINTPTR_T k, IMG_UINTPTR_T v)
 {
 	PVR_DPF ((PVR_DBG_MESSAGE,

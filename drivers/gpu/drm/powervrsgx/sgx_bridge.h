@@ -322,7 +322,7 @@ typedef struct PVRSRV_BRIDGE_IN_2DQUERYBLTSCOMPLETE_TAG
 	IMG_UINT32				ui32BridgeFlags; /* Must be first member of structure */
 	IMG_HANDLE				hDevCookie;
 	IMG_HANDLE				hKernSyncInfo;
-	bool				bWaitForComplete;
+	IMG_BOOL				bWaitForComplete;
 }PVRSRV_BRIDGE_IN_2DQUERYBLTSCOMPLETE;
 
 
@@ -332,7 +332,7 @@ typedef struct PVRSRV_BRIDGE_IN_SGXFINDSHAREDPBDESC_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
 	IMG_HANDLE hDevCookie;
-	bool   bLockOnFailure;
+	IMG_BOOL   bLockOnFailure;
 	IMG_UINT32 ui32TotalPBSize;
 }PVRSRV_BRIDGE_IN_SGXFINDSHAREDPBDESC;
 
@@ -401,7 +401,7 @@ typedef struct PVRSRV_BRIDGE_OUT_SGX_REGISTER_HW_RENDER_CONTEXT_TAG
 typedef struct PVRSRV_BRIDGE_IN_SGX_UNREGISTER_HW_RENDER_CONTEXT_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
-	bool   bForceCleanup;
+	IMG_BOOL   bForceCleanup;
 	IMG_HANDLE hDevCookie;
 	IMG_HANDLE hHWRenderContext;
 }PVRSRV_BRIDGE_IN_SGX_UNREGISTER_HW_RENDER_CONTEXT;
@@ -426,7 +426,7 @@ typedef struct PVRSRV_BRIDGE_OUT_SGX_REGISTER_HW_TRANSFER_CONTEXT_TAG
 typedef struct PVRSRV_BRIDGE_IN_SGX_UNREGISTER_HW_TRANSFER_CONTEXT_TAG
 {
 	IMG_UINT32 ui32BridgeFlags; /* Must be first member of structure */
-	bool   bForceCleanup;
+	IMG_BOOL   bForceCleanup;
 	IMG_HANDLE hDevCookie;
 	IMG_HANDLE hHWTransferContext;
 }PVRSRV_BRIDGE_IN_SGX_UNREGISTER_HW_TRANSFER_CONTEXT;

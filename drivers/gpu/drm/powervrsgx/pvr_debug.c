@@ -62,7 +62,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define	PVR_DEBUG_ALWAYS_USE_SPINLOCK
 #endif
 
-static bool VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz,
+static IMG_BOOL VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz,
 						 const char* pszFormat, va_list VArgs)
 						 IMG_FORMAT_PRINTF(3, 0);
 
@@ -71,7 +71,7 @@ static bool VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz,
 
 #define PVR_MAX_FILEPATH_LEN 256
 
-static bool BAppend(char *pszBuf, IMG_UINT32 ui32BufSiz,
+static IMG_BOOL BAppend(char *pszBuf, IMG_UINT32 ui32BufSiz,
 						const char *pszFormat, ...)
 						IMG_FORMAT_PRINTF(3, 4);
 
@@ -159,7 +159,7 @@ static inline void SelectBuffer(char **ppszBuf, IMG_UINT32 *pui32BufSiz)
  * The function takes a variable number of arguments, pointed
  * to by the var args list.
  */
-static bool VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz, const char* pszFormat, va_list VArgs)
+static IMG_BOOL VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz, const char* pszFormat, va_list VArgs)
 {
 	IMG_UINT32 ui32Used;
 	IMG_UINT32 ui32Space;
@@ -173,7 +173,7 @@ static bool VBAppend(char *pszBuf, IMG_UINT32 ui32BufSiz, const char* pszFormat,
 	pszBuf[ui32BufSiz - 1] = 0;
 
 	/* Return true if string was truncated */
-	return (i32Len < 0 || i32Len >= (IMG_INT32)ui32Space) ? true : false;
+	return (i32Len < 0 || i32Len >= (IMG_INT32)ui32Space) ? IMG_TRUE : IMG_FALSE;
 }
 
 /* Actually required for ReleasePrintf too */
@@ -269,10 +269,10 @@ IMG_VOID PVRSRVTrace(const char* pszFormat, ...)
  * The function takes a variable number of arguments, calling
  * VBAppend to do the actual work.
  */
-static bool BAppend(char *pszBuf, IMG_UINT32 ui32BufSiz, const char *pszFormat, ...)
+static IMG_BOOL BAppend(char *pszBuf, IMG_UINT32 ui32BufSiz, const char *pszFormat, ...)
 {
 	va_list VArgs;
-	bool bTrunc;
+	IMG_BOOL bTrunc;
 
 	va_start (VArgs, pszFormat);
 
@@ -302,12 +302,12 @@ IMG_VOID PVRSRVDebugPrintf	(
 						...
 					)
 {
-	bool bTrace;
+	IMG_BOOL bTrace;
 	const char *pszFileName = pszFullFileName;
 	char *pszLeafName;
 
 
-	bTrace = (bool)(ui32DebugLevel & DBGPRIV_CALLTRACE) ? true : false;
+	bTrace = (IMG_BOOL)(ui32DebugLevel & DBGPRIV_CALLTRACE) ? IMG_TRUE : IMG_FALSE;
 
 	if (gPVRDebugLevel & ui32DebugLevel)
 	{
@@ -323,7 +323,7 @@ IMG_VOID PVRSRVDebugPrintf	(
 		GetBufferLock(&ulLockFlags);
 
 		/* Add in the level of warning */
-		if (bTrace == false)
+		if (bTrace == IMG_FALSE)
 		{
 			switch(ui32DebugLevel)
 			{
@@ -371,7 +371,7 @@ IMG_VOID PVRSRVDebugPrintf	(
 		else
 		{
 			/* Traces don't need a location */
-			if (bTrace == false)
+			if (bTrace == IMG_FALSE)
 			{
 				/* Buffer for rewriting filepath in log messages */
 				static char szFileNameRewrite[PVR_MAX_FILEPATH_LEN];

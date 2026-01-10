@@ -103,7 +103,7 @@ struct _LinuxMemArea {
         {
             /* Note: The memory this represents is _not_ implicitly
              * page aligned, neither is its size */
-	    bool bPhysContig;
+	    IMG_BOOL bPhysContig;
 	    union {
 		    /*
 		     * SYSPhysAddr is valid if bPhysContig is true, else
@@ -157,9 +157,9 @@ struct _LinuxMemArea {
 
     IMG_UINT32 ui32AreaFlags;		/* Flags passed at creation time */
 
-    bool bMMapRegistered;		/* Registered with mmap code */
+    IMG_BOOL bMMapRegistered;		/* Registered with mmap code */
 
-    bool bNeedsCacheInvalidate;	/* Cache should be invalidated on first map? */
+    IMG_BOOL bNeedsCacheInvalidate;	/* Cache should be invalidated on first map? */
 
 	IMG_HANDLE hBMHandle;			/* Handle back to BM for this allocation */
 
@@ -332,7 +332,7 @@ IMG_VOID FreeIORemapLinuxMemArea(LinuxMemArea *psLinuxMemArea);
  *
  * @return 
  ******************************************************************************/
-LinuxMemArea *NewExternalKVLinuxMemArea(IMG_SYS_PHYADDR *pBasePAddr, IMG_VOID *pvCPUVAddr, IMG_UINT32 ui32Bytes, bool bPhysContig, IMG_UINT32 ui32AreaFlags);
+LinuxMemArea *NewExternalKVLinuxMemArea(IMG_SYS_PHYADDR *pBasePAddr, IMG_VOID *pvCPUVAddr, IMG_UINT32 ui32Bytes, IMG_BOOL bPhysContig, IMG_UINT32 ui32AreaFlags);
 
 
 /*!
@@ -551,9 +551,9 @@ IMG_CPU_PHYADDR LinuxMemAreaToCpuPAddr(LinuxMemArea *psLinuxMemArea, IMG_UINT32 
  *
  * @param psLinuxMemArea  
  *
- * @return true if the physical address range is contiguous, else false
+ * @return IMG_TRUE if the physical address range is contiguous, else IMG_FALSE
  ******************************************************************************/
-bool LinuxMemAreaPhysIsContig(LinuxMemArea *psLinuxMemArea);
+IMG_BOOL LinuxMemAreaPhysIsContig(LinuxMemArea *psLinuxMemArea);
 
 /*!
  *******************************************************************************

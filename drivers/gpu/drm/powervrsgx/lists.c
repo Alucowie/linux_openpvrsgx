@@ -92,7 +92,7 @@ IMPLEMENT_LIST_REMOVE(PVRSRV_POWER_DEV)
 					# bIgnoreClass - Flag indicating if there's
 						no need to check the device class.
 					# eDevClass - Device class, ONLY present if
-						bIgnoreClass was false.
+						bIgnoreClass was IMG_FALSE.
 
 	@Return		The pointer to the device node if it matchs, IMG_NULL
                 otherwise.
@@ -100,11 +100,11 @@ IMPLEMENT_LIST_REMOVE(PVRSRV_POWER_DEV)
 IMG_VOID* MatchDeviceKM_AnyVaCb(PVRSRV_DEVICE_NODE* psDeviceNode, va_list va)
 {
 	IMG_UINT32 ui32DevIndex;
-	bool bIgnoreClass;
+	IMG_BOOL bIgnoreClass;
 	PVRSRV_DEVICE_CLASS eDevClass;
 
 	ui32DevIndex = va_arg(va, IMG_UINT32);
-	bIgnoreClass = va_arg(va, int);
+	bIgnoreClass = va_arg(va, IMG_BOOL);
 	if (!bIgnoreClass)
 	{
 		eDevClass = va_arg(va, PVRSRV_DEVICE_CLASS);

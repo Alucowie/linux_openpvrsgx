@@ -59,7 +59,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  typedef struct _COMMAND_COMPLETE_DATA_
  {
-	bool			bInUse;
+	IMG_BOOL			bInUse;
 	/* <arg(s) to PVRSRVProcessQueues>;	*/	/*!< TBD */
 	IMG_UINT32			ui32DstSyncCount;	/*!< number of dst sync objects */
 	IMG_UINT32			ui32SrcSyncCount;	/*!< number of src sync objects */
@@ -75,7 +75,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 IMG_VOID QueueDumpDebugInfo(IMG_VOID);
 
 IMG_IMPORT
-PVRSRV_ERROR PVRSRVProcessQueues (bool		bFlush);
+PVRSRV_ERROR PVRSRVProcessQueues (IMG_BOOL		bFlush);
 
 #include <linux/types.h>
 #include <linux/seq_file.h>
@@ -111,7 +111,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVSubmitCommandKM(PVRSRV_QUEUE_INFO *psQueue,
 												PVRSRV_COMMAND *psCommand);
 
 IMG_IMPORT
-IMG_VOID PVRSRVCommandCompleteKM(IMG_HANDLE hCmdCookie, bool bScheduleMISR);
+IMG_VOID PVRSRVCommandCompleteKM(IMG_HANDLE hCmdCookie, IMG_BOOL bScheduleMISR);
 
 IMG_IMPORT
 PVRSRV_ERROR PVRSRVRegisterCmdProcListKM(IMG_UINT32		ui32DevIndex,

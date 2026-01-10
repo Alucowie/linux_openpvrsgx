@@ -58,15 +58,15 @@ typedef	struct _PVR_PCI_DEV_TAG
 {
 	struct pci_dev		*psPCIDev;
 	HOST_PCI_INIT_FLAGS	ePCIFlags;
-	bool abPCIResourceInUse[DEVICE_COUNT_RESOURCE];
+	IMG_BOOL abPCIResourceInUse[DEVICE_COUNT_RESOURCE];
 } PVR_PCI_DEV;
 
 typedef struct _ENV_DATA_TAG
 {
 	IMG_VOID		*pvBridgeData;
 	struct pm_dev		*psPowerDevice;
-	bool		bLISRInstalled;
-	bool		bMISRInstalled;
+	IMG_BOOL		bLISRInstalled;
+	IMG_BOOL		bMISRInstalled;
 	IMG_UINT32		ui32IRQ;
 	IMG_VOID		*pvISRCookie;
 	struct workqueue_struct	*psWorkQueue;

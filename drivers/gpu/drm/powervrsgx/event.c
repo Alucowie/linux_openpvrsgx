@@ -142,7 +142,7 @@ PVRSRV_ERROR LinuxEventObjectListDestroy(IMG_HANDLE hEventObjectList)
 
 	if(psEventObjectList)	
 	{
-		bool bListEmpty;
+		IMG_BOOL bListEmpty;
 
 		read_lock(&psEventObjectList->sLock);
 		bListEmpty = list_empty(&psEventObjectList->sList);
@@ -212,7 +212,7 @@ PVRSRV_ERROR LinuxEventObjectDelete(IMG_HANDLE hOSEventObjectList, IMG_HANDLE hO
  @Return   PVRSRV_ERROR  :  Error code
 
 ******************************************************************************/
-static PVRSRV_ERROR LinuxEventObjectDeleteCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, bool bForceCleanup)
+static PVRSRV_ERROR LinuxEventObjectDeleteCallback(IMG_PVOID pvParam, IMG_UINT32 ui32Param, IMG_BOOL bForceCleanup)
 {
 	PVRSRV_LINUX_EVENT_OBJECT *psLinuxEventObject = pvParam;
 	PVRSRV_LINUX_EVENT_OBJECT_LIST *psLinuxEventObjectList = psLinuxEventObject->psLinuxEventObjectList;

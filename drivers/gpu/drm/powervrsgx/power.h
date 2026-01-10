@@ -74,16 +74,16 @@ typedef enum _PVRSRV_INIT_SERVER_STATE_
 } PVRSRV_INIT_SERVER_STATE, *PPVRSRV_INIT_SERVER_STATE;
 
 IMG_IMPORT
-bool PVRSRVGetInitServerState(PVRSRV_INIT_SERVER_STATE	eInitServerState);
+IMG_BOOL PVRSRVGetInitServerState(PVRSRV_INIT_SERVER_STATE	eInitServerState);
 
 IMG_IMPORT
-PVRSRV_ERROR PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_STATE	eInitServerState, bool bState);
+PVRSRV_ERROR PVRSRVSetInitServerState(PVRSRV_INIT_SERVER_STATE	eInitServerState, IMG_BOOL bState);
 
 
 
 IMG_IMPORT
 PVRSRV_ERROR PVRSRVPowerLock(IMG_UINT32	ui32CallerID,
-							 bool	bSystemPowerEvent);
+							 IMG_BOOL	bSystemPowerEvent);
 IMG_IMPORT
 IMG_VOID PVRSRVPowerUnlock(IMG_UINT32	ui32CallerID);
 
@@ -113,16 +113,16 @@ IMG_IMPORT
 PVRSRV_ERROR PVRSRVRemovePowerDevice (IMG_UINT32 ui32DeviceIndex);
 
 IMG_IMPORT
-bool PVRSRVIsDevicePowered(IMG_UINT32 ui32DeviceIndex);
+IMG_BOOL PVRSRVIsDevicePowered(IMG_UINT32 ui32DeviceIndex);
 
 IMG_IMPORT
 PVRSRV_ERROR PVRSRVDevicePreClockSpeedChange(IMG_UINT32	ui32DeviceIndex,
-											 bool	bIdleDevice,
+											 IMG_BOOL	bIdleDevice,
 											 IMG_VOID	*pvInfo);
 
 IMG_IMPORT
 IMG_VOID PVRSRVDevicePostClockSpeedChange(IMG_UINT32	ui32DeviceIndex,
-										  bool		bIdleDevice,
+										  IMG_BOOL		bIdleDevice,
 										  IMG_VOID		*pvInfo);
 
 #endif /* __POWER_H__ */

@@ -387,8 +387,8 @@ struct device *PVRLDMGetDevice(void)
 
 #if defined(PVR_LDM_MODULE) || defined(SUPPORT_DRI_DRM)
 static struct mutex gsPMMutex;
-static bool bDriverIsSuspended;
-static bool bDriverIsShutdown;
+static IMG_BOOL bDriverIsSuspended;
+static IMG_BOOL bDriverIsShutdown;
 #endif
 
 #if defined(PVR_LDM_MODULE) || defined(PVR_DRI_DRM_PLATFORM_DEV)
@@ -431,7 +431,7 @@ PVR_MOD_STATIC void PVRSRVDriverShutdown(LDM_DEV *pDevice)
 		(void) PVRSRVSetPowerStateKM(PVRSRV_SYS_POWER_STATE_D3);
 	}
 
-	bDriverIsShutdown = true;
+	bDriverIsShutdown = IMG_TRUE;
 
 	/* The bridge mutex is held on exit */
 	mutex_unlock(&gsPMMutex);
@@ -492,7 +492,7 @@ PVR_MOD_STATIC int PVRSRVDriverSuspend(LDM_DEV *pDevice, pm_message_t state)
 		if (PVRSRVSetPowerStateKM(PVRSRV_SYS_POWER_STATE_D3) == PVRSRV_OK)
 		{
 			/* The bridge mutex will be held until we resume */
-			bDriverIsSuspended = true;
+			bDriverIsSuspended = IMG_TRUE;
 		}
 		else
 		{
@@ -546,7 +546,7 @@ PVR_MOD_STATIC int PVRSRVDriverResume(LDM_DEV *pDevice)
 	{
 		if (PVRSRVSetPowerStateKM(PVRSRV_SYS_POWER_STATE_D0) == PVRSRV_OK)
 		{
-			bDriverIsSuspended = false;
+			bDriverIsSuspended = IMG_FALSE;
 			mutex_unlock(&gPVRSRVLock);
 		}
 		else

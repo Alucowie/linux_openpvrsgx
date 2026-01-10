@@ -58,7 +58,7 @@ static PVRSRV_ERROR AllocDeviceMem(IMG_HANDLE		hDevCookie,
 								   IMG_UINT32		ui32ChunkSize,
 								   IMG_UINT32		ui32NumVirtChunks,
 								   IMG_UINT32		ui32NumPhysChunks,
-								   bool			*pabMapChunk,
+								   IMG_BOOL			*pabMapChunk,
 								   PVRSRV_KERNEL_MEM_INFO **ppsMemInfo);
 
 /* local structures */
@@ -175,8 +175,8 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 														 IMG_HANDLE 				*phDevMemContext,
 														 IMG_UINT32 				*pui32ClientHeapCount,
 														 PVRSRV_HEAP_INFO			*psHeapInfo,
-														 bool					*pbCreated,
-														 bool 					*pbShared)
+														 IMG_BOOL					*pbCreated,
+														 IMG_BOOL 					*pbShared)
 {
 	PVRSRV_DEVICE_NODE *psDeviceNode;
 	IMG_UINT32 ui32HeapCount, ui32ClientHeapCount=0;
@@ -233,7 +233,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 				psHeapInfo[ui32ClientHeapCount].ui32HeapByteSize = psDeviceMemoryHeap[i].ui32HeapSize;
 				psHeapInfo[ui32ClientHeapCount].ui32Attribs = psDeviceMemoryHeap[i].ui32Attribs;
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = 0;
-				pbShared[ui32ClientHeapCount] = true;
+				pbShared[ui32ClientHeapCount] = IMG_TRUE;
 				ui32ClientHeapCount++;
 				break;
 			}
@@ -261,7 +261,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 				psHeapInfo[ui32ClientHeapCount].ui32HeapByteSize = psDeviceMemoryHeap[i].ui32HeapSize;
 				psHeapInfo[ui32ClientHeapCount].ui32Attribs = psDeviceMemoryHeap[i].ui32Attribs;
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = 0;
-				pbShared[ui32ClientHeapCount] = false;
+				pbShared[ui32ClientHeapCount] = IMG_FALSE;
 
 				ui32ClientHeapCount++;
 				break;
@@ -279,7 +279,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVCreateDeviceMemContextKM(IMG_HANDLE					hDevCook
 IMG_EXPORT
 PVRSRV_ERROR IMG_CALLCONV PVRSRVDestroyDeviceMemContextKM(IMG_HANDLE hDevCookie,
 														  IMG_HANDLE hDevMemContext,
-														  bool *pbDestroyed)
+														  IMG_BOOL *pbDestroyed)
 {
 	PVR_UNREFERENCED_PARAMETER(hDevCookie);
 
@@ -311,7 +311,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapInfoKM(IMG_HANDLE					hDevCookie
 														 IMG_HANDLE 				hDevMemContext,
 														 IMG_UINT32 				*pui32ClientHeapCount,
 														 PVRSRV_HEAP_INFO			*psHeapInfo,
-														 bool 					*pbShared)
+														 IMG_BOOL 					*pbShared)
 {
 	PVRSRV_DEVICE_NODE *psDeviceNode;
 	IMG_UINT32 ui32HeapCount, ui32ClientHeapCount=0;
@@ -353,7 +353,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapInfoKM(IMG_HANDLE					hDevCookie
 				psHeapInfo[ui32ClientHeapCount].ui32HeapByteSize = psDeviceMemoryHeap[i].ui32HeapSize;
 				psHeapInfo[ui32ClientHeapCount].ui32Attribs = psDeviceMemoryHeap[i].ui32Attribs;
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = psDeviceMemoryHeap[i].ui32XTileStride;
-				pbShared[ui32ClientHeapCount] = true;
+				pbShared[ui32ClientHeapCount] = IMG_TRUE;
 				ui32ClientHeapCount++;
 				break;
 			}
@@ -381,7 +381,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVGetDeviceMemHeapInfoKM(IMG_HANDLE					hDevCookie
 				psHeapInfo[ui32ClientHeapCount].ui32HeapByteSize = psDeviceMemoryHeap[i].ui32HeapSize;
 				psHeapInfo[ui32ClientHeapCount].ui32Attribs = psDeviceMemoryHeap[i].ui32Attribs;
 				psHeapInfo[ui32ClientHeapCount].ui32XTileStride = psDeviceMemoryHeap[i].ui32XTileStride;
-				pbShared[ui32ClientHeapCount] = false;
+				pbShared[ui32ClientHeapCount] = IMG_FALSE;
 				ui32ClientHeapCount++;
 				break;
 			}
@@ -433,14 +433,14 @@ static PVRSRV_ERROR AllocDeviceMem(IMG_HANDLE		hDevCookie,
 								   IMG_UINT32		ui32ChunkSize,
 								   IMG_UINT32		ui32NumVirtChunks,
 								   IMG_UINT32		ui32NumPhysChunks,
-								   bool			*pabMapChunk,
+								   IMG_BOOL			*pabMapChunk,
 								   PVRSRV_KERNEL_MEM_INFO **ppsMemInfo)
 {
  	PVRSRV_KERNEL_MEM_INFO	*psMemInfo;
 	BM_HANDLE 		hBuffer;
 	/* Pointer to implementation details within the mem_info */
 	PVRSRV_MEMBLK	*psMemBlock;
-	bool		bBMError;
+	IMG_BOOL		bBMError;
 
 	PVR_UNREFERENCED_PARAMETER(hDevCookie);
 
@@ -862,7 +862,7 @@ PVRSRV_ERROR FreeMemCallBackCommon(PVRSRV_KERNEL_MEM_INFO *psMemInfo,
 ******************************************************************************/
 static PVRSRV_ERROR FreeDeviceMemCallBack(IMG_PVOID  pvParam,
 										  IMG_UINT32 ui32Param,
-										  bool   bDummy)
+										  IMG_BOOL   bDummy)
 {
 	PVRSRV_KERNEL_MEM_INFO	*psMemInfo = (PVRSRV_KERNEL_MEM_INFO *)pvParam;
 	
@@ -946,7 +946,7 @@ PVRSRV_ERROR IMG_CALLCONV _PVRSRVAllocDeviceMemKM(IMG_HANDLE				hDevCookie,
 												  IMG_UINT32				ui32ChunkSize,
 												  IMG_UINT32				ui32NumVirtChunks,
 												  IMG_UINT32				ui32NumPhysChunks,
-												  bool					*pabMapChunk,
+												  IMG_BOOL					*pabMapChunk,
 												  PVRSRV_KERNEL_MEM_INFO	**ppsMemInfo)
 {
 	PVRSRV_KERNEL_MEM_INFO	*psMemInfo;
@@ -1198,7 +1198,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVUnwrapExtMemoryKM (PVRSRV_KERNEL_MEM_INFO	*psMem
 ******************************************************************************/
 static PVRSRV_ERROR UnwrapExtMemoryCallBack(IMG_PVOID  pvParam,
 											IMG_UINT32 ui32Param,
-											bool   bDummy)
+											IMG_BOOL   bDummy)
 {
 	PVRSRV_KERNEL_MEM_INFO	*psMemInfo = (PVRSRV_KERNEL_MEM_INFO *)pvParam;
 	
@@ -1235,7 +1235,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVWrapExtMemoryKM(IMG_HANDLE				hDevCookie,
 												IMG_HANDLE				hDevMemContext,
 												IMG_SIZE_T 				uByteSize,
 												IMG_SIZE_T				uPageOffset,
-												bool				bPhysContig,
+												IMG_BOOL				bPhysContig,
 												IMG_SYS_PHYADDR	 		*psExtSysPAddr,
 												IMG_VOID 				*pvLinAddr,
 												IMG_UINT32				ui32Flags,
@@ -1248,7 +1248,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVWrapExtMemoryKM(IMG_HANDLE				hDevCookie,
 	PVRSRV_DEVICE_NODE* psDeviceNode;
 	BM_HANDLE 			hBuffer;
 	PVRSRV_MEMBLK		*psMemBlock;
-	bool			bBMError;
+	IMG_BOOL			bBMError;
 	BM_HEAP				*psBMHeap;
 	PVRSRV_ERROR		eError;
 	IMG_VOID 			*pvPageAlignedCPUVAddr;
@@ -1304,7 +1304,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVWrapExtMemoryKM(IMG_HANDLE				hDevCookie,
 		/* assume memory is not physically contiguous;
   		   we shouldn't trust what the user says here
   		*/
-		bPhysContig = false;
+		bPhysContig = IMG_FALSE;
 	}
 
 	/* Choose the heap to map to */
@@ -1495,7 +1495,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVUnmapDeviceMemoryKM (PVRSRV_KERNEL_MEM_INFO *psM
 ******************************************************************************/
 static PVRSRV_ERROR UnmapDeviceMemoryCallBack(IMG_PVOID  pvParam,
 											  IMG_UINT32 ui32Param,
-											  bool   bDummy)
+											  IMG_BOOL   bDummy)
 {
 	PVRSRV_ERROR				eError;
 	RESMAN_MAP_DEVICE_MEM_DATA	*psMapData = pvParam;
@@ -1566,7 +1566,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceMemoryKM(PVRSRV_PER_PROCESS_DATA	*psPer
 	PVRSRV_KERNEL_MEM_INFO		*psMemInfo = IMG_NULL;
 	BM_HANDLE 					hBuffer;
 	PVRSRV_MEMBLK				*psMemBlock;
-	bool					bBMError;
+	IMG_BOOL					bBMError;
 	PVRSRV_DEVICE_NODE			*psDeviceNode;
 	IMG_VOID 					*pvPageAlignedCPUVAddr;
 	RESMAN_MAP_DEVICE_MEM_DATA	*psMapData = IMG_NULL;
@@ -1644,7 +1644,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceMemoryKM(PVRSRV_PER_PROCESS_DATA	*psPer
 	bBMError = BM_Wrap(hDstDevMemHeap,
 					   psSrcMemInfo->uAllocSize,
 					   uPageOffset,
-					   false,
+					   IMG_FALSE,
 					   psSysPAddr,
 					   pvPageAlignedCPUVAddr,
 					   &psMemInfo->ui32Flags,
@@ -1778,7 +1778,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVUnmapDeviceClassMemoryKM(PVRSRV_KERNEL_MEM_INFO 
 ******************************************************************************/
 static PVRSRV_ERROR UnmapDeviceClassMemoryCallBack(IMG_PVOID  pvParam,
 												   IMG_UINT32 ui32Param,
-												   bool   bDummy)
+												   IMG_BOOL   bDummy)
 {
 	PVRSRV_DC_MAPINFO *psDCMapInfo = pvParam;
 	PVRSRV_KERNEL_MEM_INFO *psMemInfo;
@@ -1827,7 +1827,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceClassMemoryKM(PVRSRV_PER_PROCESS_DATA	*
 	PVRSRV_DEVICECLASS_BUFFER *psDeviceClassBuffer;
 	IMG_SYS_PHYADDR *psSysPAddr;
 	IMG_VOID *pvCPUVAddr, *pvPageAlignedCPUVAddr;
-	bool bPhysContig;
+	IMG_BOOL bPhysContig;
 	BM_CONTEXT *psBMContext;
 	DEVICE_MEMORY_INFO *psDevMemoryInfo;
 	DEVICE_MEMORY_HEAP_INFO *psDeviceMemoryHeap;
@@ -1837,7 +1837,7 @@ PVRSRV_ERROR IMG_CALLCONV PVRSRVMapDeviceClassMemoryKM(PVRSRV_PER_PROCESS_DATA	*
 	IMG_SIZE_T ui32PageSize = HOST_PAGESIZE();
 	BM_HANDLE		hBuffer;
 	PVRSRV_MEMBLK	*psMemBlock;
-	bool		bBMError;
+	IMG_BOOL		bBMError;
 	IMG_UINT32 i;
 	PVRSRV_DC_MAPINFO *psDCMapInfo = IMG_NULL;
 

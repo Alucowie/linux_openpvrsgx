@@ -157,8 +157,8 @@ typedef struct _SGX_CCB_KICK_
 	SGX_INTERNEL_STATUS_UPDATE	asTAStatusUpdate[SGX_MAX_TA_STATUS_VALS];
 	SGX_INTERNEL_STATUS_UPDATE	as3DStatusUpdate[SGX_MAX_3D_STATUS_VALS];
 
-	bool	bFirstKickOrResume;
-	bool	bLastInScene;
+	IMG_BOOL	bFirstKickOrResume;
+	IMG_BOOL	bLastInScene;
 
 	/* CCB offset of data structure associated with this kick */
 	IMG_UINT32	ui32CCBOffset;
@@ -168,7 +168,7 @@ typedef struct _SGX_CCB_KICK_
 	IMG_HANDLE	ahSrcKernelSyncInfo[SGX_MAX_SRC_SYNCS_TA];
 
 	/* TA/3D dependency data */
-	bool	bTADependency;
+	IMG_BOOL	bTADependency;
 	IMG_HANDLE	hTA3DSyncInfo;
 
 	IMG_HANDLE	hTASyncInfo;
@@ -206,7 +206,7 @@ typedef struct _SGX_INTERNAL_DEVINFO_
 {
 	IMG_UINT32			ui32Flags;
 	IMG_HANDLE			hHostCtlKernelMemInfoHandle;
-	bool			bForcePTOff;
+	IMG_BOOL			bForcePTOff;
 } SGX_INTERNAL_DEVINFO;
 
 
@@ -214,7 +214,7 @@ typedef struct _SGX_INTERNAL_DEVINFO_KM_
 {
 	IMG_UINT32			ui32Flags;
 	IMG_HANDLE			hHostCtlKernelMemInfoHandle;
-	bool			bForcePTOff;
+	IMG_BOOL			bForcePTOff;
 } SGX_INTERNAL_DEVINFO_KM;
 
 

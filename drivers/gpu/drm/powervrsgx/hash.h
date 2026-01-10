@@ -51,7 +51,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * be aligned on an IMG_UINTPTR_T boundary. 
  */
 typedef IMG_UINT32 HASH_FUNC(IMG_SIZE_T uKeySize, IMG_VOID *pKey, IMG_UINT32 uHashTabLen);
-typedef bool HASH_KEY_COMP(IMG_SIZE_T uKeySize, IMG_VOID *pKey1, IMG_VOID *pKey2);
+typedef IMG_BOOL HASH_KEY_COMP(IMG_SIZE_T uKeySize, IMG_VOID *pKey1, IMG_VOID *pKey2);
 
 typedef struct _HASH_TABLE_ HASH_TABLE;
 
@@ -85,10 +85,10 @@ IMG_UINT32 HASH_Func_Default (IMG_SIZE_T uKeySize, IMG_VOID *pKey, IMG_UINT32 uH
     @Input          pKey1 - pointer to first hash key to compare.
     @Input          pKey2 - pointer to second hash key to compare.
 
-    @Return         true  - the keys match.
-                    false - the keys don't match.
+    @Return         IMG_TRUE  - the keys match.
+                    IMG_FALSE - the keys don't match.
 ******************************************************************************/
-bool HASH_Key_Comp_Default (IMG_SIZE_T uKeySize, IMG_VOID *pKey1, IMG_VOID *pKey2);
+IMG_BOOL HASH_Key_Comp_Default (IMG_SIZE_T uKeySize, IMG_VOID *pKey1, IMG_VOID *pKey2);
 
 /*!
 ******************************************************************************
@@ -152,10 +152,10 @@ IMG_VOID HASH_Delete (HASH_TABLE *pHash);
     @Input          pKey - pointer to the key.
     @Input          v - the value associated with the key.
 
-    @Return         true - success.
-                    false - failure.
+    @Return         IMG_TRUE - success.
+                    IMG_FALSE - failure.
 ******************************************************************************/
-bool HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v);
+IMG_BOOL HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v);
 
 /*!
 ******************************************************************************
@@ -168,10 +168,10 @@ bool HASH_Insert_Extended (HASH_TABLE *pHash, IMG_VOID *pKey, IMG_UINTPTR_T v);
     @Input          k - the key value.
     @Input          v - the value associated with the key.
 
-    @Return         true - success.
-                    false - failure.
+    @Return         IMG_TRUE - success.
+                    IMG_FALSE - failure.
 ******************************************************************************/
-bool HASH_Insert (HASH_TABLE *pHash, IMG_UINTPTR_T k, IMG_UINTPTR_T v);
+IMG_BOOL HASH_Insert (HASH_TABLE *pHash, IMG_UINTPTR_T k, IMG_UINTPTR_T v);
 
 /*!
 ******************************************************************************

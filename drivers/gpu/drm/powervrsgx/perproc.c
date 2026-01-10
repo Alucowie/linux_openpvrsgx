@@ -309,7 +309,7 @@ IMG_VOID PVRSRVPerProcessDataDisconnect(IMG_UINT32	ui32PID)
 					"Last close from process 0x%x received", ui32PID));
 
 			/* Close the Resource Manager connection */
-			PVRSRVResManDisconnect(psPerProc->hResManContext, false);
+			PVRSRVResManDisconnect(psPerProc->hResManContext, IMG_FALSE);
 
 			/* Free the per-process data */
 			eError = FreePerProcessData(psPerProc);

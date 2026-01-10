@@ -60,7 +60,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	IMG_VOID IMG_CALLCONV PVRSRVSetDCState(IMG_UINT32 ui32State);
 
-	PVRSRV_ERROR IMG_CALLCONV PVRSRVSaveRestoreLiveSegments(IMG_HANDLE hArena, u8 *pbyBuffer, IMG_SIZE_T *puiBufSize, bool bSave);
+	PVRSRV_ERROR IMG_CALLCONV PVRSRVSaveRestoreLiveSegments(IMG_HANDLE hArena, u8 *pbyBuffer, IMG_SIZE_T *puiBufSize, IMG_BOOL bSave);
 
 	IMG_VOID PVRSRVScheduleDeviceCallbacks(IMG_VOID);
 
@@ -79,7 +79,7 @@ LOOP_UNTIL_TIMEOUT(MAX_HW_TIME_US)
 {
 	if(psQueueInfo->ui32ReadOffset == psQueueInfo->ui32WriteOffset)
 	{
-		bTimeout = false;
+		bTimeout = IMG_FALSE;
 		break;
 	}
 	
