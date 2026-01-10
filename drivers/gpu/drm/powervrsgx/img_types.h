@@ -42,6 +42,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __IMG_TYPES_H__
 #define __IMG_TYPES_H__
 
+#include <linux/types.h>
+
 /* define all address space bit depths: */
 /* CPU virtual address space defaults to 32bits */
 #if !defined(IMG_ADDRSPACE_CPUVADDR_BITS)
